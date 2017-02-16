@@ -1,0 +1,71 @@
+<div class="row">
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <div>
+                <md-toolbar color="primary" class="mbottom5 toolbar-small">
+                    <div class="col-xs-12 p0 m0">
+                        <span>Client Employees</span>
+                        <button md-raised-button class="pull-right btn-small" (click)="showSearch.checked=!showSearch.checked"> <md-checkbox #showSearch [checked]="false" hidden></md-checkbox><span class="glyphicon glyphicon-chevron-down text-success" style="padding: 2px 0 4px 2px;"></span></button>
+                        <button md-raised-button class="pull-right btn-small mright5" (click)="newClientEmployee()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px;"></span></button>
+                    </div>
+                </md-toolbar>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 mbottom5" *ngIf="showSearch.checked">
+                    <div class="input-group col-lg-1 col-md-2 col-sm-3 col-xs-3 pull-left mright5 ">
+                        <span class="input-group-addon ">SHOW</span>
+                        <span class="input-group-addon ">
+                            <select (change)="changeCount($event.target.value) ">
+                                <option value="10 ">10</option>
+                                <option value="50 ">50</option>
+                                <option value="100 ">100</option>
+                                <option value="0 ">ALL</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="input-group col-lg-4 col-md-4 col-sm-8 col-xs-12 pull-left">
+                        <span class="input-group-addon ">
+                            <select [(ngModel)]="selectedKey " (change)="resetClientEmployees()">
+                                <option *ngFor="let key of keys " [value]="key ">{{key}}</option>
+                            </select>
+                        </span>
+                        <input type="text" class="form-control " [(ngModel)]="searchTerm " placeholder="Search {{selectedKey}}"
+                               (keyup)="search() " [disabled]="selectedKey==null ">
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+                    <table>
+                        <thead (click)="sort($event)">
+                            <tr table-header>
+                                <th>Client</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let clientEmployee of clientEmployees">
+                                <td>{{clientEmployee.Client}}</td>
+                                <td>{{clientEmployee.FullName}}</td>
+                                <td>{{clientEmployee.PrimaryPhone}}</td>
+                                <td>{{clientEmployee.Email}}</td>
+                                <td>{{clientEmployee.Department}}</td>
+                                <td><span class="glyphicon glyphicon-new-window pointer" (click)="getClientEmployee(clientEmployee.Id)" title="View"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-align" *ngIf="pages>1">
+                    <ul class="pagination m0 p0">
+                        <li (click)="changePage(page-1)"><span aria-hidden="true">&laquo;</span></li>
+                        <li *ngFor="let number of numbers" (click)="changePage(number)" [class.active]="number==page"><span aria-hidden="true">{{number}}</span></li>
+                        <li (click)="changePage(page+1)"><span aria-hidden="true">&raquo;</span></li>
+                    </ul>
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>

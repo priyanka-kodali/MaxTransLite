@@ -1,0 +1,103 @@
+<div class="row">
+  <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+    <md-card-content class="p0">
+      <div>
+        <md-toolbar color="primary" class="mbottom5 toolbar-small">
+          <div class="col-xs-12 p0 m0">
+            <span>Patient Lists</span>
+            <button md-raised-button class="pull-right btn-small" (click)="showSearch.checked=!showSearch.checked"> <md-checkbox #showSearch [checked]="false" hidden></md-checkbox><span class="glyphicon glyphicon-chevron-down text-success" style="padding: 2px 0 4px 2px;"></span></button>
+            <button md-raised-button class="pull-right btn-small mright5" (click)="newPatientList()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px;"></span></button>
+          </div>
+        </md-toolbar>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 mbottom5" *ngIf="showSearch.checked">
+          <div class="input-group col-lg-4 col-md-4 col-sm-8 col-xs-12 pull-left">
+            <span class="input-group-addon ">
+                                <select [(ngModel)]="selectedKey " (change)="resetPatientLists() ">
+                                    <option *ngFor="let key of keys " [value]="key ">{{key}}</option>
+                                </select>
+                            </span>
+            <input type="text" class="form-control " [(ngModel)]="searchTerm " placeholder="Search {{selectedKey}}" (keyup)="search()"
+              [disabled]="selectedKey==null ">
+          </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs">
+          <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="Error.length>0">{{error}}</div>
+          <table>
+            <thead>
+              <tr table-header>
+                <th>Client</th>
+                <th>Doctor</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let patientList of PatientLists">
+                <td>{{patientList.Client}}</td>
+                <td>{{patientList.Doctor}}</td>
+                <td>{{patientList.FromDate | date}}</td>
+                <td>{{patientList.ToDate | date}}</td>
+                <td style="width:94px"><a href="{{patientList.PatientListURL}}" download><button md-raised-button>Download</button></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </md-card-content>
+  </md-card>
+</div>
+
+
+
+<div class="dim-background" *ngIf="PatientListModal">
+  <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+    <md-card-content class="p0">
+      <div>
+        <md-toolbar class="mbottom5 toolbar-small" color="primary">
+          <div class="col-xs-12 p0 m0"><span>Patient List</span> <button md-raised-button class="pull-right btn-small" (click)="PatientListModal=!PatientListModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+        </md-toolbar>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
+          <p *ngIf="UpdateSuccess" class="alert alert-success">Patient List updated sucessfully!</p>
+          <p *ngIf="UpdateFailed" class="alert alert-danger">Patient List not updated!</p>
+          <p *ngIf="UpdateProgress" class="alert alert-info">Please wait while we upload the file</p>
+          <p *ngIf="ModalError.length>0" class="alert alert-danger">{{ModalError}}</p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
+          <div class="row p0 m0">
+            <form (submit)="postPatientList()" #myForm>
+              <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                <md-input class="" name="client" placeholder="Client" [(ngModel)]="SelectedPatientList.Client" type="text" [typeahead]="clients"
+                  required (typeaheadOnSelect)="clientChanged()"></md-input>
+              </div>
+
+              <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                <md-input class="" name="name" placeholder="Doctor" [(ngModel)]="SelectedPatientList.Doctor" type="text" [typeahead]="doctors"></md-input>
+              </div>
+
+              <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                <md-input class="" name="fromdate" placeholder="From Date" [(ngModel)]="SelectedPatientList.FromDate" type="date" required></md-input>
+              </div>
+
+              <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                <md-input class="" name="todate" placeholder="To Date" [(ngModel)]="SelectedPatientList.ToDate" type="date" required></md-input>
+              </div>
+
+              <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+                <input #uploadEl type="file" ng2FileSelect [uploader]="uploader" name="patient_list" required/>
+              </div>
+
+              <div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
+                <button md-raised-button class="file-button btn-save" type="submit" value="Submit" [disabled]="uploader.queue.length<1"> Add</button>
+              </div>
+            </form> 
+          </div>
+        </div>
+      </div>
+
+    </md-card-content>
+  </md-card>
+</div>

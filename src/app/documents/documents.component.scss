@@ -1,0 +1,35 @@
+.progress-timeline-bar{
+    background:linear-gradient(90deg, #71F02E 50%, #ececec 50%)!important;
+}
+
+.progress-timeline-checkpoint-1 .bubble{
+background:#71F02E!important;
+}
+
+.progress-timeline-checkpoint-2 .bubble{
+background:#71F02E!important;
+}
+  
+.new-document{
+    position: absolute;
+    top:100px;
+}
+
+.dim-background{
+    z-index: 100;
+    width:100%;
+    height:100%;
+    position: absolute;
+    top:0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.43);
+}
+
+ .emp-info{
+     font-size: 18px;
+     margin: 5px 0;
+ }
+
+  .file-input-container{
+      height: 48px;
+  }

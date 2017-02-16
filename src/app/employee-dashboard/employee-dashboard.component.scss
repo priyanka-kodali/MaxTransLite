@@ -1,0 +1,25 @@
+
+
+.notice-list, .message-list{
+    padding-left: 5px;
+    li{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .glyphicon{
+    color: #ff9800 !important;
+    }
+}
+
+
+.jobs-card{
+   width: 49%;
+}
+
+@media(max-width:1200px){
+    .jobs-card{
+        width: 100%;
+    }
+}

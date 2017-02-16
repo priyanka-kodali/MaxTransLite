@@ -1,0 +1,120 @@
+<style>
+	@import 'https://fonts.googleapis.com/css?family=Roboto';
+</style>
+
+<div class="row m0">
+
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 m0 mbottom5 p0 md-elevation-z12 text-white">
+		<md-card-content class="p0">
+			<div class="center-align">			
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-green1 white-text">
+          <h3 class="mbottom0 mtop5">NYS</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.NotYetStarted}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.NYS}}</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-brown1 white-text">
+          <h3 class="mbottom0 mtop5">MT</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.JobsAtMt}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.MtJobs}}</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-orange1 white-text">
+          <h3 class="mbottom0 mtop5">AQA</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.JobsAtAqa}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.AqaJobs}}</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-lightblue1 white-text">
+          <h3 class="mbottom0 mtop5">QA</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.JobsAtQa}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.QaJobs}}</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-pink1 white-text">
+          <h3 class="mbottom0 mtop5">Completed</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.Completed}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.CompletedJobs}}</p>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-2 col-lg-2 bg-pruple1 white-text">
+          <h3 class="mbottom0 mtop5">Total</h3>
+          <p class="mbottom0 f18">{{DailyStatistics.Total}}</p>
+          <p class="f18 mbottom5">{{DailyStatistics.TotalJobs}}</p>
+        </div>
+
+			</div>      
+		</md-card-content>
+	</md-card>
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 m0 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar color="primary" class="toolbar-small">
+					<div class="col-xs-12 p0 m0">
+						<strong>Job Allocations </strong>
+						<button md-raised-button class="pull-right btn-small" (click)="showSearch.checked=!showSearch.checked"> <md-checkbox #showSearch [checked]="false" hidden></md-checkbox><span class="glyphicon glyphicon-search text-success" style="padding: 2px 0 4px 2px;"></span></button>
+					</div>
+				</md-toolbar>
+				<div class="search col-md-12" *ngIf="showSearch.checked">
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="fromDate" placeholder="From Date" [(ngModel)]="SearchItem.FromDate" type="date"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="toDate" placeholder="To Date" [(ngModel)]="SearchItem.ToDate" type="date"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="client" placeholder="Client" [(ngModel)]="SearchItem.Client" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="doctor" placeholder="Doctor" [(ngModel)]="SearchItem.Doctor" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="MT" placeholder="MT" [(ngModel)]="SearchItem.MT" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="SearchItem.AQA" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="QA" placeholder="QA" [(ngModel)]="SearchItem.QA" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="status" placeholder="Status" [(ngModel)]="SearchItem.Status" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<button md-raised-button type="submit" value="Submit" (click)="search()">Search</button>
+					</div>
+
+				</div>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs p0">
+				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="Error.length>0">{{Error}}</div>
+				<table>
+					<thead class="orange200">
+						<tr table-header>
+							<th>Date</th>
+							<th>Job No</th>
+							<th>Duration</th>
+							<th>Client</th>
+							<th>Doctor</th>
+							<th>MT</th>
+							<th>AQA</th>
+							<th>QA</th>
+							<th>TAT</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let job of Jobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
+							[class.bg-green]="job.Color==0">
+							<td>{{job.JobDate}}</td>
+							<td>{{job.JobNumber}}</td>
+							<td>{{job.Duration}}</td>
+							<td title={{job.Client}}>{{job.ClientShortName}}</td>
+							<td>{{job.Doctor}}</td>
+							<td>{{job.MT}}</td>
+							<td>{{job.AQA}}</td>
+							<td>{{job.QA}}</td>
+							<td>{{job.TAT}}</td>
+							<td>{{job.Status}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>

@@ -1,0 +1,369 @@
+<style>
+	@import 'https://fonts.googleapis.com/css?family=Roboto';
+</style>
+
+<div class="row m0">
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mtb10 p0 md-elevation-z12" *ngIf="MtJobs.length>0">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small bg-white" (click)="MtVisible=!MtVisible">
+					<div class="col-xs-12 p0 m0">
+						<span><strong>MT Jobs</strong> </span>
+						<span class="job-summary-strip teal500">
+                          <span>
+                            Pending : <span class="badge teal300">{{CurrentJobSummary.MtPending}}</span> <span class="amberA700-text"> {{CurrentJobSummary.MtPendingHours}}</span>
+						</span>|
+						<span>
+                            Completed : <span class="badge teal300">{{CurrentJobSummary.MtCompleted}}</span>
+						<span class="amberA700-text"> {{CurrentJobSummary.MtCompletedHours}}</span>
+						</span>|
+						<span>
+                            Total : <span class="badge teal300">{{CurrentJobSummary.MtTotal}}</span> <span class="amberA700-text"> {{CurrentJobSummary.MtTotalHours}}</span>
+						</span>
+						</span>
+
+						<span class="job-summary-strip pink300">
+                          <span>
+                            &lt; 18 : <span class="badge pink50">{{CurrentJobSummary.MtLt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.MtLt18Hours}}</span>
+						</span>|
+						<span>
+                            &gt; 18: <span class="badge pink50">{{CurrentJobSummary.MtGt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.MtGt18Hours}}</span>
+						</span>
+						</span>
+					</div>
+				</md-toolbar>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs" *ngIf="MtVisible">
+				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+				<table>
+					<thead class="orange200">
+						<tr table-header>
+							<th></th>
+							<th>Date</th>
+							<th>Job No</th>
+							<th></th>
+							<th></th>
+							<th>Duration</th>
+							<th>Client</th>
+							<th>Doctor</th>
+							<th>AQA</th>
+							<th>QA</th>
+							<th>TAT</th>
+							<th></th>
+							<th>DT</th>
+							<th>UT</th>
+							<th>Lines</th>
+						</tr>
+					</thead>
+					<tbody class="orange50">
+						<tr *ngFor="let job of MtJobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
+							[class.bg-green]="job.Color==0">
+							<td>
+								<md-checkbox [(ngModel)]="job.Selected" name="job_selected" (change)="checkboxChanged(job,'MT')"></md-checkbox>
+							</td>
+							<td>{{job.JobDate}}</td>
+							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'MT')"> {{job.JobNumber}}</a></td>
+							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
+							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
+							<td>{{job.Duration}}</td>
+							<td [title]="job.Client">{{job.ClientShortName}}</td>
+							<td>{{job.Doctor}}</td>
+							<td>{{job.AQA}}</td>
+							<td>{{job.QA}}</td>
+							<td>{{job.TAT}}</td>
+							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'MT')"></span></td>
+							<!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'MT')"></span></td>-->
+							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
+							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
+							<td>{{job.Lines}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</md-card-content>
+	</md-card>
+
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mtb10 p0 md-elevation-z12" *ngIf="AqaJobs.length>0">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small bg-white" (click)="AqaVisible=!AqaVisible">
+					<div class="col-xs-12 p0 m0">
+						<span><strong>AQA Jobs</strong></span>
+						<span class="job-summary-strip teal500">
+                          <span>
+                            Pending : <span class="badge teal300">{{CurrentJobSummary.AqaPending}}</span> <span class="amberA700-text"> {{CurrentJobSummary.AqaPendingHours}}</span>
+						</span>|
+						<span>
+                            Completed : <span class="badge teal300">{{CurrentJobSummary.AqaCompleted}}</span>
+						<span class="amberA700-text"> {{CurrentJobSummary.AqaCompletedHours}}</span>
+						</span>|
+						<span>
+                            Total : <span class="badge teal300">{{CurrentJobSummary.AqaTotal}}</span> <span class="amberA700-text"> {{CurrentJobSummary.AqaTotalHours}}</span>
+						</span>
+						</span>
+
+						<span class="job-summary-strip pink300">
+                          <span>
+                            &lt; 18 : <span class="badge pink50">{{CurrentJobSummary.AqaLt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.AqaLt18Hours}}</span>
+						</span>|
+						<span>
+                            &gt; 18: <span class="badge pink50">{{CurrentJobSummary.AqaGt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.AqaGt18Hours}}</span>
+						</span>
+						</span>
+					</div>
+				</md-toolbar>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs" *ngIf="AqaVisible">
+				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+				<table>
+					<thead class="green200">
+						<tr table-header>
+							<th></th>
+							<th>Date</th>
+							<th>Job No</th>
+							<th></th>
+							<th></th>
+							<th>Duration</th>
+							<th>Client</th>
+							<th>Doctor</th>
+							<th>MT</th>
+							<th>QA</th>
+							<th>TAT</th>
+							<th></th>
+							<th>DT</th>
+							<th>UT</th>
+							<th>Lines</th>
+						</tr>
+					</thead>
+					<tbody class="green50">
+						<tr *ngFor="let job of AqaJobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
+							[class.bg-green]="job.Color==0">
+							<td>
+								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
+							</td>
+							<td>{{job.JobDate}}</td>
+							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'AQA')"> {{job.JobNumber}}</a></td>
+							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
+							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
+							<td>{{job.Duration}}</td>
+							<td [title]="job.Client">{{job.ClientShortName}}</td>
+							<td>{{job.Doctor}}</td>
+							<td>{{job.MT}}
+								<a *ngIf="job.MTUrl" [href]="job.MTUrl" [download]="job.MTUrl" (click)="PartialTranscriptDownload(job,'AQA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
+							</td>
+							<td>{{job.QA}}</td>
+							<td>{{job.TAT}}</td>
+							<!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'AQA')"></span></td>-->
+							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'AQA')"></span></td>
+							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
+							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
+							<td>{{job.Lines}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</md-card-content>
+	</md-card>
+
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mtb10 p0 md-elevation-z12" *ngIf="QaJobs.length>0">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small bg-white" (click)="QaVisible=!QaVisible">
+					<div class="col-xs-12 p0 m0">
+						<span> <strong>QA Jobs</strong> </span>
+						<span class="job-summary-strip teal500">
+                          <span>
+                            Pending : <span class="badge teal300">{{CurrentJobSummary.QaPending}}</span> <span class="amberA700-text"> {{CurrentJobSummary.QaPendingHours}}</span>
+						</span>|
+						<span>
+                            Completed : <span class="badge teal300">{{CurrentJobSummary.QaCompleted}}</span>
+						<span class="amberA700-text"> {{CurrentJobSummary.QaCompletedHours}}</span>
+						</span>|
+						<span>
+                            Total : <span class="badge teal300">{{CurrentJobSummary.QaTotal}}</span> <span class="amberA700-text"> {{CurrentJobSummary.QaTotalHours}}</span>
+						</span>
+						</span>
+
+						<span class="job-summary-strip pink300">
+                          <span>
+                            &lt; 18 : <span class="badge pink50">{{CurrentJobSummary.QaLt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.QaLt18Hours}}</span>
+						</span>|
+						<span>
+                            &gt; 18: <span class="badge pink50">{{CurrentJobSummary.QaGt18}}</span> <span class="amberA700-text"> {{CurrentJobSummary.QaGt18Hours}}</span>
+						</span>
+						</span>
+					</div>
+				</md-toolbar>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs" *ngIf="QaVisible">
+				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+				<table>
+					<thead class="purple200">
+						<tr table-header>
+							<th></th>
+							<th>Date</th>
+							<th>Job No</th>
+							<th></th>
+							<th></th>
+							<th>Duration</th>
+							<th>Client</th>
+							<th>Doctor</th>
+							<th>MT</th>
+							<th>AQA</th>
+							<th>TAT</th>
+							<th></th>
+							<th>DT</th>
+							<th>UT</th>
+							<th>Lines</th>
+						</tr>
+					</thead>
+					<tbody class="purple50">
+						<tr *ngFor="let job of QaJobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
+							[class.bg-green]="job.Color==0">
+							<td>
+								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
+							</td>
+							<td>{{job.JobDate}}</td>
+							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'QA')"> {{job.JobNumber}}</a></td>
+							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
+							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
+							<td>{{job.Duration}}</td>
+							<td [title]="job.Client">{{job.ClientShortName}}</td>
+							<td>{{job.Doctor}}</td>
+							<td>{{job.MT}}
+								<a *ngIf="job.AQA==null && job.MTUrl!=null" [href]="job.MTUrl" [download]="job.MTUrl" (click)="PartialTranscriptDownload(job,'QA',$event)">
+									<span class="glyphicon glyphicon-cloud-download pointer"></span></a>
+							</td>
+							<td>{{job.AQA}}
+								<a *ngIf="job.AQAUrl" [href]="job.AQAUrl" [download]="job.AQAUrl" (click)="PartialTranscriptDownload(job,'QA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
+							</td>
+							<td>{{job.TAT}}</td>
+							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'QA')"></span></td>
+						    <!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'QA')"></span></td>-->
+							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
+							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
+							<td>{{job.Lines}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>
+
+
+<div class="dim-background" *ngIf="TemplateModal">
+	<md-card class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small" color="primary">
+					<div class="col-xs-12 p0 m0"><span>Templates</span> <button md-raised-button class="pull-right btn-small" (click)="TemplateModal=!TemplateModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+				</md-toolbar>
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<p *ngIf="UpdateProgress" class="alert alert-info">Please wait while we fetch templates...</p>
+				</div>
+				<ol *ngIf="Templates.length>0">
+					<li *ngFor="let template of Templates">
+						<a href={{template.DocumentURL}}> {{template.Name}} </a>
+					</li>
+				</ol>
+				<h2 class="center-align" *ngIf="Templates.length==0 && !UpdateProgress">No Templates Available</h2>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>
+
+
+<div class="dim-background" *ngIf="PatientListModal">
+	<md-card class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small" color="primary">
+					<div class="col-xs-12 p0 m0"><span>Patient Lists</span> <button md-raised-button class="pull-right btn-small" (click)="PatientListModal=!PatientListModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+				</md-toolbar>			
+				<ol *ngIf="SelectedJob.PatientList.length>0">
+					<li *ngFor="let patientList of SelectedJob.PatientList ;let i=index">
+						<a href={{patientList}}> Patient List {{i+1}} </a>
+					</li>
+				</ol>
+				<h2 class="center-align" *ngIf="SelectedJob.PatientList.length==0">No patient lists Available</h2>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>
+
+<div class="dim-background" *ngIf="FileModal">
+	<md-card class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small" color="primary">
+					<div class="col-xs-12 p0 m0"><span>Upload File</span> <button md-raised-button class="pull-right btn-small" (click)="FileModal=!FileModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+				</md-toolbar>
+				<form (submit)="postJob()" #newDocForm>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
+						<p class="alert alert-success" *ngIf="UpdateSuccess">File Uploaded Successfully.</p>
+						<p class="alert alert-danger" *ngIf="UpdateFailed">File Uploaded Failed.</p>
+						<p class="alert alert-info" *ngIf="UpdateProgress">Please wait while we upload the file..</p>
+						<p class="alert alert-danger" *ngIf="ModalError.length>0">{{ModalError}}</p>
+
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text" disabled></md-input>
+						</div>
+
+						<div class="col-md-5 col-sm-6 col-lg-5 col-xs-12">
+							<input #uploadEl type="file" ng2FileSelect [uploader]="uploader" name="trans_file" required />
+						</div>
+
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12 checkbox-container">
+							<md-checkbox [(ngModel)]="IsPartialUpload" name="partial">Partial Upload</md-checkbox>
+						</div>
+
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12 checkbox-container" *ngIf="IsPartialUpload">
+							<md-checkbox [(ngModel)]="IsFinalUpload" name="final">Final Upload</md-checkbox>
+						</div>
+
+
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="IsPartialUpload">
+							<md-input class="" required name="startTime" placeholder="Start Time" [(ngModel)]="PartialUploadStartTime" type="text"></md-input>
+						</div>
+
+
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="IsPartialUpload">
+							<md-input class="" required name="endTime" placeholder="End Time" [(ngModel)]="PartialUploadEndTime" type="text"></md-input>
+						</div>
+
+
+						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
+							<button md-raised-button class="file-button btn-save" type="submit" value="Submit" [disabled]="uploader.queue.length<1">Submit </button>
+						</div>
+
+					</div>
+
+				</form>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>
+
+
+<div class="dim-background" *ngIf="PartialDownloadModal">
+	<md-card class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small" color="primary">
+					<div class="col-xs-12 p0 m0"><span>Transcript Files</span> <button md-raised-button class="pull-right btn-small" (click)="PartialDownloadModal=!PartialDownloadModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+				</md-toolbar>
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<p *ngIf="UpdateProgress" class="alert alert-info">Please wait while we fetch the documents...</p>
+					<p *ngIf="error.length>0" class="alert alert-danger"> {{error}} </p>
+				</div>
+				<ol *ngIf="PartialDowloadDocuments.length>0">
+					<li *ngFor="let document of PartialDowloadDocuments">
+						<a href={{document.DocumentURL}}> {{document.Name}} </a>
+					</li>
+				</ol>
+				<h2 class="center-align" *ngIf="PartialDowloadDocuments.length==0 && !UpdateProgress">No Transcript Documents Available</h2>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>

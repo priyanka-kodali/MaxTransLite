@@ -1,0 +1,132 @@
+
+
+
+
+.logo{
+    height: inherit;
+    display: inline-block;
+    img{
+        height: inherit;
+        max-width: 100%;
+        padding:5px 0; 
+    }
+}
+
+a{
+    text-decoration: none;
+}
+
+router-outlet{
+  height:50px;
+  display: block; 
+}
+
+.my-nav-bar{    
+    background: #ffffff !important;
+    box-shadow: 0 -1px 5px black;
+    z-index: 2;
+    font-size:17px;
+    height: 50px;
+    position: fixed;
+    width: 100%;
+    display: block;
+}
+
+
+.right0{
+    right:0 !important;
+    left:unset !important;
+}
+
+
+
+nav {
+  height: 64px;
+margin-left: auto;  
+display: inline-block;
+float: right;
+z-index: 50;
+}
+
+.nav {
+  margin: 0 auto;
+
+  a {
+    display: block;
+    text-decoration: none;
+    cursor:pointer;
+  }
+
+  > li {
+    float: left;
+  }
+
+  > li > a {
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    font-weight: bold;
+    color: #828282;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+      background: #81d4fa;
+      color: black;
+    }
+  }
+
+  > li.active > a, > li > a:active, > .dropdown:hover > a {
+    background: #81d4fa;
+    color: #404040;
+    text-shadow: none;
+    box-shadow:(0 0 white, 0 0 2px rgba(black, .2));
+  }
+
+
+  
+
+  .active a.icon, a.icon:active { > span { background-position: 0 -16px; } }
+}
+
+.dropdown {
+  position: relative;
+
+  &:hover ul { display: block; }
+      
+
+  ul {
+    top:95%;
+  }
+
+  li {
+    display: block;
+    margin: 0 18px;
+    overflow: visible;
+
+    + li { border-top: 1px solid #eee; }
+
+    a {
+      color: #555;
+      padding: 8px 18px;
+      margin: 0 -18px;
+
+      &:hover {
+           color: black;      
+           background: #81D4FA;
+           }
+    }
+  }
+}
+
+
+.notification-badge{
+    position: relative;
+    margin-top: -20px;
+    margin-left: -13px;
+}
+
+.notification-icon{
+  font-size: 22px;
+  vertical-align: middle;
+}

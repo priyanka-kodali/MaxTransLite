@@ -1,0 +1,111 @@
+<div class="row m0">
+	<md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr10 p0 md-elevation-z12">
+		<md-card-content class="plr10 ptb5">
+			<h3>Leaves</h3>
+			<table class="light-blue50">
+				<thead class="teal500">
+					<tr>
+						<th>Type</th>
+						<th>Remaining</th>
+						<th>Taken</th>
+						<th>Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>PL</td>
+						<td class="remaining">{{MyLeavesCount.PlRemaining}}</td>
+						<td class="taken">{{MyLeavesCount.PlTaken}} </td>
+						<td class="total">{{MyLeavesCount.PlTotal}} </td>
+					</tr>
+					<tr>
+						<td>CL</td>
+						<td class="remaining">{{MyLeavesCount.ClRemaining}} </td>
+						<td class="taken"> {{MyLeavesCount.ClTaken}}</td>
+						<td class="total"> {{MyLeavesCount.ClTotal}}</td>
+					</tr>
+					<tr>
+						<td>SL</td>
+						<td class="remaining">{{MyLeavesCount.SlRemaining}}</td>
+						<td class="taken">{{MyLeavesCount.SlTaken}} </td>
+						<td class="total">{{MyLeavesCount.SlTotal}}</td>
+					</tr>
+					<tr>
+						<td>Total</td>
+						<td class="remaining">{{MyLeavesCount.TotalRemaining}} </td>
+						<td class="taken">{{MyLeavesCount.TotalTaken}} </td>
+						<td class="total">{{MyLeavesCount.TotalTotal}} </td>
+					</tr>
+				</tbody>
+			</table>
+		</md-card-content>
+	</md-card>
+
+
+	<md-card class="col-xs-12 col-sm-12 col-md-7 col-lg-8 mtb10 mlr10 p0 md-elevation-z12">
+		<md-card-content class="plr10 ptb5">
+			<h3>Applied Leaves  <button md-raised-button class="pull-right btn-small mright5" (click)="newLeave()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px;"></span></button></h3>
+			<table >
+				<thead class="teal500">
+					<tr>
+						<th>From</th>
+						<th>To</th>
+						<th>No of days</th>
+						<th>Type</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let leave of AppliedLeaves">
+						<td>{{leave.FromDate | date}}</td>
+						<td>{{leave.ToDate | date}}</td>
+						<td>{{leave.NoOfDays}} </td>
+						<td>{{leave.LeaveType}} </td>
+						<td>{{leave.FinalStatus}} </td>
+					</tr>
+				</tbody>
+			</table>
+		</md-card-content>
+	</md-card>
+</div>
+
+<div class="dim-background" *ngIf="NewLeaveModal">
+	<md-card class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar class="mbottom5 toolbar-small" color="primary">
+					<div class="col-xs-12 p0 m0"><span>Leave Application</span> <button md-raised-button class="pull-right btn-small" (click)="NewLeaveModal=!NewLeaveModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+				</md-toolbar>
+				<form #newDocForm="ngForm" (submit)="applyLeave()">
+
+					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
+						<p *ngIf="UpdateSuccess" class="alert alert-success">Leave Applied sucessfully!</p>
+						<p *ngIf="UpdateFailed" class="alert alert-danger">Leave Application failed please try again!</p>
+						<p *ngIf="UpdateProgress" class="alert alert-info">Please wait......</p>
+						<p *ngIf="Error.length>0" class="alert alert-danger"> {{Error}} </p>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
+
+		 				<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+							<md-input class="" name="fromDate" placeholder="From Date" [(ngModel)]="NewLeave.FromDate" type="date" required></md-input>
+						</div>
+						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+							<md-input class="" name="toDate" placeholder="To Date" [(ngModel)]="NewLeave.ToDate" type="date" required></md-input>
+						</div>
+						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+							<md-input class="" name="leaveType" placeholder="Leave Type" [(ngModel)]="NewLeave.LeaveType" [typeaheadMinLength]="0" [typeahead]="['Casual Leave','Privilege Leave','Special Leave']" type="text" required></md-input>
+						</div>
+						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+							<md-input class="" name="comments" placeholder="Comments" [(ngModel)]="NewLeave.Comments" type="text"></md-input>
+						</div>
+
+						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
+							<button md-raised-button class="file-button btn-save" type="submit" value="Submit" [disabled]="!newDocForm.valid">Submit </button>
+						</div>
+					</div>
+				</form>
+			</div>
+
+		</md-card-content>
+	</md-card>
+</div>

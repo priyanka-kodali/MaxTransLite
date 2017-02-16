@@ -1,0 +1,59 @@
+<style>
+	@import 'https://fonts.googleapis.com/css?family=Roboto';
+</style>
+
+<div class="row m0">
+	<md-card class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mtb10 p0 md-elevation-z12">
+		<md-card-content class="p0">
+			<div>
+				<md-toolbar color="primary" class="mbottom5 toolbar-small">
+					<div class="col-xs-12 p0 m0">
+						<strong>My Jobs</strong>
+						<button md-raised-button class="pull-right btn-small" (click)="showSearch.checked=!showSearch.checked"> <md-checkbox #showSearch [checked]="false" hidden></md-checkbox><span class="glyphicon glyphicon-search text-success" style="padding: 2px 0 4px 2px;"></span></button>
+					</div>
+				</md-toolbar>
+				<div class="search col-md-12" *ngIf="showSearch.checked">
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="fromDate" placeholder="From Date" [(ngModel)]="SearchItem.FromDate" type="date"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="toDate" placeholder="To Date" [(ngModel)]="SearchItem.ToDate" type="date"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SearchItem.JobNumber" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<md-input class="" name="status" placeholder="Status" [(ngModel)]="SearchItem.Status" type="text"></md-input>
+					</div>
+					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+						<button md-raised-button type="submit" value="Submit" (click)="search()">Search</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs p0">
+				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="Error.length>0">{{Error}}</div>
+				<table>
+					<thead class="orange200">
+						<tr table-header>
+							<th>Date</th>
+							<th>Job No</th>
+							<th>Duration</th>
+							<th>TAT</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let job of Jobs">
+							<td>{{job.JobDate}}</td>
+							<td>{{job.JobNumber}}</td>
+							<td>{{job.Duration}}</td>
+							<td>{{job.TAT}}</td>
+							<td>{{job.Status}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</md-card-content>
+	</md-card>
+</div>
+

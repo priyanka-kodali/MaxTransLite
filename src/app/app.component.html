@@ -1,0 +1,47 @@
+<div class="my-nav-bar">
+  <div class="logo">
+    <img src="../logo.png" alt="">
+  </div>
+    <nav>
+      <ul class="nav" *ngIf="isLoggedIn()">
+        <li><a (click)="navigateTo('dashboard')" class="home"><span>Dashboard</span></a></li>
+        <li *ngIf="isInRole('Transcriptionist') || isInRole('Coordinator')" ><a (click)="navigateTo('jobs')" class="home"><span>Jobs</span></a></li>
+        <li class="dropdown"  *ngIf="isInRole('Coordinator') || isInRole('Manager')" > 
+          <a>Allocations</a>
+          <ul class="dropdown-menu dropdown-menu">
+            <li><a (click)="navigateTo('default-allocations')">Default Allocations</a></li>
+            <li><a  *ngIf="isInRole('Coordinator')" (click)="navigateTo('job-allocations')">Job Allocations</a></li>
+          </ul>
+        </li>
+        <li  *ngIf="isInRole('Coordinator') || isInRole('Manager')"><a (click)="navigateTo('employees')" class="home"><span>Employees</span></a></li>
+         <li class="dropdown"  *ngIf="isInRole('Coordinator') || isInRole('Manager')">
+          <a>Clients</a>
+          <ul class="dropdown-menu">
+            <li><a (click)="navigateTo('clients')">Clients</a></li>
+            <li><a (click)="navigateTo('doctors')">Doctors</a></li>
+            <li><a (click)="navigateTo('patient-list')">Patient List</a></li>
+            <li><a (click)="navigateTo('client-employees')">Client Employee</a></li>
+          </ul>
+        </li>
+        <li class="dropdown" ><a href=""><span class="glyphicon glyphicon-comment notification-icon"></span> <span class="badge redA200 notification-badge">1</span> </a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li><a (click)="navigateTo('logout')">Messages <span class="badge">0 new</span> </a></li>
+            <li><a (click)="navigateTo('logout')">Notices <span class="badge">0 new</span></a></li>
+            <li *ngIf="isInRole('Manager')" ><a (click)="navigateTo('leaves-review')">Leave Reviews <span class="badge">0 new</span></a></li>
+          </ul>        
+        </li>
+         <li class="dropdown">
+          <a>Hi {{getDisplayName()}}!</a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li><a (click)="navigateTo('logout')">Edit Profile</a></li>
+            <li><a (click)="navigateTo('change-password')">Change Password</a></li>
+            <li><a (click)="navigateTo('logout')">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+</div>
+<router-outlet></router-outlet>
+
+

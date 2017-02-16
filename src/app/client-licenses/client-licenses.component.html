@@ -1,0 +1,44 @@
+<div class="row">
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <div>
+                <md-toolbar color="primary" class="mbottom5 toolbar-small">
+                    <div class="col-xs-12 p0 m0">
+                        <span>Client Licenses</span>
+                        <button md-raised-button class="pull-right btn-small mright5" (click)="newLicense()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px;"></span></button>
+                    </div>
+                </md-toolbar>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-success mbottom5" *ngIf="editSuccess">License Key updated successfully.</div>
+                    <table>
+                        <thead (click)="sort($event)">
+                            <tr table-header>
+                                <th>Location</th>
+                                <th>Key</th>
+                                <th>Download</th>
+                                <th>Upload</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let license of licenses">
+                                <td>{{license.Location}}</td>
+                                <td>{{license.LicenseKey}}</td>
+                                <td *ngIf="license.Download"><span class="glyphicon glyphicon-ok text-success"></span></td>
+                                <td *ngIf="!license.Download"><span class="glyphicon glyphicon-remove text-danger"></span></td>
+                                <td *ngIf="license.Upload"><span class="glyphicon glyphicon-ok text-success"></span></td>
+                                <td *ngIf="!license.Upload"><span class="glyphicon glyphicon-remove text-danger"></span></td>
+                                <td *ngIf="license.Active"><span class="glyphicon glyphicon-ok text-success"></span></td>
+                                <td *ngIf="!license.Active"><span class="glyphicon glyphicon-remove text-danger"></span></td>
+                                <td style="width:94px"><span class="glyphicon glyphicon-refresh pointer" (click)="resetLicense(license.Id)" title="Reset"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>                
+            </div> 
+        </md-card-content>
+    </md-card>
+</div>

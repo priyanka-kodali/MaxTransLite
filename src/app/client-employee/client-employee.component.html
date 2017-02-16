@@ -1,0 +1,69 @@
+<div class="row">
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <form (submit)="saveChanges()">
+                <div>
+                    <md-toolbar color="primary">
+                        <div class="col-xs-12 p0 m0">
+                            <span>Personal Details</span><button md-raised-button type="button" class="pull-right btn-small"
+                                (click)="editData()" *ngIf="!isNewClientEmployee">
+                                <span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
+</button>
+<button md-raised-button class="pull-right btn-small mright5" type="button" (click)="routeToClientEmployeeList()"><span class="glyphicon glyphicon-list text-success" style="padding: 2px 0 4px 2px"></span>
+</button>
+</div>
+</md-toolbar>
+<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+        <md-input class="" name="client" [(ngModel)]="NewClientEmployee.Client" [typeahead]="clients" autocomplete="off" placeholder="Client"
+            type="text" required [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="firstName" [(ngModel)]="NewClientEmployee.FirstName" placeholder="First Name" type="text" required
+            maxLength="35" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-4 col-lg-3 col-xs-12">
+        <md-input class="" name="middleName" [(ngModel)]="NewClientEmployee.MiddleName" placeholder="Middle Name" type="text" maxLength="20"
+            [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="lastName" [(ngModel)]="NewClientEmployee.LastName" placeholder="Last Name" type="text" required
+            maxLength="35" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="primaryPhone" [(ngModel)]="NewClientEmployee.PrimaryPhone" placeholder="Primary Phone" type="text"
+            required maxLength="15" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="secondaryPhone" [(ngModel)]="NewClientEmployee.SecondaryPhone" placeholder="Secondary Phone" type="text"
+            maxLength="15" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="fax" [(ngModel)]="NewClientEmployee.Fax" placeholder="Fax" type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="email" [(ngModel)]="NewClientEmployee.Email" placeholder="Email" type="email" required maxLength="255"
+            [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+        <md-input class="" name="department" [(ngModel)]="NewClientEmployee.Department" placeholder="Department" type="text" required
+            maxLength="20" [disabled]="inputDisabled"></md-input>
+    </div>
+    <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewClientEmployee">
+        <md-checkbox name="active" [(ngModel)]="NewClientEmployee.Active"  >Active </md-checkbox>
+    </div>
+    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 mtop10 center-align">
+        <button md-raised-button class="btn-save" [disabled]="inputDisabled">Save</button>
+    </div>
+    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+        <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
+        <p *ngIf="editSuccess" class="alert alert-success">Client Employee Details are updated successfully!</p>
+        <p *ngIf="editProgress" class="alert alert-info">Please wait...</p>
+
+    </div>
+</div>
+</div>
+</form>
+</md-card-content>
+</md-card>
+</div>

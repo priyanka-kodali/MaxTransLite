@@ -1,0 +1,132 @@
+<div class="row">
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <div>
+                <md-toolbar color="primary" class="mbottom5 toolbar-small">
+                    <div class="col-xs-12 p0 m0">
+                        <span>Doctors</span>
+                        <button md-raised-button class="pull-right btn-small" (click)="showSearch.checked=!showSearch.checked"> <md-checkbox #showSearch [checked]="false" hidden></md-checkbox><span class="glyphicon glyphicon-chevron-down text-success" style="padding: 2px 0 4px 2px;"></span></button>
+                        <button md-raised-button class="pull-right btn-small mright5" (click)="newDoctor()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px;"></span></button>
+                    </div>
+                </md-toolbar>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 mbottom5" *ngIf="showSearch.checked">
+                    <div class="input-group col-lg-1 col-md-2 col-sm-3 col-xs-3 pull-left mright5 ">
+                        <span class="input-group-addon ">SHOW</span>
+                        <span class="input-group-addon ">
+                                <select (change)="changeCount($event.target.value) ">
+                                    <option value="10 ">10</option>
+                                    <option value="50 ">50</option>
+                                    <option value="100 ">100</option>
+                                    <option value="0 ">ALL</option>
+                                </select>
+                            </span>
+                    </div>
+                    <div class="input-group col-lg-4 col-md-4 col-sm-8 col-xs-12 pull-left">
+                        <span class="input-group-addon ">
+                                <select [(ngModel)]="selectedKey " (change)="resetDoctors() ">
+                                    <option *ngFor="let key of keys " [value]="key ">{{key}}</option>
+                                </select>
+                            </span>
+                        <input type="text" class="form-control " [(ngModel)]="searchTerm " placeholder="Search {{selectedKey}}" (keyup)="search()"
+                            [disabled]="selectedKey==null ">
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs">
+                    <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="error.length>0">{{error}}</div>
+                    <table>
+                        <thead (click)="sort($event)">
+                            <tr table-header>
+                                <th>Name</th>
+                                <th>Client</th> 
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Job Level</th>
+                                <th>Voice Grade</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let doctor of doctors">
+                                <td>{{doctor.FirstName+" "+doctor.LastName }}</td>
+                                <td>{{doctor.Client}}</td>
+                                <td>{{doctor.PrimaryPhone}}</td>
+                                <td>{{doctor.Email}}</td>
+                                <td>{{doctor.JobLevel}}</td>
+                                <td>{{doctor.VoiceGrade}}</td>
+                                <td><span class="glyphicon glyphicon-new-window pointer" (click)="getDoctor(doctor)"></span></td>
+                                <td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(doctor)"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-align" *ngIf="pages>1">
+                    <ul class="pagination m0 p0">
+                        <li (click)="changePage(page-1)"><span aria-hidden="true">&laquo;</span></li>
+                        <li *ngFor="let number of numbers" (click)="changePage(number)" [class.active]="number==page"><span aria-hidden="true">{{number}}</span></li>
+                        <li (click)="changePage(page+1)"><span aria-hidden="true">&raquo;</span></li>
+                    </ul>
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>
+
+
+
+<div class="dim-background" *ngIf="TemplateModal">
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <div>
+                <md-toolbar class="mbottom5 toolbar-small" color="primary">
+                    <div class="col-xs-12 p0 m0"><span>Templates</span> <button md-raised-button class="pull-right btn-small" (click)="TemplateModal=!TemplateModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
+                </md-toolbar>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
+                        <p *ngIf="UpdateSuccess" class="alert alert-success">Template updated sucessfully!</p>
+                        <p *ngIf="UpdateFailed" class="alert alert-danger">Template not updated!</p>
+                        <p *ngIf="UpdateProgress" class="alert alert-info">Please wait while we upload the file</p>
+                    <p *ngIf="ModalError.length>0" class="alert alert-danger">{{ModalError}}</p>
+                    <p *ngIf="GetTemplateProgress" class="alert alert-info">Please wait while we fetch templales...</p>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
+                    <div class="row p0 m0">
+                        <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                            <md-input class="" name="name" placeholder="Doctor" [(ngModel)]="SelectedDoctor.Name" type="text" disabled></md-input>
+                        </div>
+
+                        <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                            <md-input class="" name="client" placeholder="Client" title="SelectedDoctor.Client" [(ngModel)]="SelectedDoctor.Client" type="text"
+                                disabled></md-input>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="name" placeholder="Template Name" title="NewTemplate.Name" [(ngModel)]="NewTemplate.Name" type="text"></md-input>
+                        </div>
+
+                        <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+                            <input type="file" ng2FileSelect [uploader]="uploader" />
+                        </div>
+
+                        <div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
+                            <button md-raised-button class="file-button btn-save" type="submit" value="Submit" (click)="updateTemplates()">Add</button>
+                        </div>
+
+                    </div>
+
+                    <div class="row p0 m0">
+                        <ol *ngIf="Templates.length>0">
+                            <li *ngFor="let template of Templates">
+                                <a href={{template.TemplateURL}}> {{template.Name}} </a>
+                            </li>
+                        </ol>
+                        <h2 class="center-align" *ngIf="Templates.length==0 && !GetTemplateProgress">No Templates Available</h2>
+                    </div>
+                </div>
+            </div>
+
+        </md-card-content>
+    </md-card>
+</div>

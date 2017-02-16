@@ -1,0 +1,53 @@
+<div class="row">
+  <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+    <md-card-content class="p0">
+      <div> 
+        <md-toolbar color="primary">
+          <div class="col-xs-12 p0 m0"><span>Default Allocation</span><button md-raised-button type="button" class="pull-right btn-small"
+                                (click)="editData()" *ngIf="!isNewDefaultAllocation">
+                                <span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
+                            </button><button md-raised-button class="pull-right btn-small mright5" (click)="routeToDefaultAllocationList()" ><span class="glyphicon glyphicon-list text-success" style="padding: 2px 0 4px 2px"></span></button></div>
+        </md-toolbar>
+        <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+          <form (submit)="saveChanges()"> 
+            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+              <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
+            </div>
+            <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+              <md-input class="" name="client" placeholder="Client" [(ngModel)]="defaultAllocation.Client" type="text" autocomplete="off" required [typeahead]="clients" [disabled]="!isNewDefaultAllocation">
+              </md-input>
+            </div>
+            <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+              <md-input class="" name="doctor" placeholder="Doctor" [(ngModel)]="defaultAllocation.Doctor" type="text" autocomplete="off" required [typeahead]="doctors" [disabled]="!isNewDefaultAllocation" ></md-input>
+            </div>
+            <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+              <md-input class="" name="jobLevel" placeholder="Job Level" [(ngModel)]="defaultAllocation.JobLevel" autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="['MT','QA','AQA']" [typeaheadMinLength]="0" type="text" required
+                ></md-input>
+            </div>
+            <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+              <md-input class="" name="employee" placeholder="Employee" [(ngModel)]="defaultAllocation.Employee" type="text" required  autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="employees"
+                ></md-input>
+            </div>
+            <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+              <md-input class="" name="accuracy" placeholder="Accuracy" [(ngModel)]="defaultAllocation.Accuracy" type="number" [disabled]="inputDisabled" max=100 step="0.01" required
+                ></md-input>
+            </div> 
+            <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+              <md-input class="" name="minutes" placeholder="Minutes (HH:MM)" (change)="validateMinutes()" [disabled]="inputDisabled" [(ngModel)]="defaultAllocation.Minutes" required type="text"></md-input>
+            </div>
+            <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewDefaultAllocation" >
+                <md-checkbox [(ngModel)]="defaultAllocation.Inactive" name="inactive"  [disabled]="inputDisabled">Inactive</md-checkbox>
+            </div>
+            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+              <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
+              <p *ngIf="editSuccess" class="alert alert-success">Allocation Details are updated successfully!</p>
+            </div>
+            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
+              <button md-raised-button class="btn-save" type="submit" [disabled]="inputDisabled">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </md-card-content>
+  </md-card>
+</div>

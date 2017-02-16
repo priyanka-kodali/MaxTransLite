@@ -1,0 +1,246 @@
+<div class="row m5">
+
+  <style>
+    @import 'https://fonts.googleapis.com/css?family=Roboto';
+  </style>
+
+  <md-card class="col-xs-12 col-sm-12 col-md-6 col-lg-6 mtb10 mlr5 p0 md-elevation-z12 jobs-card">
+    <md-card-content class="plr10 ptb5">
+      <h3 (click)="navigateTo('jobs')" class="redA200-text mtop0 pointer">My Jobs</h3>
+      <table class="small_table light-blue50">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Pending</th>
+            <th>Completed</th>
+            <th>Total</th>
+            <th>&lt; 18</th>
+            <th>&gt; 18</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mt_row">
+            <td>MT</td>
+            <td class="pending"><span class="badge mright2 red300">{{myJobsData.MtPending}}</span>{{myJobsData.MtPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{myJobsData.MtCompleted}}</span>{{myJobsData.MtCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{myJobsData.MtTotal}}</span>{{myJobsData.MtTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{myJobsData.MtLt18}}</span>{{ myJobsData.MtLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{myJobsData.MtGt18}}</span>{{myJobsData.MtGt18Hours}} </td>
+          </tr>
+          <tr class="aqa_row">
+            <td>AQA</td>
+            <td class="pending"><span class="badge mright2 red300">{{myJobsData.AqaPending}}</span>{{myJobsData.AqaPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{myJobsData.AqaCompleted}}</span>{{myJobsData.AqaCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{myJobsData.AqaTotal}}</span>{{myJobsData.AqaTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{myJobsData.AqaLt18}}</span>{{ myJobsData.AqaLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{myJobsData.AqaGt18}}</span>{{myJobsData.AqaGt18Hours}} </td>
+          </tr>
+          <tr class="qa_row">
+            <td>QA</td>
+            <td class="pending"><span class="badge mright2 red300">{{myJobsData.QaPending}}</span>{{myJobsData.QaPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{myJobsData.QaCompleted}}</span>{{myJobsData.QaCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{myJobsData.QaTotal}}</span>{{myJobsData.QaTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{myJobsData.QaLt18}}</span>{{ myJobsData.QaLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{myJobsData.QaGt18}}</span>{{myJobsData.QaGt18Hours}} </td>
+          </tr>
+          <tr class="total_row">
+            <td>Total</td>
+            <td class="pending"><span class="badge mright2 red300">{{myJobsData.TotalPending}}</span>{{myJobsData.TotalPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{myJobsData.TotalCompleted}}</span>{{myJobsData.TotalCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{myJobsData.TotalTotal}}</span>{{myJobsData.TotalTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{myJobsData.TotalLt18}}</span>{{ myJobsData.TotalLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{myJobsData.TotalGt18}}</span>{{myJobsData.TotalGt18Hours}} </td>
+          </tr>
+        </tbody>
+      </table>
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-6 col-lg-6 mtb10 mlr5 p0 md-elevation-z12 jobs-card" *ngIf="isInRole('Coordinator')">
+    <md-card-content class="plr10 ptb5">
+      <h3 (click)="navigateTo('job-allocations')" class="redA200-text mtop0 pointer">Team Jobs</h3>
+      <table class="small_table light-blue50">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Pending</th>
+            <th>Completed</th>
+            <th>Total</th>
+            <th>&lt; 18</th>
+            <th>&gt; 18</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mt_row">
+            <td>MT</td>
+            <td class="pending"><span class="badge mright2 red300">{{teamJobsData.MtPending}}</span>{{teamJobsData.MtPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{teamJobsData.MtCompleted}}</span>{{teamJobsData.MtCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{teamJobsData.MtTotal}}</span>{{teamJobsData.MtTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{teamJobsData.MtLt18}}</span>{{ teamJobsData.MtLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{teamJobsData.MtGt18}}</span>{{teamJobsData.MtGt18Hours}} </td>
+          </tr>
+          <tr class="aqa_row">
+            <td>AQA</td>
+            <td class="pending"><span class="badge mright2 red300">{{teamJobsData.AqaPending}}</span>{{teamJobsData.AqaPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{teamJobsData.AqaCompleted}}</span>{{teamJobsData.AqaCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{teamJobsData.AqaTotal}}</span>{{teamJobsData.AqaTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{teamJobsData.AqaLt18}}</span>{{ teamJobsData.AqaLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{teamJobsData.AqaGt18}}</span>{{teamJobsData.AqaGt18Hours}} </td>
+          </tr>
+          <tr class="qa_row">
+            <td>QA</td>
+            <td class="pending"><span class="badge mright2 red300">{{teamJobsData.QaPending}}</span>{{teamJobsData.QaPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{teamJobsData.QaCompleted}}</span>{{teamJobsData.QaCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{teamJobsData.QaTotal}}</span>{{teamJobsData.QaTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{teamJobsData.QaLt18}}</span>{{ teamJobsData.QaLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{teamJobsData.QaGt18}}</span>{{teamJobsData.QaGt18Hours}} </td>
+          </tr>
+          <tr class="total_row">
+            <td>Total</td>
+            <td class="pending"><span class="badge mright2 red300">{{teamJobsData.TotalPending}}</span>{{teamJobsData.TotalPendingHours}} </td>
+            <td class="completed"> <span class="badge mright2 green300">{{teamJobsData.TotalCompleted}}</span>{{teamJobsData.TotalCompletedHours}}</td>
+            <td class="total"> <span class="badge mright2 orange300">{{teamJobsData.TotalTotal}}</span>{{teamJobsData.TotalTotalHours}} </td>
+            <td class="l18"> <span class="badge mright2 purple300">{{teamJobsData.TotalLt18}}</span>{{ teamJobsData.TotalLt18Hours}}</td>
+            <td class="g18"> <span class="badge mright2 red900">{{teamJobsData.TotalGt18}}</span>{{teamJobsData.TotalGt18Hours}} </td>
+          </tr>
+        </tbody>
+      </table>
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+    <md-card-content class="plr10 ptb5">
+      <h3 class="redA200-text">Monthly Work Details</h3>
+      <table class="small_table pink50">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Direct</th>
+            <th>Indirect</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mt_row">
+            <td>MT</td>
+            <td class="direct">{{monthWorkDetailsData.MtDirect}} </td>
+            <td class="indirect">{{monthWorkDetailsData.MtIndirect}} </td>
+            <td class="total">{{monthWorkDetailsData.MtTotal}} </td>
+          </tr>
+          <tr class="aqa_row">
+            <td>AQA</td>
+            <td class="direct">-</td>
+            <td class="indirect">{{monthWorkDetailsData.AqaIndirect}} </td>
+            <td class="total">{{monthWorkDetailsData.AqaTotal}} </td>
+          </tr>
+          <tr class="qa_row">
+            <td>QA</td>
+            <td class="direct">-</td>
+            <td class="indirect">{{monthWorkDetailsData.QaIndirect}} </td>
+            <td class="total">{{monthWorkDetailsData.QaTotal}} </td>
+          </tr>
+          <tr class="total_row">
+            <td>Total</td>
+            <td class="direct">{{monthWorkDetailsData.TotalDirect}} </td>
+            <td class="indirect">{{monthWorkDetailsData.TotalIndirect}} </td>
+            <td class="total">{{monthWorkDetailsData.TotalTotal}} </td>
+          </tr>
+        </tbody>
+      </table>
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+    <md-card-content class="plr10 ptb5">
+      <h3 class="redA200-text">Stars</h3>
+      <div class="row col p0 col-sm-12 center-align">
+        <h3 class="m0">Star of the Day</h3>
+
+        <div class="col">
+
+        </div>
+
+        <div class="col">
+
+        </div>
+
+        <div class="col">
+
+        </div>
+
+      </div>
+
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+    <md-card-content class="plr10 ptb5">
+      <h3 class="redA200-text">Notices <span class="badge">{{notices.count}}</span></h3>
+      <ul class="notice-list">
+        <li *ngFor="let notice of notices">
+          <span class="glyphicon glyphicon-triangle-right"></span> notice.Notice
+        </li>
+      </ul>
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+    <md-card-content class="plr10 ptb5">
+      <h3 class="redA200-text">Messages <span class="badge">{{messages.count}}</span></h3>
+      <ul class="message-list">
+        <li *ngFor="let message of messages">
+          <span class="glyphicon glyphicon-triangle-right"></span> message.Message
+        </li>
+      </ul>
+    </md-card-content>
+  </md-card>
+
+
+  <md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+    <md-card-content class="plr10 ptb5">
+      <h3 (click)="navigateTo('leaves')" class="redA200-text pointer">Leaves</h3>
+      <table class="small_table light-green100">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Remaining</th>
+            <th>Taken</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="pl_row">
+            <td>PL</td>
+            <td class="remaining">{{leavesData.PlRemaining}}</td>
+            <td class="taken">{{leavesData.PlTaken}} </td>
+            <td class="total">{{leavesData.PlTotal}} </td>
+          </tr>
+          <tr class="cl">
+            <td>CL</td>
+            <td class="remaining">{{leavesData.ClRemaining}} </td>
+            <td class="taken"> {{leavesData.ClTaken}}</td>
+            <td class="total"> {{leavesData.ClTotal}}</td>
+          </tr>
+          <tr class="sl_row">
+            <td>SL</td>
+            <td class="remaining">{{leavesData.SlRemaining}}</td>
+            <td class="taken">{{leavesData.SlTaken}} </td>
+            <td class="total">{{leavesData.SlTotal}}</td>
+          </tr>
+          <tr class="total_row">
+            <td>Total</td>
+            <td class="remaining">{{leavesData.TotalRemaining}} </td>
+            <td class="taken">{{leavesData.TotalTaken}} </td>
+            <td class="total">{{leavesData.TotalTotal}} </td>
+          </tr>
+        </tbody>
+      </table>
+    </md-card-content>
+  </md-card>
+
+</div>
