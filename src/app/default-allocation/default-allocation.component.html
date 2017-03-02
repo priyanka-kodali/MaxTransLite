@@ -12,20 +12,21 @@
           <form (submit)="saveChanges()"> 
             <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
               <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
+              <p *ngIf="editProgress" class="alert alert-info">Please Wait...</p>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="client" placeholder="Client" [(ngModel)]="defaultAllocation.Client" type="text" autocomplete="off" required [typeahead]="clients" [disabled]="!isNewDefaultAllocation">
+              <md-input class="" name="client" #client placeholder="Client" [(ngModel)]="defaultAllocation.Client" type="text" autocomplete="off" required [typeahead]="clients" [disabled]="!isNewDefaultAllocation">
               </md-input>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="doctor" placeholder="Doctor" [(ngModel)]="defaultAllocation.Doctor" type="text" autocomplete="off" required [typeahead]="doctors" [disabled]="!isNewDefaultAllocation" ></md-input>
+              <md-input class="" name="doctor" #doctor placeholder="Doctor" [(ngModel)]="defaultAllocation.Doctor" type="text" autocomplete="off" required [typeahead]="doctors" [disabled]="!isNewDefaultAllocation" ></md-input>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="jobLevel" placeholder="Job Level" [(ngModel)]="defaultAllocation.JobLevel" autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="['MT','QA','AQA']" [typeaheadMinLength]="0" type="text" required
+              <md-input class="" name="jobLevel" #jobLevel placeholder="Job Level" [(ngModel)]="defaultAllocation.JobLevel" autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="" [typeaheadMinLength]="0" type="text" required
                 ></md-input>
             </div>
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-              <md-input class="" name="employee" placeholder="Employee" [(ngModel)]="defaultAllocation.Employee" type="text" required  autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="employees"
+              <md-input class="" name="employee" #employee placeholder="Employee" [(ngModel)]="defaultAllocation.Employee" type="text" required  autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="employees"
                 ></md-input>
             </div>
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">

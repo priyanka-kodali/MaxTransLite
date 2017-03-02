@@ -46,8 +46,7 @@ export class PayscaleComponent implements OnInit {
       try {
         this.payscaleService.getPayscale(this.EmpId).subscribe(
           (data) => {
-            this.paymentStructure = data['paymentStructure'];
-            this.EmployeeName = data['Name']; this.EmployeeNumber = data['EmployeeNumber'];
+            this.paymentStructure = data['employeePaymentStructure'];
           },
           (error) => this.error = "Error fetching payscale details"
         )
@@ -75,7 +74,7 @@ export class PayscaleComponent implements OnInit {
         this.payscaleService.editPayscale(this.paymentStructure).subscribe(
         (data) => {
           this.editSuccess = true;
-          this.paymentStructure = data;
+          this.paymentStructure = data['employeePaymentStructure'];
           this.inputDisabled=true;
         },
         (error) => { this.error = error['_body']; this.editSuccess = false; throw error; }
@@ -92,4 +91,6 @@ export class PaymentStructure {
   BankName: string;
   BankBranch: string;
   Employee_Id: number;
+  EmployeeName : string;
+  EmployeeNumber : string;
 }

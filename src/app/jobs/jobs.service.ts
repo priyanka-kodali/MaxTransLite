@@ -11,8 +11,7 @@ export class JobsService {
   getMtJobs() {
 
     let url = ApiUrl + "/api/Jobs/GetMtJobs";
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
@@ -22,8 +21,7 @@ export class JobsService {
   getAqaJobs() {
 
     let url = ApiUrl + "/api/Jobs/GetAqaJobs";
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
@@ -32,8 +30,7 @@ export class JobsService {
 
   getQaJobs() {
     let url = ApiUrl + "/api/Jobs/GetQaJobs";
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
@@ -43,8 +40,7 @@ export class JobsService {
 
   getMyWorkDetails() {
     let url = ApiUrl + "/api/Dashboard/GetMyJobDetails";
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
@@ -53,8 +49,7 @@ export class JobsService {
 
   getTemplates(DoctorId: number) {
     let url = ApiUrl + "/api/Doctor/GetTemplates?DoctorId=" + DoctorId;
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
@@ -62,24 +57,28 @@ export class JobsService {
 
   jobDownloaded(JobWorkId: number) {
     let url = ApiUrl + "/api/Jobs/JobDownloaded?JobWorkId=" + JobWorkId;
-    try
-     {
+    try {
       return this.http.post(url, null).map((data) => data.json());
     }
     catch (e) { throw e; }
 
   }
 
-
   getPartialDownloadFiles(JobWorkId: number) {
     let url = ApiUrl + "/api/Jobs/GetPartialDownloadFiles?JobWorkId=" + JobWorkId;
-    try 
-    {
+    try {
       return this.http.get(url).map((data) => data.json());
     }
     catch (e) { throw e; }
 
   }
 
+  GetURLWithSAS(blobURL: string) {
+    let url = ApiUrl + "/api/Jobs/GetURLWithSAS?url=" + blobURL;
+    try {
+      return this.http.get(url).map((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
 
 }

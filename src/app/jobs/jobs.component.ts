@@ -37,7 +37,7 @@ export class JobsComponent implements OnInit {
   FileModal: boolean;
   IsPartialUpload: boolean;
   IsFinalUpload: boolean;
-  SelectedJob: Job = new Job();  
+  SelectedJob: Job = new Job();
   SelectedJobLevel: string;
   UpdateSuccess: boolean;
   UpdateFailed: boolean;
@@ -53,7 +53,7 @@ export class JobsComponent implements OnInit {
 
   public uploader: FileUploader = new FileUploader({
     url: this.myUrl
-    ,headers: [{
+    , headers: [{
       name: 'Authorization',
       value: 'Bearer ' + sessionStorage.getItem('access_token')
     }]
@@ -78,7 +78,7 @@ export class JobsComponent implements OnInit {
     this.IsPartialUpload = false;
     this.ModalError = "";
     this.PatientListModal = false;
-    this.SelectedJob.PatientList=new Array<string>();
+    this.SelectedJob.PatientList = new Array<string>();
   }
 
   ngOnInit() {
@@ -92,7 +92,7 @@ export class JobsComponent implements OnInit {
 
       this.jobsService.getMtJobs().subscribe(
         (data) => {
-          this.MtJobs = data;          
+          this.MtJobs = data;
         }
       )
 
@@ -116,7 +116,6 @@ export class JobsComponent implements OnInit {
     )
   }
 
-
   getTemplates(DoctorId: number) {
     this.UpdateProgress = true;
     this.TemplateModal = !this.TemplateModal;
@@ -132,8 +131,9 @@ export class JobsComponent implements OnInit {
     this.PatientListModal = true;
   }
 
-  jobDownloaded(job: Job, JobLevel: string) {
-    if (job.DT != null) return;
+  downloadAudioFile(audioURL: string, job: Job, JobLevel: string) {
+    this.downloadFile(audioURL);
+    if (job.DT != null && (job.AQA!=null || job.QA!=null)) return;
     this.jobsService.jobDownloaded(job.JobWorkId).subscribe(
       (data) => job.DT = data
     );
@@ -154,54 +154,62 @@ export class JobsComponent implements OnInit {
 
   postJob() {
 
-    try{
-    this.UpdateProgress = true;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.ModalError = "";
-    this.uploader.onBuildItemForm = (item, form) => {
-      form.append("JobWorkId", this.SelectedJob.JobWorkId);
-      form.append("PartialUpload", this.IsPartialUpload);
-      form.append("FinalUpload", this.IsFinalUpload);
-      form.append("PartialUploadStartTime", this.PartialUploadStartTime);
-      form.append("PartialUploadEndTime", this.PartialUploadEndTime);
-    }
-    var file = this.uploader.queue[this.uploader.queue.length - 1];
-    file.withCredentials=false;
-    if (file.file.type != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && file.file.type != "application/msword") {
-      this.ModalError = "Please select a word('.doc. or '.docx') document";
-      this.UpdateProgress = false;
-      return;
-    }    
-    this.uploader.uploadItem(file);
-
-    this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      this.UpdateProgress = false;
-      response = JSON.parse(response);
-      if (status != 200) {
-        this.UpdateFailed = true;
-      }
-      if (status == 200) {
-        this.UpdateSuccess = true;
-        this.SelectedJob=new Job();
-        this.uploader.clearQueue();
-        this.getJobSummary();
-        switch (this.SelectedJobLevel) {
-          case 'MT':
-            this.MtJobs[this.MtJobs.indexOf(this.SelectedJob)] = response;
-            break;
-          case 'AQA':
-            this.AqaJobs[this.AqaJobs.indexOf(this.SelectedJob)] = response;
-            break;
-          case 'QA':
-            this.QaJobs[this.QaJobs.indexOf(this.SelectedJob)] = response;
-            break;
+    try {
+      this.UpdateProgress = true;
+      this.UpdateSuccess = false;
+      this.UpdateFailed = false;
+      this.ModalError = "";
+      if (this.PartialUploadEndTime.trim() == this.SelectedJob.Duration.split('-')[1].trim()) {
+        this.IsFinalUpload = true;
+        if (!confirm("Is this last document?")) {
+          this.PartialUploadEndTime = "";
+          this.UpdateProgress = false;
+          return;
         }
       }
-    };
+      this.uploader.onBuildItemForm = (item, form) => {
+        form.append("JobWorkId", this.SelectedJob.JobWorkId);
+        form.append("PartialUpload", this.IsPartialUpload);
+        form.append("FinalUpload", this.IsFinalUpload);
+        form.append("PartialUploadStartTime", this.PartialUploadStartTime);
+        form.append("PartialUploadEndTime", this.PartialUploadEndTime);
+      }
+      var file = this.uploader.queue[this.uploader.queue.length - 1];
+      file.withCredentials = false;
+      if (file.file.type != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && file.file.type != "application/msword") {
+        this.ModalError = "Please select a word('.doc. or '.docx') document";
+        this.UpdateProgress = false;
+        return;
+      }
+      this.uploader.uploadItem(file);
+
+      this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+        this.UpdateProgress = false;
+        response = JSON.parse(response);
+        if (status != 200) {
+          this.UpdateFailed = true;
+        }
+        if (status == 200) {
+          this.UpdateSuccess = true;
+          this.uploader.clearQueue();
+          this.getJobSummary();
+          switch (this.SelectedJobLevel) {
+            case 'MT':
+              this.MtJobs[this.MtJobs.indexOf(this.SelectedJob)] = response;
+              break;
+            case 'AQA':
+              this.AqaJobs[this.AqaJobs.indexOf(this.SelectedJob)] = response;
+              break;
+            case 'QA':
+              this.QaJobs[this.QaJobs.indexOf(this.SelectedJob)] = response;
+              break;
+          }
+          this.SelectedJob = new Job();
+        }
+      };
 
     }
-    catch(ex){
+    catch (ex) {
       throw ex;
     }
   }
@@ -225,9 +233,12 @@ export class JobsComponent implements OnInit {
 
   }
 
-  PartialTranscriptDownload(job: Job, Level: string, event: Event) {
+  getTranscriptFile(job: Job, Level: string, event: Event) {
     this.UpdateProgress = true;
     this.error = "";
+     this.jobsService.jobDownloaded(job.JobWorkId).subscribe(
+      (data) => job.DT = data
+    );
 
     switch (Level) {
       case 'AQA':
@@ -239,6 +250,9 @@ export class JobsComponent implements OnInit {
             (data) => { this.PartialDowloadDocuments = data; this.UpdateProgress = false; },
             (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
           );
+        }
+        else {
+          this.downloadFile(job.MTUrl);
         }
         break;
       case 'QA':
@@ -253,6 +267,9 @@ export class JobsComponent implements OnInit {
               (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
             );
           }
+          else {
+            this.downloadFile(job.MTUrl);
+          }
         }
         else {
           if (job.AQAUrl.indexOf('.docx') == -1 || job.AQAUrl.indexOf('.doc') == -1) {
@@ -264,13 +281,17 @@ export class JobsComponent implements OnInit {
               (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
             );
           }
+          else {
+            this.downloadFile(job.AQAUrl);
+          }
         }
-
-
         break;
     }
   }
 
+  downloadFile(url: string) {
+    this.jobsService.GetURLWithSAS(url).subscribe((data) => window.open(data))
+  }
 
 }
 
@@ -278,7 +299,7 @@ class Job {
 
   constructor() {
     this.PatientList = new Array<string>();
-    this.PatientList.length=0;
+    this.PatientList.length = 0;
   }
 
   Selected: boolean;
@@ -306,6 +327,7 @@ class Job {
   ShowDownload: boolean;
   ShowUpload: boolean;
   Color: number;
+  JobLevel : number;
 }
 
 class JobSummary {

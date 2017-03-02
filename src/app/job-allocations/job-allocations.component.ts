@@ -11,6 +11,7 @@ import { FileUploader } from '../../../node_modules/ng2-file-upload';
 export class JobAllocationsComponent implements OnInit {
 
   Jobs: Array<Job> = new Array<Job>();
+  DuplicateJobs: Array<Job> = new Array<Job>();
   Error: string;
   ModalError: string;
   ModalWarning: string;
@@ -54,7 +55,7 @@ export class JobAllocationsComponent implements OnInit {
 
   ngOnInit() {
     this.jobAllocationsService.getJobs().subscribe(
-      (data) => { { this.Jobs = data; } },
+      (data) => { { this.Jobs = data; this.DuplicateJobs=data;} },
       (error) => this.Error = "Error fetching jobs"
     )
   }
@@ -131,17 +132,17 @@ export class JobAllocationsComponent implements OnInit {
 
   levelChanged() {
     switch (this.SelectedJob.JobLevel) {
-      case "L1 (MT)":
+      case "L1":
         this.AQAHidden = true;
         this.QAHidden = true;
         this.MTHidden = false;
         break;
-      case "L1-L3 (MT,QA)":
+      case "L1-L3":
         this.AQAHidden = true;
         this.QAHidden = false;
         this.MTHidden = false;
         break;
-      case "L1-L2-L3 (MT,AQA,QA)":
+      case "L1-L2-L3":
         this.AQAHidden = false;
         this.QAHidden = false;
         this.MTHidden = false;
@@ -158,9 +159,10 @@ export class JobAllocationsComponent implements OnInit {
     this.UpdateFailed = false;
     this.UpdateSuccess = false;
     this.ModalError = "";
-    var newJob=new Job();
-    newJob=job;
-    this.SelectedJob = newJob;
+    this.SelectedJob=job;//this.DuplicateJobs.filter((item)=>item.JobId==job.JobId)[0];
+    if(this.SelectedJob.MT==null)this.SelectedJob.MT=="";
+    if(this.SelectedJob.AQA==null)this.SelectedJob.AQA=="";
+    if(this.SelectedJob.QA==null)this.SelectedJob.QA=="";
     this.statusChanged();
     this.levelChanged();
     this.getEmployees();
@@ -209,6 +211,7 @@ export class JobAllocationsComponent implements OnInit {
           this.Jobs.push(data);
           this.UpdateSuccess = true;
           this.Jobs.sort(function (a, b) { return a.JobId - b.JobId; });
+          this.DuplicateJobs=this.Jobs;
 
         },
         (error) => this.UpdateFailed = true
@@ -226,6 +229,8 @@ export class JobAllocationsComponent implements OnInit {
     this.SplitAllocationChildJobs = new Array<SplitJob>();
     this.SelectedJobNumber = job.JobNumber.split('_')[0];
     this.SelectedJobSequenceNumber = parseInt(job.JobNumber.split('_')[1]);
+    this.statusChanged();
+    this.levelChanged();
     this.getEmployees();
     this.ModalError = "";
     this.UpdateFailed = false;
@@ -241,7 +246,7 @@ export class JobAllocationsComponent implements OnInit {
           splitJob.MT = "";
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
-          if (k == 1) continue;
+          if (k == i) continue;
           if (splitJob.MT != "" && this.SplitAllocationChildJobs[k].MT == splitJob.MT) {
             this.ModalWarning = "Multiple jobs are having same MT";
           }
@@ -252,7 +257,7 @@ export class JobAllocationsComponent implements OnInit {
           splitJob.AQA = "";
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
-          if (k == 1) continue;
+          if (k == i) continue;
           if (splitJob.AQA != "" && this.SplitAllocationChildJobs[k].AQA == splitJob.AQA) {
             this.ModalWarning = "Multiple jobs are having same AQA";
           }
@@ -263,7 +268,7 @@ export class JobAllocationsComponent implements OnInit {
           splitJob.QA = "";
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
-          if (k == 1) continue;
+          if (k == i) continue;
           if (splitJob.QA != "" && this.SplitAllocationChildJobs[k].QA == splitJob.QA) {
             this.ModalWarning = "Multiple jobs are having same QA";
           }
@@ -373,7 +378,7 @@ export class JobAllocationsComponent implements OnInit {
 
 
     this.jobAllocationsService.searchJobs(this.SearchItem).subscribe(
-      (data) => { this.Jobs = data; this.Error = ""; },
+      (data) => { this.Jobs = data; this.DuplicateJobs=data; this.Error = ""; },
       (error) => this.Error = "Error fetching jobs"
     );
 
@@ -399,8 +404,8 @@ export class Job {
   Duration: string;
   ClientShortName: string;
   TotalMinutes: number;
-  Color : number;
-  DefaultTAT : number;
+  Color: number;
+  DefaultTAT: number;
 }
 
 class SplitJob {

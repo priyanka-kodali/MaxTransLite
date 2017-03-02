@@ -8,11 +8,8 @@ import { MdToolbarModule } from '@angular2-material/toolbar';
 import { MdButtonModule } from '@angular2-material/button';
 import { MdCheckboxModule } from '@angular2-material/checkbox';
 import { MdRadioModule , MdUniqueSelectionDispatcher} from '@angular2-material/radio';
-import { TypeaheadModule} from 'ng2-bootstrap';
-//import { Ng2TableModule} from 'ng2-table';
+import { TypeaheadModule,  ComponentLoaderFactory, PositioningService} from 'ng2-bootstrap';
 import { FileUploadModule } from 'ng2-file-upload';
-
-// import { LocationStrategy,  HashLocationStrategy } from '@angular/common';
 
 import { AppRoutingModule, routingComponents } from './app.routes';
 
@@ -73,11 +70,10 @@ import { ClientLicenseComponent } from './client-license/client-license.componen
     MdCheckboxModule,
     MdRadioModule,
     TypeaheadModule,
-    //Ng2TableModule,
     FileUploadModule
+    
   ],
- // providers: [HttpClient,{provide: LocationStrategy, useClass: HashLocationStrategy}],
-  providers: [HttpClient, MdUniqueSelectionDispatcher],
+  providers: [HttpClient, MdUniqueSelectionDispatcher, ComponentLoaderFactory, PositioningService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

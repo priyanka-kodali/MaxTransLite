@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit, ElementRef, Renderer, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import 'rxjs/Rx';
 import { ClientService } from './client.service';
@@ -12,7 +12,7 @@ import { MasterService } from '../app.service';
   styleUrls: ['client.component.scss'],
   providers: [ClientService, MasterService]
 })
-export class ClientComponent implements OnInit {
+export class ClientComponent implements OnInit, AfterViewInit {
 
   NewClient: Client;
   error: string;
@@ -37,21 +37,43 @@ export class ClientComponent implements OnInit {
   masterCityIds: Array<number> = new Array<number>();
   masterStateIds: Array<number> = new Array<number>();
   masterCountryIds: Array<number> = new Array<number>();
-  vendorIds: Array<number> = new Array<any>();
-  verticalIds: Array<number> = new Array<any>();
+  vendorIds: Array<number> = new Array<number>();
+  verticalIds: Array<number> = new Array<number>();
+  timezones: Array<string> = new Array<string>();
+  timezoneIds: Array<number> = new Array<number>();
   isNewClient: boolean;
   isDataAvailable: boolean;
   IsTranscriptionClient: boolean;
   locations: Array<Location> = new Array<Location>();
+  clientTypes: Array<string> = new Array<string>();
+  paymentTypes: Array<string> = new Array<string>();
+  currencies: Array<string> = new Array<string>();
 
 
-  constructor(private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientService: ClientService) {
+  @ViewChild("name") name: ElementRef;
+  @ViewChild("shortName") shortName: ElementRef;
+  @ViewChild("primaryPhone") primaryPhone: ElementRef;
+  @ViewChild("secondaryPhone") secondaryPhone: ElementRef;
+  @ViewChild("fax") fax: ElementRef;
+  @ViewChild("email") email: ElementRef;
+  @ViewChild("clientVertical") clientVertical: ElementRef;
+  @ViewChild("clientType") clientType: ElementRef;
+  @ViewChild("vendor") vendor: ElementRef;
+  @ViewChild("NumberOfCharactersPerLine") NumberOfCharactersPerLine: ElementRef;
+  @ViewChild("fileTypes") fileTypes: ElementRef;
+  @ViewChild("paymentType") paymentType: ElementRef;
+  @ViewChild("currency") currency: ElementRef;
+
+
+  constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientService: ClientService) {
     this.NewClient = new Client();
     this.error = "";
-    this.isVendor = false;
     this.isIndirectClient = false;
     this.editSuccess = false;
     this.editProgress = false;
+    this.clientTypes = ['Direct Client', 'Indirect Client', 'Vendor'];
+    this.paymentTypes = ['Fixed', 'FTE', 'Per Unit'];
+    this.currencies = ['INR', 'USD'];
     this.sub = this.activatedRoute.params.subscribe(
       params => this.ClientId = +params['ClientId']
     );
@@ -61,12 +83,32 @@ export class ClientComponent implements OnInit {
     this.locations[0].IsInvoiceAddress = true;
   }
 
+  ngAfterViewInit() { }
+
   ngOnInit() {
+    //get states and cities for master arrays 
+    this.masterService.getAllCities().subscribe(
+      (data) => {
+        data["cities"].forEach(city => {
+          this.masterCities.push(city.Name);
+          this.masterCityIds.push(city.Id);
+        });
+      });
+
+    this.masterService.getAllStates().subscribe(
+      (data) => {
+        data["states"].forEach(state => {
+          this.masterStates.push(state.Name);
+          this.masterStateIds.push(state.Id);
+        });
+      });
+
 
     if (this.isNewClient) {
       this.inputDisabled = false;
       this.getMasterData();
       this.NewClient.Active = true;
+      this.NewClient.FileTypes = "DSS|DS2|WAV|WMA";
     }
 
     else {
@@ -119,14 +161,9 @@ export class ClientComponent implements OnInit {
           this.countryIds.push(country.Id);
           this.masterCountryIds.push(country.Id);
         });
-        data['states'].forEach(state => {
-          this.masterStates.push(state.Name);
-          this.masterStateIds.push(state.Id);
-        });
-        data['cities'].forEach(city => {
-          this.masterCities.push(city.Name);
-          this.masterCityIds.push(city.Id);
-        });
+
+        //states andd cities for master arrays are obtained seperatly
+
         data['vendors'].forEach(client => {
           this.vendors.push(client.Name);
           this.vendorIds.push(client.Id);
@@ -134,6 +171,10 @@ export class ClientComponent implements OnInit {
         data['verticals'].forEach(vertical => {
           this.verticals.push(vertical.Name);
           this.verticalIds.push(vertical.Id);
+        });
+        data['timezones'].forEach(timezone => {
+          this.timezones.push(timezone.Name);
+          this.timezoneIds.push(timezone.Id);
         });
         this.isDataAvailable = true;
         this.error = "";
@@ -151,7 +192,6 @@ export class ClientComponent implements OnInit {
   routeToClientList() {
     this.router.navigate(['clients']);
   }
-
 
   countrySelected(index: number) {
     this.locations[index].City = "";
@@ -189,24 +229,29 @@ export class ClientComponent implements OnInit {
   }
 
   saveChanges() {
-    this.editProgress = true;
+
+    if (!this.validate()) return;
+
     this.error = "";
     this.editSuccess = false;
-    this.locations.forEach(element => {
-      element.City_Id = this.masterCityIds[this.masterCities.indexOf(element.City)];
-      element.State_Id = this.masterStateIds[this.masterStates.indexOf(element.State)];
-      element.Country_Id = this.masterCountryIds[this.masterCountries.indexOf(element.Country)];
-    });
+    this.editProgress = true;
 
     this.NewClient.Locations = this.locations;
-    this.NewClient.Vendor_Id = this.vendorIds[this.vendors.indexOf(this.NewClient.Vendor)];
-    this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.indexOf(this.NewClient.ClientVertical)];
 
     try {
       if (this.isNewClient) {
         this.clientService.postClient(this.NewClient).subscribe(
-          (data) => this.router.navigate(["client", data]),
+         (data) => {
+            document.body.scrollTop = 0;
+            this.NewClient = data['client'];
+            this.locations = data['locations'];
+            this.error = "";
+            this.editProgress = false;
+            this.editSuccess = true;
+            this.inputDisabled = true;
+          },
           (error) => {
+            this.editSuccess = false;
             this.error = error['_body'];
             this.editProgress = false;
           }
@@ -235,6 +280,158 @@ export class ClientComponent implements OnInit {
     catch (e) { throw e; }
   }
 
+  validate() {
+
+    if (this.isVendor) {
+      this.NewClient.NumberOfCharactersPerLine=null;
+      this.NewClient.FileTypes=null;
+      this.NewClient.PaymentAmount = null;
+      this.NewClient.Currency = null;
+      this.NewClient.PaymentType = null;
+    }
+    else {
+      this.NewClient.Vendor = null;
+      this.NewClient.Vendor_Id = null;
+    }
+
+    this.error = "";
+    this.editSuccess = false;
+    this.editProgress = true;
+    var namesRegex = /^[a-zA-Z ]*$/;
+    var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+
+
+    this.NewClient.Vendor_Id = this.vendorIds[this.vendors.indexOf(this.NewClient.Vendor)];
+    this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.indexOf(this.NewClient.ClientVertical)];
+
+    if (!namesRegex.test(this.NewClient.Name)) {
+      this.error = "Name should not contain special characters"
+      this.renderer.invokeElementMethod(this.name, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (this.NewClient.Name.trim().length > 255) {
+      this.error = "Name should not exceed 255 characters"
+      this.renderer.invokeElementMethod(this.name, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (this.NewClient.ShortName.trim().length > 20) {
+      this.error = "Short Name should not exceed 20 characters"
+      this.renderer.invokeElementMethod(this.shortName, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (!phoneRegex.test(this.NewClient.PrimaryPhone)) {
+      this.error = "Please enter a valid Primary Phone Number "
+      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (this.NewClient.SecondaryPhone && !phoneRegex.test(this.NewClient.SecondaryPhone)) {
+      this.error = "Please enter a valid Secondary Phone Number "
+      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (this.NewClient.Fax && !phoneRegex.test(this.NewClient.Fax)) {
+      this.error = "Please enter a valid Fax Number "
+      this.renderer.invokeElementMethod(this.fax, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+    if (!emailRegex.test(this.NewClient.Email)) {
+      this.error = "Please enter a valid email";
+      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+    if (!this.NewClient.ClientVertical_Id) {
+      this.error = "Please select valid Client Vertical";
+      this.renderer.invokeElementMethod(this.clientVertical, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (this.clientTypes.indexOf(this.NewClient.ClientType) == -1) {
+      this.error = "Please select a valid Client Type"
+      this.renderer.invokeElementMethod(this.clientType, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+    if (!this.NewClient.Vendor_Id && this.NewClient.Vendor) {
+      this.error = "Please select valid vendor";
+      this.renderer.invokeElementMethod(this.vendor, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+    for (var i = 0; i < this.locations.length; i++) {
+
+      var element = this.locations[i];
+      element.City_Id = this.masterCityIds[this.masterCities.indexOf(element.City)];
+      element.State_Id = this.masterStateIds[this.masterStates.indexOf(element.State)];
+      element.Country_Id = this.masterCountryIds[this.masterCountries.indexOf(element.Country)];
+      element.TimeZone_Id = this.timezoneIds[this.timezones.indexOf(element.TimeZone)];
+
+      if (!element.Country_Id) {
+        this.error = "Please select valid country for location " + (this.locations.indexOf(element) + 1);
+        this.editProgress = false;
+        return false;
+      }
+      if (!element.State_Id) {
+        this.error = "Please select valid state for location " + (this.locations.indexOf(element) + 1);
+        this.editProgress = false;
+        return false;
+      }
+
+      if (!element.City_Id) {
+        this.error = "Please select valid city for location " + (this.locations.indexOf(element) + 1);
+        this.editProgress = false;
+        return false;
+      }
+
+
+      if (element.ZIP.trim().length > 10) {
+        this.error = "ZIP should not exceed 10 characters for location " + (this.locations.indexOf(element) + 1);
+        this.editProgress = false;
+        return false;
+      }
+
+      if (!element.TimeZone_Id) {
+        this.error = "Please select valid timezone for location " + (this.locations.indexOf(element) + 1);
+        this.editProgress = false;
+        return false;
+      }
+
+    }
+    
+    if(this.locations.filter((item)=>item.IsInvoiceAddress==true).length!=1){
+      this.error="Please choose an invoice address";
+      return false;
+    }
+
+
+    if (this.NewClient.PaymentType && this.paymentTypes.indexOf(this.NewClient.PaymentType) == -1) {
+      this.error = "Please select a valid Payment Type"
+      this.renderer.invokeElementMethod(this.paymentType, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+    if (this.NewClient.Currency && this.currencies.indexOf(this.NewClient.Currency) == -1) {
+      this.error = "Please select a valid currency"
+      this.renderer.invokeElementMethod(this.currency, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+
+
+    return true;
+  }
 }
 
 class Client {
@@ -248,8 +445,7 @@ class Client {
   SecondaryPhone: string;
   Fax: string;
   Email: string;
-  TimeZone: string;
-  NumberOfCharactersForLine: number;
+  NumberOfCharactersPerLine: number;
   PaymentAmount: number;
   Currency: string;
   PaymentType: string;
@@ -274,5 +470,6 @@ class Location {
   City_Id: number;
   State_Id: number;
   Country_Id: number;
+  TimeZone_Id: number;
 
 }

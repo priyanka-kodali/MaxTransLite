@@ -110,6 +110,13 @@ export class PatientListComponent implements OnInit {
     }
     this.SelectedPatientList.Client_Id = this.clientIds[this.clients.indexOf(this.SelectedPatientList.Client)];
     this.SelectedPatientList.Doctor_Id = this.doctorIds[this.doctors.indexOf(this.SelectedPatientList.Doctor)];
+
+    
+    if (this.SelectedPatientList.Client_Id == undefined) {
+      this.ModalError = "Please select valid client";
+      this.UpdateProgress = false;
+      return;
+    }
     this.uploader.onBuildItemForm = (item, form) => {
       form.append("FromDate", this.SelectedPatientList.FromDate);
       form.append("ToDate", this.SelectedPatientList.ToDate);

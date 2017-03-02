@@ -8,90 +8,91 @@ import { Router } from '@angular/router';
   selector: 'app-employee-dashboard',
   templateUrl: 'employee-dashboard.component.html',
   styleUrls: ['employee-dashboard.component.scss'],
-  providers:[EmployeeDashboardService]
+  providers: [EmployeeDashboardService]
 })
 export class EmployeeDashboardComponent implements OnInit {
 
-  myJobsData : Jobs =new Jobs();
-  teamJobsData : Jobs =new Jobs();
-  monthWorkDetailsData : MonthWorkDetails =new MonthWorkDetails();
-  starsOfTheDay : Array<Star> =new Array<Star>();
-  starsOfTheMonth : Array<Star> =new Array<Star>();
-  notices : Array<Notice>=new Array<Notice>();
-  messages : Array<Message>=new Array<Message>();
-  leavesData : Leaves=new Leaves();
-  appComponent : AppComponent;
+  myJobsData: Jobs = new Jobs();
+  teamJobsData: Jobs = new Jobs();
+  monthWorkDetailsData: MonthWorkDetails = new MonthWorkDetails();
+  starsOfTheDay: Array<Star> = new Array<Star>();
+  starsOfTheMonth: Array<Star> = new Array<Star>();
+  notices: Array<Notice> = new Array<Notice>();
+  messages: Array<Message> = new Array<Message>();
+  leavesData: Leaves = new Leaves();
+  appComponent: AppComponent;
 
-  constructor(private  employeeDashboardService : EmployeeDashboardService,private router : Router) {
+  constructor(private employeeDashboardService: EmployeeDashboardService, private router: Router) {
   }
 
   ngOnInit() {
-
-    try{
+    new AppComponent(null).showLoading();
+    try {
       this.employeeDashboardService.getMyWorkDetails().subscribe(
-      (data)=>this.myJobsData=data
-    )      
+        (data) => this.myJobsData = data
+      )
 
-    this.employeeDashboardService.getMonthlyWorkDetails().subscribe(
-      (data)=>this.monthWorkDetailsData=data
-    )
+      this.employeeDashboardService.getMonthlyWorkDetails().subscribe(
+        (data) => this.monthWorkDetailsData = data
+      )
 
 
-    this.employeeDashboardService.getLeavesCount().subscribe(
-      (data)=>this.leavesData=data
-    )
-    if(this.isInRole('Coordinator')){
-      this.employeeDashboardService.getTeamWorkDetails().subscribe(
-      (data)=>this.teamJobsData=data
-    )   
+      this.employeeDashboardService.getLeavesCount().subscribe(
+        (data) => this.leavesData = data
+      )
+      if (this.isInRole('Coordinator')) {
+        this.employeeDashboardService.getTeamWorkDetails().subscribe(
+          (data) => this.teamJobsData = data
+        )
+      }
+       new AppComponent(null).hideLoading();
+
     }
-
+    catch (e) { }
   }
-    catch(e){}
-  } 
 
 
 
-  navigateTo(to :string){
+  navigateTo(to: string) {
     this.router.navigate([to]);
   }
 
 
-  isInRole(role: string) {    
+  isInRole(role: string) {
     this.appComponent = new AppComponent(null);
     if (this.appComponent.isLoggedIn()) {
-      this.appComponent.roles = sessionStorage.getItem('roles');      
-      return this.appComponent.roles.indexOf(role)>-1;
-    } 
+      this.appComponent.roles = sessionStorage.getItem('roles');
+      return this.appComponent.roles.indexOf(role) > -1;
+    }
   }
 
 
 }
 
 
-class Jobs{
-  MtPending : number;
-  MtPendingHours : string;
-  MtCompleted:number;
-  MtCompletedHours:string;
-  MtTotal : number;
-  MtTotalHours : string;
-  MtLt18 : number;
-  MtLt18Hours : string;
-  MtGt18:number;
-  MtGt18Hour :string;
+class Jobs {
+  MtPending: number;
+  MtPendingHours: string;
+  MtCompleted: number;
+  MtCompletedHours: string;
+  MtTotal: number;
+  MtTotalHours: string;
+  MtLt18: number;
+  MtLt18Hours: string;
+  MtGt18: number;
+  MtGt18Hour: string;
 
 
-  AqaPending : number;
-  AqaPendingHours : string;
-  AqaCompleted:number;
-  AqaCompletedHours:string;
-  AqaTotal : number;
-  AqaTotalHours : string;
-  AqaLt18 : number;
-  AqaLt18Hours : string;
-  AqaGt18:number;
-  AqaGt18Hours:string;
+  AqaPending: number;
+  AqaPendingHours: string;
+  AqaCompleted: number;
+  AqaCompletedHours: string;
+  AqaTotal: number;
+  AqaTotalHours: string;
+  AqaLt18: number;
+  AqaLt18Hours: string;
+  AqaGt18: number;
+  AqaGt18Hours: string;
 
 
   QaPending: number;
@@ -106,65 +107,65 @@ class Jobs{
   QaGt18Hours: string;
 
 
-  TotalPending : number;
-  TotalPendingHours : string;
-  TotalCompleted:number;
-  TotalCompletedHours:string;
-  TotalTotal : number;
-  TotalTotalHours : string;
-  TotalLt18 : number;
-  TotalLt18Hours : string;
-  TotalGt18:number;
-  TotalGt18Hours:string;
+  TotalPending: number;
+  TotalPendingHours: string;
+  TotalCompleted: number;
+  TotalCompletedHours: string;
+  TotalTotal: number;
+  TotalTotalHours: string;
+  TotalLt18: number;
+  TotalLt18Hours: string;
+  TotalGt18: number;
+  TotalGt18Hours: string;
 
 
 }
 
-class MonthWorkDetails{
-  MtDirect : number;
-  MtIndirect : number;
-  MtTotal:number;
+class MonthWorkDetails {
+  MtDirect: number;
+  MtIndirect: number;
+  MtTotal: number;
 
-  AqaIndirect : number;
-  AqaTotal:number;
+  AqaIndirect: number;
+  AqaTotal: number;
 
-  QaIndirect : number;
-  QaTotal:number;
+  QaIndirect: number;
+  QaTotal: number;
 
-  TotalDirect : number;
-  TotalIndirect : number;
-  TotalTotal:number; 
+  TotalDirect: number;
+  TotalIndirect: number;
+  TotalTotal: number;
 }
 
-class Star{
-  Department : string;
-  PhotoURL : string;
-  Name : string;
-  Hours : number;
+class Star {
+  Department: string;
+  PhotoURL: string;
+  Name: string;
+  Hours: number;
 }
 
-class Notice{
-  Notice : string;  
+class Notice {
+  Notice: string;
 }
 
-class Message{
-  Message : string;
+class Message {
+  Message: string;
 }
 
-class Leaves{
-  PlRemaining : number;
-  PlTaken : number;
-  PlTotal:number;
+class Leaves {
+  PlRemaining: number;
+  PlTaken: number;
+  PlTotal: number;
 
-  ClRemaining : number;
-  ClTaken : number;
-  ClTotal:number;
+  ClRemaining: number;
+  ClTaken: number;
+  ClTotal: number;
 
-  SlRemaining : number;
-  SlTaken : number;
-  SlTotal:number;
+  SlRemaining: number;
+  SlTaken: number;
+  SlTotal: number;
 
-  TotalRemaining : number;
-  TotalTaken : number;
-  TotalTotal:number;
+  TotalRemaining: number;
+  TotalTaken: number;
+  TotalTotal: number;
 }

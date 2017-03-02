@@ -19,6 +19,7 @@
           <ul class="dropdown-menu">
             <li><a (click)="navigateTo('clients')">Clients</a></li>
             <li><a (click)="navigateTo('doctors')">Doctors</a></li>
+            <li><a (click)="navigateTo('doctor-groups')">Doctor Groups</a></li>
             <li><a (click)="navigateTo('patient-list')">Patient List</a></li>
             <li><a (click)="navigateTo('client-employees')">Client Employee</a></li>
           </ul>
@@ -43,5 +44,8 @@
 
 </div>
 <router-outlet></router-outlet>
+<div id="loading" *ngIf="loading">
+  <img src="images/loading.gif" id="loading_gif"/>
+</div>
 
 

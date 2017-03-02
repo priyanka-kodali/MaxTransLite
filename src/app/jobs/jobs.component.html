@@ -62,7 +62,7 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected" (change)="checkboxChanged(job,'MT')"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'MT')"> {{job.JobNumber}}</a></td>
+							<td> <a (click)="downloadAudioFile(job.AudioURL,job,'MT')"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td>{{job.Duration}}</td>
@@ -71,8 +71,7 @@
 							<td>{{job.AQA}}</td>
 							<td>{{job.QA}}</td>
 							<td>{{job.TAT}}</td>
-							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'MT')"></span></td>
-							<!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'MT')"></span></td>-->
+							<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'MT')"></span></td>
 							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
 							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
 							<td>{{job.Lines}}</td>
@@ -142,19 +141,18 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'AQA')"> {{job.JobNumber}}</a></td>
+							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="downloadAudioFile(job.AudioURL,job,'AQA')"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td>{{job.Duration}}</td>
 							<td [title]="job.Client">{{job.ClientShortName}}</td>
 							<td>{{job.Doctor}}</td>
 							<td>{{job.MT}}
-								<a *ngIf="job.MTUrl" [href]="job.MTUrl" [download]="job.MTUrl" (click)="PartialTranscriptDownload(job,'AQA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
+								<a *ngIf="job.MTUrl" (click)="getTranscriptFile(job,'AQA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
 							</td>
 							<td>{{job.QA}}</td>
 							<td>{{job.TAT}}</td>
-							<!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'AQA')"></span></td>-->
-							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'AQA')"></span></td>
+							<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'AQA')"></span></td>
 							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
 							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
 							<td>{{job.Lines}}</td>
@@ -224,22 +222,21 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td> <a [href]="job.AudioURL" [download]="job.AudioURL" (click)="jobDownloaded(job,'QA')"> {{job.JobNumber}}</a></td>
+							<td> <a (click)="downloadAudioFile(job.AudioURL,job,'QA')"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td>{{job.Duration}}</td>
 							<td [title]="job.Client">{{job.ClientShortName}}</td>
 							<td>{{job.Doctor}}</td>
 							<td>{{job.MT}}
-								<a *ngIf="job.AQA==null && job.MTUrl!=null" [href]="job.MTUrl" [download]="job.MTUrl" (click)="PartialTranscriptDownload(job,'QA',$event)">
+								<a *ngIf="job.AQA==null && job.MTUrl!=null" (click)="getTranscriptFile(job,'QA',$event)">
 									<span class="glyphicon glyphicon-cloud-download pointer"></span></a>
 							</td>
 							<td>{{job.AQA}}
-								<a *ngIf="job.AQAUrl" [href]="job.AQAUrl" [download]="job.AQAUrl" (click)="PartialTranscriptDownload(job,'QA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
+								<a *ngIf="job.AQAUrl" (click)="getTranscriptFile(job,'QA',$event)"> <span class="glyphicon glyphicon-cloud-download pointer"></span></a>
 							</td>
 							<td>{{job.TAT}}</td>
-							<td><span class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'QA')"></span></td>
-						    <!--<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'QA')"></span></td>-->
+							<td><span *ngIf="job.DT" class="glyphicon glyphicon-cloud-upload pointer" (click)="uploadFile(job,'QA')"></span></td>
 							<td [title]="job.DT | date">{{job.DT | date:'shortTime'}}</td>
 							<td [title]="job.UT | date">{{job.UT | date:'shortTime'}}</td>
 							<td>{{job.Lines}}</td>
@@ -313,13 +310,12 @@
 						<div class="col-md-5 col-sm-6 col-lg-5 col-xs-12">
 							<input #uploadEl type="file" ng2FileSelect [uploader]="uploader" name="trans_file" required />
 						</div>
-
-						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12 checkbox-container">
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12 checkbox-container" *ngIf="SelectedJobLevel!='QA' && SelectedJob.JobLevel!='L1'">
 							<md-checkbox [(ngModel)]="IsPartialUpload" name="partial">Partial Upload</md-checkbox>
 						</div>
 
-						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12 checkbox-container" *ngIf="IsPartialUpload">
-							<md-checkbox [(ngModel)]="IsFinalUpload" name="final">Final Upload</md-checkbox>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="IsPartialUpload">
+							<md-input class="" name="jobDuration" placeholder="Job Duration" [(ngModel)]="SelectedJob.Duration" type="text" disabled></md-input>
 						</div>
 
 
@@ -359,7 +355,7 @@
 				</div>
 				<ol *ngIf="PartialDowloadDocuments.length>0">
 					<li *ngFor="let document of PartialDowloadDocuments">
-						<a href={{document.DocumentURL}}> {{document.Name}} </a>
+						<a (click)="downloadFile(document.DocumentURL)"> {{document.Name}} </a>
 					</li>
 				</ol>
 				<h2 class="center-align" *ngIf="PartialDowloadDocuments.length==0 && !UpdateProgress">No Transcript Documents Available</h2>

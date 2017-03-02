@@ -1,7 +1,4 @@
 
-
-
-
 .logo{
     height: inherit;
     display: inline-block;
@@ -10,6 +7,7 @@
         max-width: 100%;
         padding:5px 0; 
     }
+    float: left;
 }
 
 a{
@@ -44,8 +42,8 @@ nav {
   height: 64px;
 margin-left: auto;  
 display: inline-block;
-float: right;
 z-index: 50;
+float: right;
 }
 
 .nav {
@@ -129,4 +127,22 @@ z-index: 50;
 .notification-icon{
   font-size: 22px;
   vertical-align: middle;
+}
+
+#loading{
+  position: absolute;
+  height: 100%;
+  width: 100%; 
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.53);
+}
+
+#loading_gif{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+  height: 170px
 }

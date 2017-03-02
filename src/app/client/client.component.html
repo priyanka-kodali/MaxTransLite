@@ -18,63 +18,63 @@
   </div>
 
   <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-    <md-input class="" name="name" [(ngModel)]="NewClient.Name" placeholder="Name" type="text" required maxLength="256" autocomplete="off"
+    <md-input class="" name="name" #name [(ngModel)]="NewClient.Name" placeholder="Name" type="text" required maxLength="255" autocomplete="off"
       [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-    <md-input class="" name="shortName" [(ngModel)]="NewClient.ShortName" placeholder="Short Name" type="text" autocomplete="off"
+    <md-input class="" name="shortName" #shortName [(ngModel)]="NewClient.ShortName" placeholder="Short Name" type="text" autocomplete="off"
       required maxLength="20" [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="primaryPhone" [(ngModel)]="NewClient.PrimaryPhone" placeholder="Primary Phone" autocomplete="off"
+    <md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewClient.PrimaryPhone" placeholder="Primary Phone" autocomplete="off"
       type="text" required maxLength="15" [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="secondaryPhone" [(ngModel)]="NewClient.SecondaryPhone" autocomplete="off" placeholder="Secondary Phone"
+    <md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewClient.SecondaryPhone" autocomplete="off" placeholder="Secondary Phone"
       type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="fax" [(ngModel)]="NewClient.Fax" placeholder="Fax" type="text" autocomplete="off" maxLength="15"
+    <md-input class="" name="fax" #fax [(ngModel)]="NewClient.Fax" placeholder="Fax" type="text" autocomplete="off" maxLength="15"
       [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="email" [(ngModel)]="NewClient.Email" placeholder="Email" type="email" autocomplete="off" required
+    <md-input class="" name="email" #email [(ngModel)]="NewClient.Email" placeholder="Email" type="email" autocomplete="off" required
       maxLength="255" [disabled]="inputDisabled"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="clientVertical" [(ngModel)]="NewClient.ClientVertical" placeholder="Client Vertical" type="text"
+    <md-input class="" name="clientVertical" #clientVertical [(ngModel)]="NewClient.ClientVertical" placeholder="Client Vertical" type="text"
       autocomplete="off" [typeahead]="verticals" [typeaheadMinLength]="0" [disabled]="inputDisabled" required (typeaheadOnSelect)="clientVerticalChange()"></md-input>
   </div>
 
   <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" name="clientType" [(ngModel)]="NewClient.ClientType" placeholder="Client Type" type="text" autocomplete="off"
-      [typeahead]="['Direct Client','Indirect Client','Vendor']" [typeaheadMinLength]="0" [disabled]="inputDisabled" (typeaheadOnSelect)="clientTypeChange()"
+    <md-input class="" name="clientType" #clientType [(ngModel)]="NewClient.ClientType" placeholder="Client Type" type="text" autocomplete="off"
+      [typeahead]="clientTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" (typeaheadOnSelect)="clientTypeChange()"
       required></md-input>
   </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" name="vendor" [(ngModel)]="NewClient.Vendor" required placeholder="Vendor Name" type="text" autocomplete="off"
-      [typeahead]="vendors" [disabled]="inputDisabled" *ngIf="isIndirectClient"></md-input>
+  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12"  *ngIf="isIndirectClient">
+    <md-input class="" name="vendor" #vendor [(ngModel)]="NewClient.Vendor" required placeholder="Vendor Name" type="text" autocomplete="off"
+      [typeahead]="vendors" [disabled]="inputDisabled"></md-input>
   </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" name="numberOfCharactersForLine" [(ngModel)]="NewClient.NumberOfCharactersForLine" min="0" max="100" autocomplete="off"
-      placeholder="Characters per Line" type="number" required [disabled]="inputDisabled" *ngIf="!isVendor && IsTranscriptionClient"></md-input>
+  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor && !isIndirectClient && NewClient.ClientVertical=='Transcription'">
+    <md-input class="" name="NumberOfCharactersPerLine" #NumberOfCharactersPerLine [(ngModel)]="NewClient.NumberOfCharactersPerLine" min="0" max="100" autocomplete="off"
+      placeholder="Characters per Line" type="number" required [disabled]="inputDisabled" ></md-input>
   </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" name="fileTypes" [(ngModel)]="NewClient.FileTypes" placeholder="File Types" type="text" autocomplete="off"
-      required maxLength="40" [disabled]="inputDisabled" *ngIf="!isVendor && IsTranscriptionClient"></md-input>
+  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor && !isIndirectClient && NewClient.ClientVertical=='Transcription'">
+    <md-input class="" name="fileTypes" #fileTypes [(ngModel)]="NewClient.FileTypes" placeholder="File Types" type="text" autocomplete="off"
+      required maxLength="40" [disabled]="inputDisabled" ></md-input>
   </div>
 
   <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewClient">
-    <md-checkbox name="active" [(ngModel)]="NewClient.Active">Active </md-checkbox>
+    <md-checkbox name="active" [(ngModel)]="NewClient.Active" [disabled]="inputDisabled" >Active </md-checkbox>
   </div>
 
 </div>
@@ -117,11 +117,11 @@
       required maxLength="10" [disabled]="inputDisabled"></md-input>
   </div>
   <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.TimeZone" placeholder="Time Zone" autocomplete="off"
+    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.TimeZone" placeholder="Time Zone" [typeahead]="timezones" autocomplete="off"
       type="text" required [disabled]="inputDisabled"></md-input>
   </div>
   <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-    <md-checkbox [(ngModel)]="location.IsInvoiceAddress" [ngModelOptions]="{standalone: true}" (change)="InvoiceAddressSelected(i)">Invoice Address </md-checkbox>
+    <md-checkbox [disabled]="inputDisabled" [(ngModel)]="location.IsInvoiceAddress" [ngModelOptions]="{standalone: true}" (change)="InvoiceAddressSelected(i)">Invoice Address </md-checkbox>
   </div>
 </div>
 
@@ -131,17 +131,17 @@
   <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
 
     <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="paymentType" [(ngModel)]="NewClient.PaymentType" placeholder="Payment Type" type="text" autocomplete="off"
-        [typeahead]="['Fixed','FTE','Per Unit']" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
+      <md-input class="" name="paymentType" #paymentType [(ngModel)]="NewClient.PaymentType" placeholder="Payment Type" type="text" autocomplete="off"
+        [typeahead]="paymentTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
     </div>
 
     <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="currency" [(ngModel)]="NewClient.Currency" placeholder="Currency" type="text" autocomplete="off"
-        [typeahead]="['INR','USD']" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
+      <md-input class="" name="currency" #currency [(ngModel)]="NewClient.Currency" placeholder="Currency" type="text" autocomplete="off"
+        [typeahead]="currencies" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
     </div>
 
     <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="paymentAmount" [(ngModel)]="NewClient.PaymentAmount" min="0" autocomplete="off" placeholder="Payment Amount"
+      <md-input class="" name="paymentAmount" #paymentAmount [(ngModel)]="NewClient.PaymentAmount" min="0" autocomplete="off" placeholder="Payment Amount"
         type="number" required maxLength="10" step="0.01" [disabled]="inputDisabled"></md-input>
     </div>
 

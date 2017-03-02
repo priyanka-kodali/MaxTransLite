@@ -140,17 +140,17 @@
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!MTHidden">
 								<md-input class="" name="MT" placeholder="MT" [(ngModel)]="SelectedJob.MT" [typeahead]="Employees" autocomplete="off" type="text"
-									[disabled]="MTDisabled" (typeaheadOnSelect)="mtChanged()" (change)="mtChanged()"></md-input>
+									[disabled]="MTDisabled" (typeaheadOnSelect)="mtChanged()" ></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!AQAHidden">
 								<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="SelectedJob.AQA" [typeahead]="Employees" autocomplete="off"
-									type="text" [disabled]="AQADisabled" (typeaheadOnSelect)="aqaChanged()"  (change)="aqaChanged()"></md-input>
+									type="text" [disabled]="AQADisabled" (typeaheadOnSelect)="aqaChanged()" ></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!QAHidden">
-								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off" type="text"
-									[disabled]="QADisabled" (typeaheadOnSelect)="qaChanged()" (change)="qaChanged()"></md-input>
+								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off"
+								 	type="text" [disabled]="QADisabled" (typeaheadOnSelect)="qaChanged()"></md-input>
 							</div>
 
 							<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
@@ -218,17 +218,17 @@
 							<div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
 								<md-input class="" name="endTime" placeholder="End Time" [(ngModel)]="newSplitJob.EndTime" type="text"></md-input>
 							</div>
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!MTHidden">
 								<md-input class="" name="MT" placeholder="MT" [(ngModel)]="newSplitJob.MT" (typeaheadOnSelect)="employeeForSplitSelected(i,'MT')"
-									[typeahead]="Employees" type="text"></md-input>
+								[typeahead]="Employees" type="text"></md-input>
 							</div>
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12"  *ngIf="!AQAHidden">
 								<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="newSplitJob.AQA" (typeaheadOnSelect)="employeeForSplitSelected(i,'AQA')"
-									[typeahead]="Employees" type="text"></md-input>
+								[typeahead]="Employees" type="text"></md-input>
 							</div>
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12"  *ngIf="!QAHidden">
 								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="newSplitJob.QA" (typeaheadOnSelect)="employeeForSplitSelected(i,'QA')"
-									[typeahead]="Employees" type="text"></md-input>
+								[typeahead]="Employees" type="text"></md-input>
 							</div>
 						</div>
 

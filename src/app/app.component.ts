@@ -9,10 +9,12 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 
-  roles : string;
+  roles: string;
+  public  loading: boolean;
 
-  constructor(private router : Router){}
-  
+
+
+  constructor(private router: Router) { }
 
   isLoggedIn() {
     var loggedIn = sessionStorage.getItem('access_token');
@@ -20,23 +22,30 @@ export class AppComponent {
   }
 
   isInRole(role: string) {
-     //return true;
     if (this.isLoggedIn()) {
-      this.roles = sessionStorage.getItem('roles');      
-      return this.roles.indexOf(role)>-1;
-    } 
+      this.roles = sessionStorage.getItem('roles');
+      return this.roles.indexOf(role) > -1;
+    }
 
   }
-  getDisplayName(){
-    if(this.isLoggedIn()){    
+
+  getDisplayName() {
+    if (this.isLoggedIn()) {
       return sessionStorage.getItem('displayName');
     }
   }
 
-  navigateTo(route : string){    
+  navigateTo(route: string) {
     this.router.navigate([route]);
   }
 
+  showLoading(){
+    this.loading=true;
+  }
+
+  hideLoading(){
+    this.loading=false;
+  }
 }
 
 

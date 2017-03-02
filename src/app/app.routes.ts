@@ -31,7 +31,6 @@ import { PatientListComponent } from './patient-list/patient-list.component';
 import { ClientLicenseComponent } from './client-license/client-license.component';
 import { ClientLicensesComponent } from './client-licenses/client-licenses.component';
 
-
 export const routes: Routes=[
   ...newEmployeeRoutes,
   ...editEmployeeRoutes,
@@ -77,7 +76,7 @@ export const routes: Routes=[
   
   {path:'doctor-groups',component:DoctorGroupsComponent}
 
-
+  
 ];
 
 @NgModule({

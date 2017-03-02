@@ -15,38 +15,38 @@
 </md-toolbar>
 <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
     <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-        <md-input class="" name="client" [(ngModel)]="NewClientEmployee.Client" [typeahead]="clients" autocomplete="off" placeholder="Client"
+        <md-input class="" name="client" #client [(ngModel)]="NewClientEmployee.Client" [typeahead]="clients" autocomplete="off" placeholder="Client"
             type="text" required [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="firstName" [(ngModel)]="NewClientEmployee.FirstName" placeholder="First Name" type="text" required
+        <md-input class="" name="firstName" #firstName [(ngModel)]="NewClientEmployee.FirstName" placeholder="First Name" type="text" required
             maxLength="35" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-4 col-lg-3 col-xs-12">
-        <md-input class="" name="middleName" [(ngModel)]="NewClientEmployee.MiddleName" placeholder="Middle Name" type="text" maxLength="20"
+        <md-input class="" name="middleName" #middleName [(ngModel)]="NewClientEmployee.MiddleName" placeholder="Middle Name" type="text" maxLength="20"
             [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="lastName" [(ngModel)]="NewClientEmployee.LastName" placeholder="Last Name" type="text" required
+        <md-input class="" name="lastName" #lastName [(ngModel)]="NewClientEmployee.LastName" placeholder="Last Name" type="text" required
             maxLength="35" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="primaryPhone" [(ngModel)]="NewClientEmployee.PrimaryPhone" placeholder="Primary Phone" type="text"
+        <md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewClientEmployee.PrimaryPhone" placeholder="Primary Phone" type="text"
             required maxLength="15" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="secondaryPhone" [(ngModel)]="NewClientEmployee.SecondaryPhone" placeholder="Secondary Phone" type="text"
+        <md-input class="" name="secondaryPhone"#secondaryPhone  [(ngModel)]="NewClientEmployee.SecondaryPhone" placeholder="Secondary Phone" type="text"
             maxLength="15" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="fax" [(ngModel)]="NewClientEmployee.Fax" placeholder="Fax" type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
+        <md-input class="" name="fax" #fax [(ngModel)]="NewClientEmployee.Fax" placeholder="Fax" type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="email" [(ngModel)]="NewClientEmployee.Email" placeholder="Email" type="email" required maxLength="255"
+        <md-input class="" name="email" #email [(ngModel)]="NewClientEmployee.Email" placeholder="Email" type="email" required maxLength="255"
             [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-        <md-input class="" name="department" [(ngModel)]="NewClientEmployee.Department" placeholder="Department" type="text" required
+        <md-input class="" name="department" #department [(ngModel)]="NewClientEmployee.Department" placeholder="Department" type="text" required
             maxLength="20" [disabled]="inputDisabled"></md-input>
     </div>
     <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewClientEmployee">

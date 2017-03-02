@@ -24,4 +24,21 @@ export class MasterService {
     catch (e) { throw e; }
   }
 
+
+    getAllStates() {
+    let url = ApiUrl + "/api/MasterData/GetStates?countryId=0";
+    try {
+      return this.http.get(url).map((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
+
+  getAllCities() {
+    let url = ApiUrl + "/api/MasterData/GetCities?stateId=0";
+    try {
+      return this.http.get(url).map((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
+
 }

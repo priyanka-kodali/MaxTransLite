@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Renderer } from '@angular/core';
 import { DefaultAllocationService } from './default-allocation.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -11,7 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
   providers: [DefaultAllocationService]
 
 })
-export class DefaultAllocationComponent implements OnInit {
+export class DefaultAllocationComponent implements OnInit,AfterViewInit {
 
   private sub: any;
   DAId: number;
@@ -24,22 +24,34 @@ export class DefaultAllocationComponent implements OnInit {
   clientIds: Array<number> = new Array<number>();
   employees: Array<string> = new Array<string>();
   employeeIds: Array<number> = new Array<number>();
+  jobLevels: Array<string> = new Array<string>();
   inputDisabled: boolean;
   editSuccess: boolean;
+  editProgress: boolean;
   isNewDefaultAllocation: boolean;
   isDataAvailable: boolean;
 
+  
+  @ViewChild("client") client: ElementRef;
+  @ViewChild("doctor") doctor: ElementRef;
+  @ViewChild("jobLevel") jobLevel: ElementRef;
+  @ViewChild("employee") employee: ElementRef;
 
-  constructor(private defaultAllocationService: DefaultAllocationService, private router: Router, private activatedRoute: ActivatedRoute) {
+
+  constructor(private renderer : Renderer, private defaultAllocationService: DefaultAllocationService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.DAId = 0;
     this.error = "";
     this.editSuccess = false;
+    this.editProgress = false;
+    this.jobLevels=['MT','QA','AQA'];
     this.sub = this.activatedRoute.params.subscribe(
       params => this.DAId = +params['DAId']
     );
     this.isNewDefaultAllocation = isNaN(this.DAId);
     this.isDataAvailable = false;
   }
+
+  ngAfterViewInit(){}
 
   ngOnInit() {
 
@@ -73,9 +85,9 @@ export class DefaultAllocationComponent implements OnInit {
             this.employeeIds.push(employee.Id);
           });
           this.isDataAvailable = true;
-          this.error="";
-      },
-      (error) => { this.error="Error fetching Master Data" }
+          this.error = "";
+        },
+        (error) => { this.error = "Error fetching Master Data" }
       )
     }
     catch (e) {
@@ -94,14 +106,33 @@ export class DefaultAllocationComponent implements OnInit {
   }
 
   saveChanges() {
-    this.defaultAllocation.Doctor_Id = this.doctorIds[this.doctors.indexOf(this.defaultAllocation.Doctor)];
-    this.defaultAllocation.Client_Id = this.clientIds[this.clients.indexOf(this.defaultAllocation.Client)];
-    this.defaultAllocation.Employee_Id = this.employeeIds[this.employees.indexOf(this.defaultAllocation.Employee)];
+    if (!this.validate()) return;
+
+    this.error = "";
+    this.editSuccess = false;
+    this.editProgress = true;
+
+
+    if (this.defaultAllocation.Client_Id == undefined) {
+      this.error = "Please select valid client";
+      this.editProgress = false;
+      return;
+    }
+    if (this.defaultAllocation.Doctor_Id == undefined) {
+      this.error = "Please select valid doctor";
+      this.editProgress = false;
+      return;
+    }
+    if (this.defaultAllocation.Employee_Id == undefined) {
+      this.error = "Please select valid employee";
+      this.editProgress = false;
+      return;
+    }
 
     if (this.isNewDefaultAllocation) {
       this.defaultAllocationService.addDefaultAllocation(this.defaultAllocation).subscribe(
         (data) => this.router.navigate(['default-allocation', data]),
-        (error) => { this.error = error['_body']; }
+        (error) => { this.error = error['_body']; this.editProgress = false; }
       )
     }
 
@@ -109,11 +140,53 @@ export class DefaultAllocationComponent implements OnInit {
       this.defaultAllocationService.editDefaultAllocation(this.defaultAllocation).subscribe(
         (data) => {
           this.defaultAllocation = data,
-          this.inputDisabled = true; 
+            this.inputDisabled = true;
           this.editSuccess = true;
+          this.editProgress = false;
         },
-        (error) => { this.error = error['_body']; }
+        (error) => { this.error = error['_body']; this.editProgress = false; }
       )
+    }
+
+  }
+
+
+  validate(){
+    this.error = "";
+    this.editSuccess = false;
+    this.editProgress = true;
+
+    this.defaultAllocation.Doctor_Id = this.doctorIds[this.doctors.indexOf(this.defaultAllocation.Doctor)];
+    this.defaultAllocation.Client_Id = this.clientIds[this.clients.indexOf(this.defaultAllocation.Client)];
+    this.defaultAllocation.Employee_Id = this.employeeIds[this.employees.indexOf(this.defaultAllocation.Employee)];
+
+
+
+
+    if (!this.defaultAllocation.Client_Id) {
+      this.error = "Please select valid client";
+      this.renderer.invokeElementMethod(this.client, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (!this.defaultAllocation.Doctor_Id) {
+      this.error = "Please select valid doctor";
+      this.renderer.invokeElementMethod(this.doctor, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    if (!this.defaultAllocation.Employee_Id) {
+      this.error = "Please select valid employee";
+      this.renderer.invokeElementMethod(this.employee, 'focus');
+      this.editProgress = false;
+      return false;
+    }
+    
+    if (this.jobLevels.indexOf(this.defaultAllocation.JobLevel) == -1) {
+      this.error = "Please select a valid Job Level"
+      this.renderer.invokeElementMethod(this.jobLevel, 'focus');
+      this.editProgress = false;
+      return false;
     }
 
   }
