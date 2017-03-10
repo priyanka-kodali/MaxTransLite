@@ -10,7 +10,7 @@ import { MasterService } from '../app.service';
   selector: 'app-doctor',
   templateUrl: 'doctor.component.html',
   styleUrls: ['doctor.component.scss'],
-  providers: [DoctorService, MasterService]
+  providers: [DoctorService]
 })
 export class DoctorComponent implements OnInit, AfterViewInit {
 
@@ -20,8 +20,6 @@ export class DoctorComponent implements OnInit, AfterViewInit {
   DocId: number;
   CliId: number;
   inputDisabled: boolean;
-  editSuccess: boolean;
-  editProgress: boolean;
   cities: Array<string> = new Array<string>();
   states: Array<string> = new Array<string>();
   countries: Array<string> = new Array<string>();
@@ -55,19 +53,20 @@ export class DoctorComponent implements OnInit, AfterViewInit {
   @ViewChild("city") city: ElementRef;
   @ViewChild("zip") zip: ElementRef;
   @ViewChild("dictationMode") dictationMode: ElementRef;
+  @ViewChild("idigitalId") idigitalId: ElementRef;
+  @ViewChild("idigitalAuthorId") idigitalAuthorId: ElementRef;
   @ViewChild("jobLevel") jobLevel: ElementRef;
   @ViewChild("voiceGrade") voiceGrade: ElementRef;
   @ViewChild("doctorGroup") doctorGroup: ElementRef;
 
   constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private doctorService: DoctorService) {
+    this.masterService.postAlert("remove", "");
     this.NewDoctor = new Doctor();
     this.NewDoctor.Specialties = new Array<string>();
     this.dictationModes = ['Dictaphone', 'Toll Free', 'Email'];
     this.jobLevels = ['L1', 'L1-L3', 'L1-L2-L3'];
     this.voiceGrades = ['A', 'B', 'C', 'D'];
     this.error = "";
-    this.editSuccess = false;
-    this.editProgress = false;
     this.sub = this.activatedRoute.params.subscribe(
       params => this.DocId = +params['DocId']
     );
@@ -79,10 +78,12 @@ export class DoctorComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
 
+    this.masterService.changeLoading(true);
+
     if (this.isNewDoctor) {
       this.inputDisabled = false;
-      this.getData();
       this.NewDoctor.Active = true;
+      this.getData();
     }
 
     else {
@@ -90,47 +91,59 @@ export class DoctorComponent implements OnInit, AfterViewInit {
       document.body.scrollTop = 0;
       try {
         this.NewDoctor.Id = this.DocId;
-        this.doctorService.getDoctor(this.DocId).subscribe(
-          (data) => this.NewDoctor = data['doctor'],
-          (error) => this.error = "Error fetching Doctor Information"
+        this.doctorService.getDoctor(this.DocId).then(
+          (data) => {
+            this.NewDoctor = data['doctor'];
+            this.masterService.changeLoading(false);
+          },
+          (error) => {
+            this.error = "Error fetching Doctor Information";
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+          }
         );
       }
       catch (e) {
-        this.error = "Error processing Doctor Information"
+        this.error = "Error processing Doctor Information";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
       }
     }
 
   }
 
-
   editData() {
+    this.masterService.changeLoading(true);
     this.inputDisabled = !this.inputDisabled;
-    if (!this.isDataAvailable)
+    if (!this.isDataAvailable) {
+
+      this.states = new Array<string>();
+      this.stateIds = new Array<number>();
+      this.masterService.getStates(this.NewDoctor.Country_Id).then(
+        (data) => data['states'].forEach(state => {
+          this.states.push(state.Name);
+          this.stateIds.push(state.Id);
+        })
+      )
+
+      this.cities = new Array<string>();
+      this.cityIds = new Array<number>();
+      this.masterService.getCities(this.NewDoctor.State_Id).then(
+        (data) => data['cities'].forEach(city => {
+          this.cities.push(city.Name);
+          this.cityIds.push(city.Id);
+        })
+      )
       this.getData();
+    }
 
-
-    this.states = new Array<string>();
-    this.stateIds = new Array<number>();
-    this.masterService.getStates(this.NewDoctor.Country_Id).subscribe(
-      (data) => data['states'].forEach(state => {
-        this.states.push(state.Name);
-        this.stateIds.push(state.Id);
-      })
-    )
-
-    this.cities = new Array<string>();
-    this.cityIds = new Array<number>();
-    this.masterService.getCities(this.NewDoctor.State_Id).subscribe(
-      (data) => data['cities'].forEach(city => {
-        this.cities.push(city.Name);
-        this.cityIds.push(city.Id);
-      })
-    )
+    this.masterService.changeLoading(false);
 
   }
 
   getData() {
-    this.doctorService.getData().subscribe(
+    this.masterService.changeLoading(true);
+    this.doctorService.getData().then(
       (data) => {
         data['countries'].forEach(country => {
           this.countries.push(country.Name);
@@ -151,44 +164,63 @@ export class DoctorComponent implements OnInit, AfterViewInit {
           this.specialties = this.specialties.filter((item) => item != element);
         });
 
-
         this.isDataAvailable = true;
-        this.error = "";
+        this.masterService.changeLoading(false);
       },
-      (error) => { this.error = "Error fetching Master Data" }
+      (error) => {
+        this.error = "Error fetching Master Data";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
   }
 
   countrySelected() {
+    this.masterService.changeLoading(true);
     this.NewDoctor.State = "";
     this.NewDoctor.City = "";
     this.states = new Array<string>();
     this.stateIds = new Array<number>();
-    var countryId = this.countryIds[this.countries.indexOf(this.NewDoctor.Country)];
-    this.masterService.getStates(countryId).subscribe(
+    var countryId = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewDoctor.Country.toLowerCase())];
+    if (!countryId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getStates(countryId).then(
       (data) => data['states'].forEach(state => {
         this.states.push(state.Name);
         this.stateIds.push(state.Id);
+        this.masterService.changeLoading(false);
       })
     )
   }
 
   stateSelected() {
+    this.masterService.changeLoading(true);
     this.NewDoctor.City = "";
     this.cities = new Array<string>();
     this.cityIds = new Array<number>();
-    var stateId = this.stateIds[this.states.indexOf(this.NewDoctor.State)];
-    this.masterService.getCities(stateId).subscribe(
+    var stateId = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewDoctor.State.toLowerCase())];
+    if (!stateId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getCities(stateId).then(
       (data) => data['cities'].forEach(city => {
         this.cities.push(city.Name);
         this.cityIds.push(city.Id);
+        this.masterService.changeLoading(false);
       })
     )
   }
 
   specialtiesChange() {
-    if (this.NewDoctor.Specialties.indexOf(this.specialtySelector) > -1) { }
+    this.specialtySelector = this.specialtySelector ? this.specialtySelector.trim() : this.specialtySelector;
+    if (this.NewDoctor.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) { }
     else {
+      if (this.NewDoctor.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) == -1) {
+        return;
+      }
       this.specialties = this.specialties.filter((item) => item != this.specialtySelector);
       this.NewDoctor.Specialties.push(this.specialtySelector);
       this.specialtySelector = null;
@@ -212,36 +244,49 @@ export class DoctorComponent implements OnInit, AfterViewInit {
   }
 
   saveChanges() {
-    if (!this.validate()) return;
+    this.masterService.changeLoading(true);
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
+    if (!this.validate()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      return;
+    }
+
+    this.masterService.postAlert("remove", "");
 
     try {
       if (this.isNewDoctor) {
-        this.doctorService.postDoctor(this.NewDoctor) .subscribe((data) => {
-            document.body.scrollTop = 0;
-            this.NewDoctor = data['doctor'];
-            this.error = "";
-            this.editSuccess = true;
-            this.editProgress = false;
-            this.inputDisabled = true;
-          },
-          (error) => { this.editSuccess = false; this.editProgress = false; this.error = error['_body']; throw error; }
-          );
+        this.doctorService.postDoctor(this.NewDoctor).then((data) => {
+          document.body.scrollTop = 0;
+          this.NewDoctor = data['doctor'];
+          this.inputDisabled = true;
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "Doctor added successfully");
+          this.isNewDoctor=false;
+        },
+          (error) => {
+            this.error = error['_body'];
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+            throw error;
+          }
+        );
       }
       else {
         this.doctorService.editDoctor(this.NewDoctor)
-          .subscribe((data) => {
+          .then((data) => {
             document.body.scrollTop = 0;
             this.NewDoctor = data['doctor'];
-            this.error = "";
-            this.editSuccess = true;
-            this.editProgress = false;
             this.inputDisabled = true;
+            this.masterService.postAlert("success", "Doctor details updated successfully");
+            this.masterService.changeLoading(false);
           },
-          (error) => { this.editSuccess = false; this.editProgress = false; this.error = error['_body']; throw error; }
+          (error) => {
+            this.error = error['_body'];
+            this.masterService.postAlert("error", this.error);
+            this.masterService.changeLoading(false);
+            throw error;
+          }
           );
       }
     }
@@ -250,165 +295,216 @@ export class DoctorComponent implements OnInit, AfterViewInit {
 
   validate() {
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
-    var namesRegex = /^[a-zA-Z ]*$/;
+    this.masterService.postAlert("remove", "");
+    var namesRegex = /^[a-zA-Z0-9 ]*$/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 
-
-    this.NewDoctor.City_Id = this.cityIds[this.cities.indexOf(this.NewDoctor.City)];
-    this.NewDoctor.State_Id = this.stateIds[this.states.indexOf(this.NewDoctor.State)];
-    this.NewDoctor.Country_Id = this.countryIds[this.countries.indexOf(this.NewDoctor.Country)];
-    this.NewDoctor.Client_Id = this.clientIds[this.clients.indexOf(this.NewDoctor.Client)];
+    this.NewDoctor.Salutation = this.NewDoctor.Salutation.trim();
+    this.NewDoctor.FirstName = this.NewDoctor.FirstName.trim();
+    this.NewDoctor.MiddleName = this.NewDoctor.MiddleName ? this.NewDoctor.MiddleName.trim() : this.NewDoctor.MiddleName;
+    this.NewDoctor.LastName = this.NewDoctor.LastName.trim();
+    this.NewDoctor.PrimaryPhone = this.NewDoctor.PrimaryPhone.trim();
+    this.NewDoctor.SecondaryPhone = this.NewDoctor.SecondaryPhone ? this.NewDoctor.SecondaryPhone.trim() : this.NewDoctor.SecondaryPhone;
+    this.NewDoctor.Email = this.NewDoctor.Email.trim();
+    this.NewDoctor.Client = this.NewDoctor.Client.trim();
+    this.NewDoctor.AddressLine1 = this.NewDoctor.AddressLine1.trim();
+    this.NewDoctor.AddressLine2 = this.NewDoctor.AddressLine2 ? this.NewDoctor.AddressLine2.trim() : this.NewDoctor.AddressLine2;
+    this.NewDoctor.ZIP = this.NewDoctor.ZIP.trim();
+   
+   
+    this.NewDoctor.City_Id = this.cityIds[this.cities.findIndex((item) => item.toLowerCase() == this.NewDoctor.City.toLowerCase())];
+    this.NewDoctor.State_Id = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewDoctor.State.toLowerCase())];
+    this.NewDoctor.Country_Id = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewDoctor.Country.toLowerCase())];
+    this.NewDoctor.Client_Id = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.NewDoctor.Client.toLowerCase())];
 
     if (!this.NewDoctor.DoctorGroup) {
-      this.NewDoctor.DoctorGroup_Id = this.doctorGroupIds[this.doctorGroups.indexOf("Default Group")];
+      this.NewDoctor.DoctorGroup_Id = this.doctorGroupIds[this.doctorGroups.findIndex((item) => item.toLowerCase() == "default group")];
     }
     else {
-      this.NewDoctor.DoctorGroup_Id = this.doctorGroupIds[this.doctorGroups.indexOf(this.NewDoctor.DoctorGroup)];
+      this.NewDoctor.DoctorGroup_Id = this.doctorGroupIds[this.doctorGroups.findIndex((item) => item.toLowerCase() == this.NewDoctor.DoctorGroup.toLowerCase())];
     }
 
 
     if (this.NewDoctor.Salutation.trim().length > 5) {
       this.error = "Salutation should not exceed 5 characters"
       this.renderer.invokeElementMethod(this.salutation, 'focus');
-      this.editProgress = false;
       return false;
     }
 
+    if (this.NewDoctor.Salutation.trim().length == 0) {
+      this.error = "Salutation should not be empty"
+      this.renderer.invokeElementMethod(this.salutation, 'focus');
+      return false;
+    }
 
+     if (this.NewDoctor.FirstName.trim().length == 0) {
+      this.error = "First Name should not be empty"
+      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      return false;
+    }
     if (!namesRegex.test(this.NewDoctor.FirstName)) {
       this.error = "First Name should not contain special characters"
       this.renderer.invokeElementMethod(this.firstName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewDoctor.FirstName.trim().length > 35) {
       this.error = "First Name should not exceed 35 characters"
       this.renderer.invokeElementMethod(this.firstName, 'focus');
-      this.editProgress = false;
       return false;
     }
-    
+    if (this.NewDoctor.MiddleName && this.NewDoctor.MiddleName.trim().length == 0) {
+      this.error = "Middle Name should not be empty"
+      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      return false;
+    }
     if (!namesRegex.test(this.NewDoctor.MiddleName)) {
       this.error = "Middle Name should not contain special characters"
       this.renderer.invokeElementMethod(this.middleName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewDoctor.MiddleName && this.NewDoctor.MiddleName.trim().length > 20) {
       this.error = "Middle Name should not exceed 20 characters"
       this.renderer.invokeElementMethod(this.middleName, 'focus');
-      this.editProgress = false;
+      return false;
+    }
+    if (this.NewDoctor.LastName.trim().length == 0) {
+      this.error = "Last Name should not be empty"
+      this.renderer.invokeElementMethod(this.lastName, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewDoctor.LastName)) {
       this.error = "Last Name should not contain special characters"
       this.renderer.invokeElementMethod(this.lastName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewDoctor.LastName.trim().length > 35) {
       this.error = "Last Name should not exceed 35 characters"
       this.renderer.invokeElementMethod(this.lastName, 'focus');
-      this.editProgress = false;
+      return false;
+    }
+    if (this.NewDoctor.PrimaryPhone.trim().length == 0) {
+      this.error = "Primary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
       return false;
     }
     if (!phoneRegex.test(this.NewDoctor.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
       this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
-      this.editProgress = false;
+      return false;
+    }
+    if (this.NewDoctor.SecondaryPhone && this.NewDoctor.SecondaryPhone.trim().length == 0) {
+      this.error = "Secondary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
       return false;
     }
     if (this.NewDoctor.SecondaryPhone && !phoneRegex.test(this.NewDoctor.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
       this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
-      this.editProgress = false;
       return false;
     }
-
+    if (this.NewDoctor.Email.trim().length == 0) {
+      this.error = "Email should not be empty"
+      this.renderer.invokeElementMethod(this.email, 'focus');
+      return false;
+    }
     if (!emailRegex.test(this.NewDoctor.Email)) {
       this.error = "Please enter a valid email";
       this.renderer.invokeElementMethod(this.email, 'focus');
-      this.editProgress = false;
       return false;
-    }
+    }    
     if (!this.NewDoctor.Client_Id) {
       this.error = "Please select valid client";
       this.renderer.invokeElementMethod(this.client, 'focus');
-      this.editProgress = false;
       return false;
     }
-
-
+    if (this.NewDoctor.AddressLine1.trim().length == 0) {
+      this.error = "Address should not be empty"
+      this.renderer.invokeElementMethod(this.addressLine1, 'focus');
+      return false;
+    }
     if (this.NewDoctor.AddressLine1.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
       this.renderer.invokeElementMethod(this.addressLine1, 'focus');
-      this.editProgress = false;
       return false;
     }
 
+    if (this.NewDoctor.AddressLine2 && this.NewDoctor.AddressLine2.trim().length == 0) {
+      this.error = "Address should not be empty"
+      this.renderer.invokeElementMethod(this.addressLine2, 'focus');
+      return false;
+    }
     if (this.NewDoctor.AddressLine2 && this.NewDoctor.AddressLine2.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
       this.renderer.invokeElementMethod(this.addressLine2, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewDoctor.Country_Id) {
       this.error = "Please select valid country";
       this.renderer.invokeElementMethod(this.country, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!this.NewDoctor.State_Id) {
       this.error = "Please select valid state";
       this.renderer.invokeElementMethod(this.state, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewDoctor.City_Id) {
       this.error = "Please select valid city";
       this.renderer.invokeElementMethod(this.city, 'focus');
-      this.editProgress = false;
       return false;
     }
-
+    if (this.NewDoctor.ZIP.trim().length == 0) {
+      this.error = "ZIP should not be empty"
+      this.renderer.invokeElementMethod(this.zip, 'focus');
+      return false;
+    }
     if (this.NewDoctor.ZIP.trim().length > 10) {
       this.error = "ZIP should not exceed 10 characters"
       this.renderer.invokeElementMethod(this.zip, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.dictationModes.indexOf(this.NewDoctor.DictationMode) == -1) {
+    if (this.dictationModes.findIndex((item) => item.toLowerCase() == this.NewDoctor.DictationMode.toLowerCase()) == -1) {
       this.error = "Please select a valid Dictation Mode"
       this.renderer.invokeElementMethod(this.dictationMode, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.jobLevels.indexOf(this.NewDoctor.JobLevel) == -1) {
+    if (this.NewDoctor.DictationMode != "Toll Free") {
+      this.NewDoctor.IdigitalId = null;
+      this.NewDoctor.IdigitalAuthorId = null;
+    }
+
+    if(this.NewDoctor.IdigitalId && this.NewDoctor.IdigitalId.trim().length ==0){
+      this.error = "Idigital Id should not be empty"
+      this.renderer.invokeElementMethod(this.idigitalId, 'focus');
+      return false;
+    }
+    
+    if(this.NewDoctor.IdigitalAuthorId && this.NewDoctor.IdigitalAuthorId.trim().length ==0){
+      this.error = "Idigital Author Id should not be empty"
+      this.renderer.invokeElementMethod(this.idigitalAuthorId, 'focus');
+      return false;
+    }
+
+    if (this.jobLevels.findIndex((item) => item.toLowerCase() == this.NewDoctor.JobLevel.toLowerCase()) == -1) {
       this.error = "Please select a valid Job Level"
       this.renderer.invokeElementMethod(this.jobLevel, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.voiceGrades.indexOf(this.NewDoctor.VoiceGrade) == -1) {
+    if (this.voiceGrades.findIndex((item) => item.toLowerCase() == this.NewDoctor.VoiceGrade.toLowerCase()) == -1) {
       this.error = "Please select a valid Voice Grade"
       this.renderer.invokeElementMethod(this.voiceGrade, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewDoctor.DoctorGroup_Id) {
       this.error = "Please select valid Doctor Group";
       this.renderer.invokeElementMethod(this.doctorGroup, 'focus');
-      this.editProgress = false;
       return false;
     }
 
@@ -447,4 +543,6 @@ class Doctor {
   DoctorGroup: string;
   DoctorGroup_Id: number;
   Active: boolean;
+  IdigitalId: string;
+  IdigitalAuthorId: string;
 }

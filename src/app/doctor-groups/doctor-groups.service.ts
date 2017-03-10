@@ -13,7 +13,7 @@ export class DoctorGroupsService {
 
         let url = ApiUrl + "/api/Doctor/GetDoctorGroups";
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }
@@ -21,7 +21,7 @@ export class DoctorGroupsService {
         getDoctorGroup(id: number) {
         let url = ApiUrl + "/api/Doctor/GetDoctorGroup?id=" + id;
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }
@@ -30,7 +30,7 @@ export class DoctorGroupsService {
         addDoctorGroup(name: string) {
         let url = ApiUrl + "/api/Doctor/AddDoctorGroup?name=" + name;
         try {
-            return this.http.post(url,null);
+            return this.http.post(url,null).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }

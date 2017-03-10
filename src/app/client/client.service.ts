@@ -11,7 +11,7 @@ export class ClientService {
   getData() {
     let url = ApiUrl + "/api/MasterData/GetMasterDataForNewClient";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -20,7 +20,7 @@ export class ClientService {
   postClient(data: any) {
     let url = ApiUrl + "/api/Client/AddClient";
     try {
-      return this.http.post(url, data).map((data) => data.json());
+      return this.http.post(url, data).toPromise().then((data) => data.json());
     }
     catch (e) {
       throw e;
@@ -30,7 +30,7 @@ export class ClientService {
   getClient(ClientId: number) {
     let url = ApiUrl + "/api/Client/GetClient?ClientId=" + ClientId;
     try {
-      return this.http.get(url).map((data) => data = data.json());
+      return this.http.get(url).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;
@@ -41,7 +41,7 @@ export class ClientService {
   editClient(data: any) {
     let url = ApiUrl + "/api/Client/EditClient";
     try {
-      return this.http.post(url, data).map((data) => data = data.json());
+      return this.http.post(url, data).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;

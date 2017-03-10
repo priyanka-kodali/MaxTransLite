@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { EmployeeDashboardService } from './employee-dashboard.service';
 import { AppComponent } from '../app.component';
 import { Router } from '@angular/router';
+import { MasterService } from '../app.service';
 
 @Component({
   moduleId: module.id,
@@ -20,53 +21,69 @@ export class EmployeeDashboardComponent implements OnInit {
   notices: Array<Notice> = new Array<Notice>();
   messages: Array<Message> = new Array<Message>();
   leavesData: Leaves = new Leaves();
-  appComponent: AppComponent;
+  sub: any
+  error: string;
 
-  constructor(private employeeDashboardService: EmployeeDashboardService, private router: Router) {
+  constructor(private employeeDashboardService: EmployeeDashboardService, private router: Router, private masterService: MasterService, private appComponent: AppComponent) {
   }
 
+
   ngOnInit() {
-    new AppComponent(null).showLoading();
+    this.masterService.changeLoading(true);
     try {
-      this.employeeDashboardService.getMyWorkDetails().subscribe(
-        (data) => this.myJobsData = data
-      )
+      Promise.all([
+        this.employeeDashboardService.getMyWorkDetails().then(
+          (data) => this.myJobsData = data,
+          (error) => {
+            this.error = "Error fetching work details";
+            this.masterService.postAlert("error", this.error);
+          }
+        ),
 
-      this.employeeDashboardService.getMonthlyWorkDetails().subscribe(
-        (data) => this.monthWorkDetailsData = data
-      )
+        this.employeeDashboardService.getMonthlyWorkDetails().then(
+          (data) => this.monthWorkDetailsData = data,
+          (error) => {
+            this.error = "Error fetching monthly work details";
+            this.masterService.postAlert("error", this.error);
+          }
+        ),
 
+        this.sub = this.employeeDashboardService.getLeavesCount().then(
+          (data) => this.leavesData = data,
+          (error) => {
+            this.error = "Error fetching leave details";
+            this.masterService.postAlert("error", this.error);
+          }
+        )
+      ]).then(() => this.masterService.changeLoading(false));
 
-      this.employeeDashboardService.getLeavesCount().subscribe(
-        (data) => this.leavesData = data
-      )
       if (this.isInRole('Coordinator')) {
-        this.employeeDashboardService.getTeamWorkDetails().subscribe(
-          (data) => this.teamJobsData = data
+        this.masterService.changeLoading(true);
+        this.employeeDashboardService.getTeamWorkDetails().then(
+          (data) => {
+            this.teamJobsData = data;
+            this.masterService.changeLoading(false);
+          },
+          (error) => {
+            this.error = "Error fetching team work details";
+            this.masterService.postAlert("error", this.error);
+          }
         )
       }
-       new AppComponent(null).hideLoading();
-
     }
     catch (e) { }
   }
-
-
 
   navigateTo(to: string) {
     this.router.navigate([to]);
   }
 
-
   isInRole(role: string) {
-    this.appComponent = new AppComponent(null);
     if (this.appComponent.isLoggedIn()) {
       this.appComponent.roles = sessionStorage.getItem('roles');
       return this.appComponent.roles.indexOf(role) > -1;
     }
   }
-
-
 }
 
 

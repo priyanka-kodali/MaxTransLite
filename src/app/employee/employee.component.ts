@@ -11,7 +11,7 @@ import { MasterService } from '../app.service';
   selector: 'app-employee',
   templateUrl: 'employee.component.html',
   styleUrls: ['employee.component.scss'],
-  providers: [EmployeeService, MasterService]
+  providers: [EmployeeService]
 })
 
 export class EmployeeComponent implements OnInit, AfterViewInit {
@@ -35,8 +35,6 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   doctorGroupSelector: string;
   specialtySelector: string;
   error: string;
-  editSuccess: boolean;
-  editProgress: boolean;
   private sub: any;
   EmpId: number;
   inputDisabled: boolean;
@@ -44,7 +42,6 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   isDataAvailable: boolean;
   NewEmployee: Employee;
   ImageSrc: string;
-  hideFileButton: boolean;
   bloodGroups: Array<string>;
   employmentTypes: Array<string>;
 
@@ -67,6 +64,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   @ViewChild("city") city: ElementRef;
   @ViewChild("zip") zip: ElementRef;
   @ViewChild("doj") doj: ElementRef;
+  @ViewChild("dor") dor: ElementRef;
   @ViewChild("provisionalPeriod") provisionalPeriod: ElementRef;
   @ViewChild("employmentType") employmentType: ElementRef;
   @ViewChild("designation") designation: ElementRef;
@@ -92,8 +90,6 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     this.employmentTypes = ['Consultant', 'Permanent'];
     this.error = "";
     this.ImageSrc = "";
-    this.hideFileButton = false;
-    this.editProgress = false;
     this.sub = this.activatedRoute.params.subscribe(
       params => this.EmpId = +params['EmpId']
     );
@@ -105,10 +101,12 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
 
+    this.masterService.postAlert("remove", "");
+    this.masterService.changeLoading(true);
     if (this.isNewEmployee) {
       this.inputDisabled = false;
-      this.editSuccess = false;
       this.getMasterData();
+      this.ImageSrc = "../images/dummy-profile-pic.png";
     }
 
     if (!this.isNewEmployee) {
@@ -116,20 +114,27 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       try {
         this.NewEmployee.Id = this.EmpId;
         this.employeeService.getEmployee(this.EmpId)
-          .subscribe(
+          .then(
           (data) => {
             this.NewEmployee = data["employee"];
             this.NewEmployee.DOB = data["employee"]['DOB'].split("T")[0];
             this.NewEmployee.DOJ = data["employee"]['DOJ'].split("T")[0];
+            this.NewEmployee.DOR = data["employee"]['DOR'] ? data["employee"]['DOR'].split("T")[0] : null;
             this.ImageSrc = this.NewEmployee.PhotoURL;
-            if (this.ImageSrc != null) {
-              this.hideFileButton = true;
-            }
+            this.masterService.changeLoading(false);
           },
-          (error) => { this.error = "Error fetching employee data" }
+          (error) => {
+            this.error = "Error fetching employee data";
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+          }
           );
       }
-      catch (e) { this.error = "Error processing employee data" }
+      catch (e) {
+        this.error = "Error processing employee data";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     }
 
   }
@@ -142,7 +147,6 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     });
     // read the image file as a data URL.
     reader.readAsDataURL(event.target['files'][0]);
-    this.hideFileButton = true;
   }
 
   removeImage() {
@@ -150,14 +154,12 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.ImageSrc = "";
-    this.hideFileButton = false;
     this.uploader.clearQueue();
-    // this.renderer.setElementAttribute(this.photo,"value","");
     this.renderer.setElementProperty(this.photo, "value", "");
   }
 
   getMasterData() {
-    this.employeeService.getData().subscribe(
+    this.employeeService.getData().then(
       (data) => {
         data['countries'].forEach(country => {
           this.countries.push(country.Name);
@@ -175,62 +177,91 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
           this.roles.push(role.Name);
           this.roleIds.push(role.Id);
         });
+        if (this.NewEmployee.Department) {
+          this.getManagers();
+        }
         this.specialties = data['specialties'];
         this.doctorGroups = data['doctorGroups'];
         this.isDataAvailable = true;
-        this.error = "";
+        this.masterService.changeLoading(false);
       },
-      (error) => { this.error = "Error fetching Master Data" }
+      (error) => {
+        this.error = "Error fetching Master Data";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
   }
 
   getManagers() {
     try {
-      this.NewEmployee.Department_Id = this.departmentIds[this.departments.indexOf(this.NewEmployee.Department)];
-
-      this.employeeService.getManagers(this.NewEmployee.Department_Id).subscribe(
+      this.masterService.changeLoading(true);
+      this.managers = new Array<string>();
+      this.managerIds = new Array<number>();
+      this.masterService.changeLoading(true);
+      this.NewEmployee.Department_Id = this.departmentIds[this.departments.findIndex((item) => item.toLowerCase() == this.NewEmployee.Department.toLowerCase())];
+      if (!this.NewEmployee.Department_Id) {
+        this.masterService.changeLoading(false);
+        return;
+      }
+      this.employeeService.getManagers(this.NewEmployee.Department_Id).then(
         (data) => {
           data['managers'].forEach(manager => {
             this.managers.push(manager.Name);
             this.managerIds.push(manager.Id);
           });
         })
+      this.masterService.changeLoading(false);
     }
     catch (e) { throw e; }
   }
 
   editData() {
+
     this.inputDisabled = !this.inputDisabled;
-
-    this.states = new Array<string>();
-    this.stateIds = new Array<number>();
-    this.masterService.getStates(this.NewEmployee.Country_Id).subscribe(
-      (data) => data['states'].forEach(state => {
-        this.states.push(state.Name);
-        this.stateIds.push(state.Id);
-      })
-    )
-
-    this.cities = new Array<string>();
-    this.cityIds = new Array<number>();
-    this.masterService.getCities(this.NewEmployee.State_Id).subscribe(
-      (data) => data['cities'].forEach(city => {
-        this.cities.push(city.Name);
-        this.cityIds.push(city.Id);
-      })
-    )
-    this.stateSelected();
     if (!this.isDataAvailable) {
-      this.getMasterData(); this.getManagers();
+      this.masterService.changeLoading(true);
+
+      this.states = new Array<string>();
+      this.stateIds = new Array<number>();
+
+      this.cities = new Array<string>();
+      this.cityIds = new Array<number>();
+
+      Promise.all([
+        this.masterService.getStates(this.NewEmployee.Country_Id).then(
+          (data) => data['states'].forEach(state => {
+            this.states.push(state.Name);
+            this.stateIds.push(state.Id);
+          })
+        ),
+
+        this.masterService.getCities(this.NewEmployee.State_Id).then(
+          (data) => {
+            data['cities'].forEach(city => {
+              this.cities.push(city.Name);
+              this.cityIds.push(city.Id);
+            })
+          }
+        )
+      ]).then(() => this.masterService.changeLoading(false));
+
+
+      this.masterService.changeLoading(true);
+      this.getMasterData()
     }
   }
 
   departmentChange() {
+    if (this.NewEmployee.Department != "MT") {
+      this.NewEmployee.Specialties = new Array<string>();
+      this.NewEmployee.DoctorGroups = new Array<string>();
+    }
     this.getManagers();
   }
 
   specialtiesChange() {
-    if (this.NewEmployee.Specialties.indexOf(this.specialtySelector) > -1) { }
+    if (this.NewEmployee.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) { }
     else {
       this.specialties = this.specialties.filter((item) => item != this.specialtySelector);
       this.NewEmployee.Specialties.push(this.specialtySelector);
@@ -251,7 +282,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   doctorGroupChange() {
-    if (this.NewEmployee.DoctorGroups.indexOf(this.doctorGroupSelector) > -1) { }
+    if (this.NewEmployee.DoctorGroups.findIndex((item) => item.toLowerCase() == this.doctorGroupSelector.toLowerCase()) > -1) { }
     else {
       this.doctorGroups = this.doctorGroups.filter((item) => item != this.doctorGroupSelector);
       this.NewEmployee.DoctorGroups.push(this.doctorGroupSelector);
@@ -277,42 +308,67 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   countrySelected() {
+    this.masterService.changeLoading(true);
     this.NewEmployee.State = "";
     this.NewEmployee.City = "";
     this.states = new Array<string>();
     this.stateIds = new Array<number>();
-    var countryId = this.countryIds[this.countries.indexOf(this.NewEmployee.Country)];
-    this.masterService.getStates(countryId).subscribe(
-      (data) => data['states'].forEach(state => {
-        this.states.push(state.Name);
-        this.stateIds.push(state.Id);
-      })
+    var countryId = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewEmployee.Country.toLowerCase())];
+    if (!countryId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getStates(countryId).then(
+      (data) => {
+        data['states'].forEach(state => {
+          this.states.push(state.Name);
+          this.stateIds.push(state.Id);
+        });
+        this.masterService.changeLoading(false);
+      }
     )
   }
 
   stateSelected() {
+    this.masterService.changeLoading(true);
     this.NewEmployee.City = "";
     this.cities = new Array<string>();
     this.cityIds = new Array<number>();
-    var stateId = this.stateIds[this.states.indexOf(this.NewEmployee.State)];
-    this.masterService.getCities(stateId).subscribe(
-      (data) => data['cities'].forEach(city => {
-        this.cities.push(city.Name);
-        this.cityIds.push(city.Id);
-      })
+    var stateId = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewEmployee.State.toLowerCase())];
+    if (!stateId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getCities(stateId).then(
+      (data) => {
+        data['cities'].forEach(city => {
+          this.cities.push(city.Name);
+          this.cityIds.push(city.Id);
+        });
+        this.masterService.changeLoading(false);
+      }
     )
+
   }
 
   saveChanges() {
-    if (!this.validate()) return;
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
+    this.masterService.changeLoading(true);
+
+    if (!this.validate()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      return;
+    }
+
+    this.masterService.postAlert("remove", "");
 
     this.uploader.onBuildItemForm = (item, form) => {
       form.append("employeeData", JSON.stringify(this.NewEmployee));
     }
+
+    var file = this.uploader.queue[this.uploader.queue.length - 1];
+    file.withCredentials = false;
 
     try {
       if (this.isNewEmployee) {
@@ -320,26 +376,24 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
           elem.alias = "MyForm";
           elem.url = ApiUrl + "/api/Employee/AddEmployee";
         });
-        this.uploader.uploadAll();
+        this.uploader.uploadItem(file);
         this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
           response = JSON.parse(response);
           if (status != 200) {
-            this.editProgress = false;
-            this.editSuccess = false;
-            this.error = "Error updating employee details"
+            this.error = response;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
           }
           if (status == 200) {
             this.NewEmployee = response["employee"];
             this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
             this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
-            this.error = "";
-            this.editSuccess = true;
+            this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
             this.inputDisabled = true;
-            this.editProgress = true;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("success", "Employee added successfully");
           }
         }
-
-
       }
 
       else {
@@ -347,238 +401,225 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
           elem.alias = "MyForm";
           elem.url = ApiUrl + "/api/Employee/EditEmployee";
         });
-        this.uploader.uploadAll();
+        this.uploader.uploadItem(file);
 
         this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
           response = JSON.parse(response);
           if (status != 200) {
-            this.editSuccess = false; this.error = "Error updating employee details"
+            this.error = response;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
           }
           if (status == 200) {
             this.NewEmployee = response["employee"];
             this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
             this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
-            this.error = "";
-            this.editSuccess = true;
+            this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
             this.inputDisabled = true;
-            this.editProgress = true;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("success", "Employee details updated successfully");
           }
         }
-
       }
     }
-    catch (e) { throw e; }
+    catch (e) {
+      this.error = "Error updating employee details";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      throw e;
+    }
   }
 
   validate() {
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
+    this.masterService.postAlert("remove", "");
+
     var namesRegex = /^[a-zA-Z ]*$/;
-    var employeeNumberRegex = /^[A-Za-z]{2}[0-9]{4}/;
+    var employeeNumberRegex = /^[A-Za-z]{3}[0-9]{4}/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
     var panRegex = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}/;
     var aadharRegex = /^[0-9]{12}/;
 
 
-    this.NewEmployee.City_Id = this.cityIds[this.cities.indexOf(this.NewEmployee.City)];
-    this.NewEmployee.State_Id = this.stateIds[this.states.indexOf(this.NewEmployee.State)];
-    this.NewEmployee.Country_Id = this.countryIds[this.countries.indexOf(this.NewEmployee.Country)];
-    this.NewEmployee.Designation_Id = this.designationIds[this.designations.indexOf(this.NewEmployee.Designation)];
-    this.NewEmployee.Department_Id = this.departmentIds[this.departments.indexOf(this.NewEmployee.Department)];
-    this.NewEmployee.Manager_Id = this.managerIds[this.managers.indexOf(this.NewEmployee.Manager)];
-    this.NewEmployee.Role_Id = this.roleIds[this.roles.indexOf(this.NewEmployee.Role)];
+
+
+    this.NewEmployee.City_Id = this.cityIds[this.cities.findIndex((item) => item.toLowerCase() == this.NewEmployee.City.toLowerCase())];
+    this.NewEmployee.State_Id = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewEmployee.State.toLowerCase())];
+    this.NewEmployee.Country_Id = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewEmployee.Country.toLowerCase())];
+    this.NewEmployee.Designation_Id = this.designationIds[this.designations.findIndex((item) => item.toLowerCase() == this.NewEmployee.Designation.toLowerCase())];
+    this.NewEmployee.Department_Id = this.departmentIds[this.departments.findIndex((item) => item.toLowerCase() == this.NewEmployee.Department.toLowerCase())];
+    this.NewEmployee.Manager_Id = this.managerIds[this.managers.findIndex((item) => item.toLowerCase() == this.NewEmployee.Manager.toLowerCase())];
+    this.NewEmployee.Role_Id = this.roleIds[this.roles.findIndex((item) => item.toLowerCase() == this.NewEmployee.Role.toLowerCase())];
 
 
 
     if (!namesRegex.test(this.NewEmployee.FirstName)) {
       this.error = "First Name should not contain special characters"
       this.renderer.invokeElementMethod(this.firstName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewEmployee.FirstName.trim().length > 35) {
       this.error = "First Name should not exceed 35 characters"
       this.renderer.invokeElementMethod(this.firstName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!namesRegex.test(this.NewEmployee.MiddleName)) {
       this.error = "Middle Name should not contain special characters"
       this.renderer.invokeElementMethod(this.middleName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewEmployee.MiddleName && this.NewEmployee.MiddleName.trim().length > 20) {
       this.error = "Middle Name should not exceed 20 characters"
       this.renderer.invokeElementMethod(this.middleName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!namesRegex.test(this.NewEmployee.LastName)) {
       this.error = "Last Name should not contain special characters"
       this.renderer.invokeElementMethod(this.lastName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewEmployee.LastName.trim().length > 35) {
       this.error = "Last Name should not exceed 35 characters"
       this.renderer.invokeElementMethod(this.lastName, 'focus');
-      this.editProgress = false;
       return false;
     }
-    if (!employeeNumberRegex.test(this.NewEmployee.EmployeeNumber)) {
+    if (this.NewEmployee.EmployeeNumber && !employeeNumberRegex.test(this.NewEmployee.EmployeeNumber)) {
       this.error = "Please enter a valid Employee Number (eg : MX0001)"
       this.renderer.invokeElementMethod(this.employeeNumber, 'focus');
-      this.editProgress = false;
       return false;
     }
-    if (this.NewEmployee.EmployeeNumber.trim().length > 6) {
-      this.error = "Employee Number should not exceed 6 characters"
+    if (this.NewEmployee.EmployeeNumber && this.NewEmployee.EmployeeNumber.trim().length > 7) {
+      this.error = "Employee Number should not exceed 7 characters"
       this.renderer.invokeElementMethod(this.employeeNumber, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!phoneRegex.test(this.NewEmployee.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
       this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewEmployee.SecondaryPhone && !phoneRegex.test(this.NewEmployee.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
       this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!emailRegex.test(this.NewEmployee.Email)) {
       this.error = "Please enter a valid email";
       this.renderer.invokeElementMethod(this.email, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     var dob = new Date(this.NewEmployee.DOB);
     var doj = new Date(this.NewEmployee.DOJ);
+    var dor = this.NewEmployee.DOR ? new Date(this.NewEmployee.DOR) : null;
 
     if (dob.getTime() >= new Date().getTime()) {
       this.error = "Please select a valid DOB";
       this.renderer.invokeElementMethod(this.dob, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.bloodGroups.indexOf(this.NewEmployee.BloodGroup) == -1) {
+    if (this.bloodGroups.findIndex((item) => item.toLowerCase() == this.NewEmployee.BloodGroup.toLowerCase()) == -1) {
       this.error = "Please select a valid Blood Group"
       this.renderer.invokeElementMethod(this.bloodGroup, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (this.NewEmployee.PAN && !panRegex.test(this.NewEmployee.PAN)) {
       this.error = "Please enter a valid PAN";
       this.renderer.invokeElementMethod(this.pan, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (this.NewEmployee.Aadhar && !aadharRegex.test(this.NewEmployee.Aadhar)) {
       this.error = "Please enter a valid aadhar (12 digits)";
       this.renderer.invokeElementMethod(this.aadhar, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.uploader.queue.length != 1) {
+    if (this.uploader.queue.length < 1) {
       this.error = "Please select a valid photo for the employee";
       this.renderer.invokeElementMethod(this.photo.nativeElement, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (this.NewEmployee.AddressLine1.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
       this.renderer.invokeElementMethod(this.addressLine1, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (this.NewEmployee.AddressLine2 && this.NewEmployee.AddressLine2.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
       this.renderer.invokeElementMethod(this.addressLine2, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.Country_Id) {
       this.error = "Please select valid country";
       this.renderer.invokeElementMethod(this.country, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!this.NewEmployee.State_Id) {
       this.error = "Please select valid state";
       this.renderer.invokeElementMethod(this.state, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.City_Id) {
       this.error = "Please select valid city";
       this.renderer.invokeElementMethod(this.city, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (this.NewEmployee.ZIP.trim().length > 10) {
       this.error = "ZIP should not exceed 10 characters"
       this.renderer.invokeElementMethod(this.zip, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (doj.getTime() <= dob.getTime() || doj.getTime() >= new Date().getTime()) {
       this.error = "Please select a valid DOJ"
       this.renderer.invokeElementMethod(this.doj, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.employmentTypes.indexOf(this.NewEmployee.EmploymentType) == -1) {
+
+    if (this.NewEmployee.DOR && (dor.getTime() <= dob.getTime() || dor.getTime() <= doj.getTime())) {
+      this.error = "Please select a valid DOR"
+      this.renderer.invokeElementMethod(this.dor, 'focus');
+      return false;
+    }
+
+    if (this.employmentTypes.findIndex((item) => item.toLowerCase() == this.NewEmployee.EmploymentType.toLowerCase()) == -1) {
       this.error = "Please select a valid Employment Type"
       this.renderer.invokeElementMethod(this.employmentType, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.Designation_Id) {
       this.error = "Please select valid designation";
       this.renderer.invokeElementMethod(this.designation, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.Department_Id) {
       this.error = "Please select valid department";
       this.renderer.invokeElementMethod(this.department, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.Manager_Id && this.NewEmployee.Manager) {
       this.error = "Please select valid manager";
       this.renderer.invokeElementMethod(this.manager, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewEmployee.Role_Id) {
       this.error = "Please select valid role";
       this.renderer.invokeElementMethod(this.role, 'focus');
-      this.editProgress = false;
       return false;
     }
 
@@ -608,6 +649,7 @@ class Employee {
   Country: string;
   ZIP: string;
   DOJ: Date;
+  DOR: Date;
   ProvisionalPeriod: number;
   EmploymentType: string;
   Designation: string;

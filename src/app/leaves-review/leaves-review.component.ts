@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LeavesReviewService } from './leaves-review.service';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-leaves-review',
@@ -16,45 +17,51 @@ export class LeavesReviewComponent implements OnInit {
   SelectedLeaveReviewDate1: string;
   SelectedLeaveReviewDate2: string;
   ReviewLeaveModal: boolean;
-  ModalError: string;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress : boolean;
   MasterReviewers: Array<string> = new Array<string>();
   MasterReviewer_Ids: Array<number> = new Array<number>();
   Reviewers: Array<string> = new Array<string>();
   Reviewer_Ids: Array<number> = new Array<number>();
   IsReviewerDataAvailable: boolean;
+  error: string;
 
-  constructor(private leavesReviewService: LeavesReviewService) {
+  constructor(private leavesReviewService: LeavesReviewService, private masterService: MasterService) {
     this.ReviewLeaveModal = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress=false;
-    this.ModalError = "";
+    this.error = "";
     this.IsReviewerDataAvailable = false;
   }
 
   ngOnInit() {
-    this.leavesReviewService.getLeavesToReview().subscribe(
-      (data) => this.Leaves = data,
-      (error) => { }
+    this.masterService.changeLoading(true);
+    this.leavesReviewService.getLeavesToReview().then(
+      (data) => {
+        this.Leaves = data;
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = "Error fetching leaves data";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     )
   }
 
   getReviewers() {
+    this.masterService.changeLoading(true);
     if (!this.IsReviewerDataAvailable) {
-      this.leavesReviewService.getReviewers().subscribe(
+      this.leavesReviewService.getReviewers().then(
         (data) => {
-          data.forEach(reviewer => {
-            // this.MasterReviewers.push(reviewer.Name);
-            // this.MasterReviewer_Ids.push(reviewer.Id);
+          data["reviewers"].forEach(reviewer => {
             this.Reviewers.push(reviewer.Name);
             this.Reviewer_Ids.push(reviewer.Id);
             this.IsReviewerDataAvailable = true;
           });
+          this.masterService.changeLoading(false);
         },
-        (error) => { }
+        (error) => {
+          this.error = "Error fetching reviewers";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+        }
       )
     }
   }
@@ -67,36 +74,27 @@ export class LeavesReviewComponent implements OnInit {
       this.SelectedLeaveReviewDate1 = this.SelectedLeave.ReviewDate1.toString().split("T")[0];
     if (this.SelectedLeaveReviewDate2 != null)
       this.SelectedLeaveReviewDate2 = this.SelectedLeave.ReviewDate2.toString().split("T")[0];
-    this.ReviewLeaveModal = true;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.ModalError = "";
-    // if(this.SelectedLeave.IsReviewer1){
-    //   this.Reviewers=this.MasterReviewers.filter((item)=>item!=this.SelectedLeave.Reviewer1);
-    //   this.Reviewer_Ids=this.MasterReviewer_Ids.filter((item)=>item!=this.SelectedLeave.Reviewer1Id);
-    // }
+
   }
 
   authorizeLeave() {
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-        this.UpdateProgress=true;
-    this.ModalError = "";
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
     if (this.SelectedLeave.IsReviewer1) {
-      this.SelectedLeave.Reviewer2_Id = this.Reviewer_Ids[this.Reviewers.indexOf(this.SelectedLeave.Reviewer2)];
+      this.SelectedLeave.Reviewer2_Id = this.Reviewer_Ids[this.Reviewers.findIndex((item)=>item.toLowerCase()==this.SelectedLeave.Reviewer2.toLowerCase())];
     }
 
-    this.leavesReviewService.authorizeLeave(this.SelectedLeave).subscribe(
+    this.leavesReviewService.authorizeLeave(this.SelectedLeave).then(
       (data) => {
         this.SelectedLeave = data;
         this.ReviewLeaveModal = false;
-        this.UpdateSuccess = true;
-        this.UpdateProgress=false;
+        this.masterService.changeLoading(false);
       },
       (error) => {
-        this.UpdateFailed=true;
-        this.UpdateProgress=false;
-       }
+        this.error = "Error updating leave";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     )
   }
 

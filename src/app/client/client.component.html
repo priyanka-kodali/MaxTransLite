@@ -1,161 +1,159 @@
 <div class="row">
-  <h1 class="center-align text-info">Client Information</h1>
-  <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
-    <md-card-content class="p0">
-      <form #myForm (submit)="saveChanges()">
-        <div>
-          <md-toolbar color="primary">
-            <div class="col-xs-12 p0 m0"><span>General Details</span><button md-raised-button type="button" class="pull-right btn-small" (click)="editData()"
-                *ngIf="!isNewClient"><span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
-</button> <button md-raised-button class="pull-right btn-small mright5" type="button" (click)="routeToClientList()"><span class="glyphicon glyphicon-list text-success" style="padding: 2px 0 4px 2px"></span>
-</button>
-</div>
-</md-toolbar>
-<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
-  <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-    <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-  <p *ngIf="editSuccess" class="alert alert-success">Client Details are updated successfully!</p>
-  </div>
+    <h1 class="center-align text-info">Client Information</h1>
+    <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
+        <md-card-content class="p0">
+            <form #myForm (submit)="saveChanges()">
+                <div>
+                    <md-toolbar color="primary">
+                        <div class="col-xs-12 p0 m0">
+                            <span>General Details</span>
+                            <button md-raised-button type="button" class="pull-right btn-small" (click)="editData()" *ngIf="!isNewClient">
+                                <span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
+                            </button>
+                            <button md-raised-button class="pull-right btn-small mright5" type="button" (click)="routeToClientList()">
+                                <span class="glyphicon glyphicon-list text-success" style="padding: 2px 0 4px 2px"></span>
+                            </button>
+                        </div>
+                    </md-toolbar>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+                        <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+                            <md-input class="" name="name" #name [(ngModel)]="NewClient.Name" placeholder="Name" type="text" required maxLength="255"
+                                      autocomplete="off" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-    <md-input class="" name="name" #name [(ngModel)]="NewClient.Name" placeholder="Name" type="text" required maxLength="255" autocomplete="off"
-      [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+                            <md-input class="" name="shortName" #shortName [(ngModel)]="NewClient.ShortName" placeholder="Short Name" type="text" autocomplete="off"
+                                      required maxLength="20" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-    <md-input class="" name="shortName" #shortName [(ngModel)]="NewClient.ShortName" placeholder="Short Name" type="text" autocomplete="off"
-      required maxLength="20" [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewClient.PrimaryPhone" placeholder="Primary Phone" autocomplete="off"
+                                      type="text" required maxLength="15" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewClient.PrimaryPhone" placeholder="Primary Phone" autocomplete="off"
-      type="text" required maxLength="15" [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewClient.SecondaryPhone" autocomplete="off" placeholder="Secondary Phone"
+                                      type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewClient.SecondaryPhone" autocomplete="off" placeholder="Secondary Phone"
-      type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="fax" #fax [(ngModel)]="NewClient.Fax" placeholder="Fax" type="text" autocomplete="off" maxLength="15"
+                                      [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="fax" #fax [(ngModel)]="NewClient.Fax" placeholder="Fax" type="text" autocomplete="off" maxLength="15"
-      [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="email" #email [(ngModel)]="NewClient.Email" placeholder="Email" type="email" autocomplete="off"
+                                      required maxLength="255" [disabled]="!isNewClient"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="email" #email [(ngModel)]="NewClient.Email" placeholder="Email" type="email" autocomplete="off" required
-      maxLength="255" [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+                            <md-input class="" name="clientVertical" #clientVertical [(ngModel)]="NewClient.ClientVertical" placeholder="Client Vertical"
+                                      type="text" autocomplete="off" [typeahead]="verticals" [typeaheadMinLength]="0" [disabled]="inputDisabled"
+                                      required (typeaheadOnSelect)="clientVerticalChange()"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-    <md-input class="" name="clientVertical" #clientVertical [(ngModel)]="NewClient.ClientVertical" placeholder="Client Vertical" type="text"
-      autocomplete="off" [typeahead]="verticals" [typeaheadMinLength]="0" [disabled]="inputDisabled" required (typeaheadOnSelect)="clientVerticalChange()"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" name="clientType" #clientType [(ngModel)]="NewClient.ClientType" placeholder="Client Type" type="text"
+                                      autocomplete="off" [typeahead]="clientTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" (typeaheadOnSelect)="clientTypeChange()"
+                                      required></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" name="clientType" #clientType [(ngModel)]="NewClient.ClientType" placeholder="Client Type" type="text" autocomplete="off"
-      [typeahead]="clientTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" (typeaheadOnSelect)="clientTypeChange()"
-      required></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="isIndirectClient">
+                            <md-input class="" name="vendor" #vendor [(ngModel)]="NewClient.Vendor" required placeholder="Vendor Name" type="text" autocomplete="off"
+                                      [typeahead]="vendors" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12"  *ngIf="isIndirectClient">
-    <md-input class="" name="vendor" #vendor [(ngModel)]="NewClient.Vendor" required placeholder="Vendor Name" type="text" autocomplete="off"
-      [typeahead]="vendors" [disabled]="inputDisabled"></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor && NewClient.ClientVertical=='Transcription'">
+                            <md-input class="" name="NumberOfCharactersPerLine" #NumberOfCharactersPerLine [(ngModel)]="NewClient.NumberOfCharactersPerLine"
+                                      min="1" max="100" autocomplete="off" placeholder="Characters per Line" type="number" required [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor && !isIndirectClient && NewClient.ClientVertical=='Transcription'">
-    <md-input class="" name="NumberOfCharactersPerLine" #NumberOfCharactersPerLine [(ngModel)]="NewClient.NumberOfCharactersPerLine" min="0" max="100" autocomplete="off"
-      placeholder="Characters per Line" type="number" required [disabled]="inputDisabled" ></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor  && NewClient.ClientVertical=='Transcription'">
+                            <md-input class="" name="fileTypes" #fileTypes [(ngModel)]="NewClient.FileTypes" placeholder="File Types" type="text" autocomplete="off"
+                                      required maxLength="40" [disabled]="inputDisabled"></md-input>
+                        </div>
 
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isVendor && !isIndirectClient && NewClient.ClientVertical=='Transcription'">
-    <md-input class="" name="fileTypes" #fileTypes [(ngModel)]="NewClient.FileTypes" placeholder="File Types" type="text" autocomplete="off"
-      required maxLength="40" [disabled]="inputDisabled" ></md-input>
-  </div>
+                        <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewClient">
+                            <md-checkbox name="active" [(ngModel)]="NewClient.Active" [disabled]="inputDisabled">Active </md-checkbox>
+                        </div>
 
-  <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewClient">
-    <md-checkbox name="active" [(ngModel)]="NewClient.Active" [disabled]="inputDisabled" >Active </md-checkbox>
-  </div>
+                    </div>
+                </div>
+                <div>
+                    <md-toolbar color="primary">
+                        <div class="col-xs-12 p0 m0">
+                            <span>Address Details</span><button md-raised-button class="pull-right btn-small mright5" type="button" [disabled]="inputDisabled"
+                                                                (click)="addClientLocation()">
+                                <span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px"></span>
+                            </button>
+                        </div>
+                    </md-toolbar>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mtb10" *ngFor="let location of locations; let i=index">
+                        <h3>Location {{i+1}}</h3>
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.AddressLine1" placeholder="Address Line 1"
+                                      autocomplete="off" type="text" required maxLength="255" [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.AddressLine2" placeholder="Address Line 2"
+                                      autocomplete="off" type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.Landmark" placeholder="Landmark" type="text"
+                                      autocomplete="off" maxLength="255" [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.Country" [typeahead]="countries" autocomplete="off"
+                                      placeholder="Country" type="text" required [disabled]="inputDisabled" (blur)="countrySelected(i)" (typeaheadOnSelect)="countrySelected(i)"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.State" autocomplete="off" [typeahead]="location.states"
+                                      placeholder="State" type="text" required [disabled]="inputDisabled" (blur)="stateSelected(i)" (typeaheadOnSelect)="stateSelected(i)"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.City" [typeahead]="location.cities" autocomplete="off"
+                                      placeholder="City" type="text" required [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.ZIP" placeholder="ZIP" type="text" autocomplete="off"
+                                      required maxLength="10" [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.TimeZone" placeholder="Time Zone (Eg : CST, IST)" [typeahead]="timezones"
+                                      autocomplete="off" type="text" required [disabled]="inputDisabled"></md-input>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+                            <md-checkbox [disabled]="inputDisabled" [(ngModel)]="location.IsInvoiceAddress" [ngModelOptions]="{standalone: true}" (change)="InvoiceAddressSelected(i)">Invoice Address </md-checkbox>
+                        </div>
+                    </div>
 
-</div>
-</div>
-<div>
-  <md-toolbar color="primary">
-    <div class="col-xs-12 p0 m0"><span>Address Details</span><button md-raised-button class="pull-right btn-small mright5" type="button" [disabled]="inputDisabled"
-        (click)="addClientLocation()"><span class="glyphicon glyphicon-plus text-success" style="padding: 2px 0 4px 2px"></span>
-</button>
-</div>
-</md-toolbar>
-<div class="col-lg-12 col-md-12 col-sm-12 mtb10" *ngFor="let location of locations; let i=index">
-  <h3>Location {{i+1}}</h3>
-  <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.AddressLine1" placeholder="Address Line 1"
-      autocomplete="off" type="text" required maxLength="255" [disabled]="inputDisabled"></md-input>
-  </div>
-  <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.AddressLine2" placeholder="Address Line 2"
-      autocomplete="off" type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.Landmark" placeholder="Landmark" type="text"
-      autocomplete="off" maxLength="255" [disabled]="inputDisabled"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.Country" [typeahead]="countries" autocomplete="off"
-      placeholder="Country" type="text" required [disabled]="inputDisabled" (typeaheadOnSelect)="countrySelected(i)"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.State" autocomplete="off" [typeahead]="states"
-      placeholder="State" type="text" required [disabled]="inputDisabled" (focus)="getStates(i)" (typeaheadOnSelect)="stateSelected(i)"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.City" [typeahead]="cities" autocomplete="off"
-      placeholder="City" type="text" required [disabled]="inputDisabled" (focus)="getCities(i)"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.ZIP" placeholder="ZIP" type="text" autocomplete="off"
-      required maxLength="10" [disabled]="inputDisabled"></md-input>
-  </div>
-  <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-    <md-input class="" [ngModelOptions]="{standalone: true}" [(ngModel)]="location.TimeZone" placeholder="Time Zone" [typeahead]="timezones" autocomplete="off"
-      type="text" required [disabled]="inputDisabled"></md-input>
-  </div>
-  <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-    <md-checkbox [disabled]="inputDisabled" [(ngModel)]="location.IsInvoiceAddress" [ngModelOptions]="{standalone: true}" (change)="InvoiceAddressSelected(i)">Invoice Address </md-checkbox>
-  </div>
-</div>
+                </div>
+                <div *ngIf="!isVendor">
+                    <md-toolbar color="primary">Payment Details</md-toolbar>
+                    <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
 
-</div>
-<div *ngIf="!isVendor">
-  <md-toolbar color="primary">Payment Details</md-toolbar>
-  <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" name="paymentType" #paymentType [(ngModel)]="NewClient.PaymentType" placeholder="Payment Type" type="text"
+                                      autocomplete="off" [typeahead]="paymentTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
+                        </div>
 
-    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="paymentType" #paymentType [(ngModel)]="NewClient.PaymentType" placeholder="Payment Type" type="text" autocomplete="off"
-        [typeahead]="paymentTypes" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
-    </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" name="currency" #currency [(ngModel)]="NewClient.Currency" placeholder="Currency" type="text" autocomplete="off"
+                                      [typeahead]="currencies" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
+                        </div>
 
-    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="currency" #currency [(ngModel)]="NewClient.Currency" placeholder="Currency" type="text" autocomplete="off"
-        [typeahead]="currencies" [typeaheadMinLength]="0" [disabled]="inputDisabled" required></md-input>
-    </div>
-
-    <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-      <md-input class="" name="paymentAmount" #paymentAmount [(ngModel)]="NewClient.PaymentAmount" min="0" autocomplete="off" placeholder="Payment Amount"
-        type="number" required maxLength="10" step="0.01" [disabled]="inputDisabled"></md-input>
-    </div>
+                        <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+                            <md-input class="" name="paymentAmount" #paymentAmount [(ngModel)]="NewClient.PaymentAmount" min="0" max="999999" autocomplete="off" placeholder="Payment Amount"
+                                      type="number" required maxLength="10" step="0.01" [disabled]="inputDisabled"></md-input>
+                        </div>
 
 
-  </div>
-</div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-  <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-  <p *ngIf="editProgress" class="alert alert-info">Please wait.......</p>
-</div>
-<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align mtb10">
-  <button md-raised-button class="btn-save" [disabled]="inputDisabled||editProgress">Save</button>
-</div>
-</form>
-</md-card-content>
-</md-card>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align mtb10">
+                    <button md-raised-button class="btn-save" [disabled]="inputDisabled">Save</button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
 </div>

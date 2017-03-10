@@ -11,7 +11,7 @@ export class EmployeeDashboardService{
   getMyWorkDetails(){    
     let url= ApiUrl+"/api/Dashboard/GetMyJobDetails";
     try{
-      return this.http.get(url).map(  (data)=>data.json()  );
+      return this.http.get(url).toPromise().then(  (data)=>data.json()  );
     }
     catch(e){throw e;}
     
@@ -21,7 +21,7 @@ export class EmployeeDashboardService{
   getTeamWorkDetails(){    
     let url= ApiUrl+"/api/Dashboard/GetTeamJobDetails";
     try{
-      return this.http.get(url).map(  (data)=>data.json()  );
+      return this.http.get(url).toPromise().then(  (data)=>data.json()  );
     }
     catch(e){throw e;}
     
@@ -30,7 +30,7 @@ export class EmployeeDashboardService{
  getMonthlyWorkDetails(){    
     let url= ApiUrl+"/api/Dashboard/GetMonthlyWorkDetails";
     try{
-      return this.http.get(url).map(  (data)=>data.json()  );
+      return this.http.get(url).toPromise().then(  (data)=>data.json()  );
     }
     catch(e){throw e;}
     
@@ -40,7 +40,7 @@ export class EmployeeDashboardService{
 
         let url = ApiUrl + "/api/Leave/GetLeavesCount";
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
 

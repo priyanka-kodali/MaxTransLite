@@ -20,9 +20,6 @@
 						<input type="text" class="form-control" [(ngModel)]="searchTerm" placeholder="Search {{selectedKey}}" (keyup)="search()"
 							[disabled]="selectedKey==null">
 					</div>
-					<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-						<p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-					</div>
 					<table class="mtop10">
 						<thead (click)="sort($event)">
 							<tr table-header>
@@ -43,7 +40,7 @@
 								<td>{{document.Keywords}}</td>
 								<td>{{document.Notes}}</td>
 								<td style="width:88px"><button md-raised-button>View</button></td>
-								<td style="width:94px"><button md-raised-button><a href="{{document.DocumentURL}}" download>Download</a></button></td>
+								<td style="width:94px"><button md-raised-button><a (click)="downloadFile(document.DocumentURL)">Download</a></button></td>
 							</tr>
 						</tbody>
 					</table>
@@ -60,8 +57,6 @@
 				</md-toolbar>
 				<form #newDocForm="ngForm" (submit)="uploadDocument()">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
-						<p *ngIf="modalError.length>0" class="alert alert-danger">{{modalError}}</p>
-						<p class="alert alert-success" *ngIf="uploadSuccess">Document has been uploaded successfully!</p>
 						<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 file-input-container">
 							<input type="file" name="document" value="Document" id="documentInput" ng2FileSelect [uploader]="uploader">
 						</div>

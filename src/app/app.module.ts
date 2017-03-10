@@ -2,16 +2,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import {  RouterModule } from '@angular/router';
 import { MdInputModule } from '@angular2-material/input';
 import { MdCardModule } from '@angular2-material/card';
 import { MdToolbarModule } from '@angular2-material/toolbar';
 import { MdButtonModule } from '@angular2-material/button';
 import { MdCheckboxModule } from '@angular2-material/checkbox';
-import { MdRadioModule , MdUniqueSelectionDispatcher} from '@angular2-material/radio';
-import { TypeaheadModule,  ComponentLoaderFactory, PositioningService} from 'ng2-bootstrap';
+import { MdRadioModule, MdUniqueSelectionDispatcher } from '@angular2-material/radio';
+import { TypeaheadModule, ComponentLoaderFactory, PositioningService } from 'ng2-bootstrap';
 import { FileUploadModule } from 'ng2-file-upload';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
-import { AppRoutingModule, routingComponents } from './app.routes';
+
+import { AppRoutingModule, routingComponents,routes } from './app.routes';
 
 import { HttpClient } from './http-client';
 
@@ -37,7 +40,7 @@ import { JobsComponent } from './jobs/jobs.component';
 import { LogoutComponent } from './logout/logout.component';
 import { JobAllocationsComponent } from './job-allocations/job-allocations.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-import {ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { DoctorGroupsComponent } from './doctor-groups/doctor-groups.component';
 import { DoctorDashboardComponent } from './doctor-dashboard/doctor-dashboard.component';
@@ -50,13 +53,20 @@ import { PatientListComponent } from './patient-list/patient-list.component';
 import { ClientLicensesComponent } from './client-licenses/client-licenses.component';
 import { ClientLicenseComponent } from './client-license/client-license.component';
 
+
+import { MasterService } from './app.service';
+
 @NgModule({
   declarations: [
     AppComponent, routingComponents,
     ClientsComponent, ClientEmployeeComponent, ClientEmployeesComponent, ClientsComponent,
     DefaultAllocationComponent, DefaultAllocationsComponent, DoctorComponent, DoctorsComponent,
     DocumentsComponent, EditEmployeeComponent, EmployeeComponent, EmployeesComponent,
-    EmployeeDashboardComponent, HomeComponent, LoginComponent, NewEmployeeComponent, PayscaleComponent, JobsComponent, LogoutComponent, JobAllocationsComponent, ForgotPasswordComponent, ResetPasswordComponent, ChangePasswordComponent, DoctorGroupsComponent, DoctorDashboardComponent, ClientDashboardComponent, DashboardComponent, LeavesComponent, ManagerDashboardComponent, LeavesReviewComponent, PatientListComponent, ClientLicensesComponent, ClientLicenseComponent
+    EmployeeDashboardComponent, HomeComponent, LoginComponent, NewEmployeeComponent, PayscaleComponent,
+    JobsComponent, LogoutComponent, JobAllocationsComponent, ForgotPasswordComponent, ResetPasswordComponent,
+    ChangePasswordComponent, DoctorGroupsComponent, DoctorDashboardComponent, ClientDashboardComponent,
+    DashboardComponent, LeavesComponent, ManagerDashboardComponent, LeavesReviewComponent, PatientListComponent,
+    ClientLicensesComponent, ClientLicenseComponent
   ],
   imports: [
     BrowserModule,
@@ -70,8 +80,9 @@ import { ClientLicenseComponent } from './client-license/client-license.componen
     MdCheckboxModule,
     MdRadioModule,
     TypeaheadModule,
-    FileUploadModule
-    
+    FileUploadModule,
+    SimpleNotificationsModule,
+    RouterModule.forRoot(routes, { useHash: true })
   ],
   providers: [HttpClient, MdUniqueSelectionDispatcher, ComponentLoaderFactory, PositioningService],
   bootstrap: [AppComponent]

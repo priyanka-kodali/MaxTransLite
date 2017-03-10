@@ -10,7 +10,7 @@ import { MasterService } from '../app.service';
   selector: 'app-client',
   templateUrl: 'client.component.html',
   styleUrls: ['client.component.scss'],
-  providers: [ClientService, MasterService]
+  providers: [ClientService]
 })
 export class ClientComponent implements OnInit, AfterViewInit {
 
@@ -21,22 +21,14 @@ export class ClientComponent implements OnInit, AfterViewInit {
   private sub: any;
   ClientId: number;
   inputDisabled: boolean;
-  editSuccess: boolean;
-  editProgress: boolean;
-  cities: Array<string> = new Array<string>();
-  states: Array<string> = new Array<string>();
   countries: Array<string> = new Array<string>();
   masterCities: Array<string> = new Array<string>();
   masterStates: Array<string> = new Array<string>();
-  masterCountries: Array<string> = new Array<string>();
   vendors: Array<string> = new Array<string>();
   verticals: Array<string> = new Array<string>();
-  cityIds: Array<number> = new Array<number>();
-  stateIds: Array<number> = new Array<number>();
   countryIds: Array<number> = new Array<number>();
   masterCityIds: Array<number> = new Array<number>();
   masterStateIds: Array<number> = new Array<number>();
-  masterCountryIds: Array<number> = new Array<number>();
   vendorIds: Array<number> = new Array<number>();
   verticalIds: Array<number> = new Array<number>();
   timezones: Array<string> = new Array<string>();
@@ -68,9 +60,8 @@ export class ClientComponent implements OnInit, AfterViewInit {
   constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientService: ClientService) {
     this.NewClient = new Client();
     this.error = "";
+    this.masterService.postAlert("remove", "");
     this.isIndirectClient = false;
-    this.editSuccess = false;
-    this.editProgress = false;
     this.clientTypes = ['Direct Client', 'Indirect Client', 'Vendor'];
     this.paymentTypes = ['Fixed', 'FTE', 'Per Unit'];
     this.currencies = ['INR', 'USD'];
@@ -86,8 +77,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() { }
 
   ngOnInit() {
-    //get states and cities for master arrays 
-    this.masterService.getAllCities().subscribe(
+
+    //get states and cities for master arrays    (No need of loading image)
+    this.masterService.getAllCities().then(
       (data) => {
         data["cities"].forEach(city => {
           this.masterCities.push(city.Name);
@@ -95,20 +87,21 @@ export class ClientComponent implements OnInit, AfterViewInit {
         });
       });
 
-    this.masterService.getAllStates().subscribe(
+    this.masterService.getAllStates().then(
       (data) => {
         data["states"].forEach(state => {
           this.masterStates.push(state.Name);
           this.masterStateIds.push(state.Id);
         });
-      });
+      })
 
 
+    this.masterService.changeLoading(true);
     if (this.isNewClient) {
       this.inputDisabled = false;
-      this.getMasterData();
       this.NewClient.Active = true;
       this.NewClient.FileTypes = "DSS|DS2|WAV|WMA";
+      this.getMasterData();
     }
 
     else {
@@ -117,17 +110,26 @@ export class ClientComponent implements OnInit, AfterViewInit {
       try {
         this.NewClient.Id = this.ClientId;
         this.clientService.getClient(this.ClientId)
-          .subscribe(
+          .then(
           (data) => {
             this.NewClient = data['client'];
             this.locations = data['locations'];
             this.isVendor = this.NewClient.ClientType == "Vendor" ? true : false;
             this.isIndirectClient = this.NewClient.ClientType == "Indirect Client" ? true : false;
+            this.masterService.changeLoading(false);
           },
-          (error) => { this.error = "Error fetching Client Details" }
+          (error) => {
+            this.masterService.changeLoading(false);
+            this.error = "Error fetching Client Details";
+            this.masterService.postAlert("error", this.error);
+          }
           );
       }
-      catch (e) { this.error = "Error processing Client Details" }
+      catch (e) {
+        this.masterService.changeLoading(false);
+        this.error = "Error processing Client Details";
+        this.masterService.postAlert("error", this.error);
+      }
     }
   }
 
@@ -137,7 +139,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   clientVerticalChange() {
-    this.IsTranscriptionClient = this.NewClient.ClientVertical == "Transcription" ? true : false;
+    this.IsTranscriptionClient = this.NewClient.ClientVertical.toLowerCase() == "transcription" ? true : false;
   }
 
   addClientLocation() {
@@ -152,14 +154,12 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   getMasterData() {
-    this.clientService.getData().subscribe(
+    var sub = this.clientService.getData().then(
       (data) => {
 
         data['countries'].forEach(country => {
           this.countries.push(country.Name);
-          this.masterCountries.push(country.Name);
           this.countryIds.push(country.Id);
-          this.masterCountryIds.push(country.Id);
         });
 
         //states andd cities for master arrays are obtained seperatly
@@ -177,16 +177,26 @@ export class ClientComponent implements OnInit, AfterViewInit {
           this.timezoneIds.push(timezone.Id);
         });
         this.isDataAvailable = true;
-        this.error = "";
+        for (var i = 0; i < this.locations.length; i++) {
+          this.getStates(i);
+          this.getCities(i);
+        }
+        this.masterService.changeLoading(false);
       },
-      (error) => { this.error = "Error fetching Master Data" }
+      (error) => {
+        this.error = "Error fetching Master Data";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
   }
 
   editData() {
     this.inputDisabled = !this.inputDisabled;
-    if (!this.isDataAvailable)
+    if (!this.isDataAvailable) {
+      this.masterService.changeLoading(true);
       this.getMasterData();
+    }
   }
 
   routeToClientList() {
@@ -196,83 +206,106 @@ export class ClientComponent implements OnInit, AfterViewInit {
   countrySelected(index: number) {
     this.locations[index].City = "";
     this.locations[index].State = "";
+    this.getStates(index);
   }
 
   stateSelected(index: number) {
     this.locations[index].City = "";
+    this.getCities(index);
   }
 
   getStates(index: number) {
-    this.states = new Array<string>();
-    this.stateIds = new Array<number>();
-    if (this.locations[index].Country.trim().length < 1) return;
-    var countryId = this.countryIds[this.countries.indexOf(this.locations[index].Country)];
-    this.masterService.getStates(countryId).subscribe(
-      (data) => data['states'].forEach(state => {
-        this.states.push(state.Name);
-        this.stateIds.push(state.Id);
-      })
+    this.masterService.changeLoading(true);
+    var location = this.locations[index]
+    location.states = new Array<string>();
+    if (!location.Country) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    var countryId = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == location.Country.toLowerCase())];
+    if (location.Country && !countryId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getStates(countryId).then(
+      (data) => {
+        data['states'].forEach(state => {
+          location.states.push(state.Name);
+        });
+        this.masterService.changeLoading(false);
+      }
     )
   }
 
   getCities(index: number) {
-    this.cities = new Array<string>();
-    this.cityIds = new Array<number>();
-    if (this.locations[index].State.trim().length < 1) return;
-    var stateId = this.stateIds[this.states.indexOf(this.locations[index].State)];
-    this.masterService.getCities(stateId).subscribe(
-      (data) => data['cities'].forEach(city => {
-        this.cities.push(city.Name);
-        this.cityIds.push(city.Id);
-      })
+    this.masterService.changeLoading(true);
+    var location = this.locations[index]
+    location.cities = new Array<string>();
+    if (!location.State) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    var stateId = this.masterStateIds[this.masterStates.findIndex((item) => item.toLowerCase() == location.State.toLowerCase())];
+    if (location.State && !stateId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
+    this.masterService.getCities(stateId).then(
+      (data) => {
+        data['cities'].forEach(city => {
+          location.cities.push(city.Name);
+        });
+        this.masterService.changeLoading(false);
+      }
     )
   }
 
   saveChanges() {
+    this.masterService.changeLoading(true);
 
-    if (!this.validate()) return;
+    if (!this.validate()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      return;
+    }
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
+    this.masterService.postAlert("remove", "");
 
     this.NewClient.Locations = this.locations;
 
     try {
       if (this.isNewClient) {
-        this.clientService.postClient(this.NewClient).subscribe(
-         (data) => {
+        this.clientService.postClient(this.NewClient).then(
+          (data) => {
             document.body.scrollTop = 0;
             this.NewClient = data['client'];
             this.locations = data['locations'];
-            this.error = "";
-            this.editProgress = false;
-            this.editSuccess = true;
             this.inputDisabled = true;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("success", "Client added successfully");
           },
           (error) => {
-            this.editSuccess = false;
             this.error = error['_body'];
-            this.editProgress = false;
+            this.masterService.postAlert("error", this.error);
+            this.masterService.changeLoading(false);
           }
         );
       }
 
       else {
         this.clientService.editClient(this.NewClient)
-          .subscribe((data) => {
+          .then((data) => {
             document.body.scrollTop = 0;
             this.NewClient = data['client'];
             this.locations = data['locations'];
-            this.error = "";
-            this.editProgress = false;
-            this.editSuccess = true;
             this.inputDisabled = true;
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("success", "Client details updated successfully");
           },
           (error) => {
-            this.editSuccess = false;
             this.error = error['_body'];
-            this.editProgress = false;
+            this.masterService.postAlert("error", this.error);
+            this.masterService.changeLoading(false);
           }
           );
       }
@@ -282,9 +315,21 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
   validate() {
 
+    this.masterService.postAlert("remove", "");
+
+    // this.NewClient.Name = this.NewClient.Name.trim()
+    // this.NewClient.ShortName = this.NewClient.ShortName.trim();
+    // this.NewClient.PrimaryPhone = this.NewClient.PrimaryPhone.trim();
+    // this.NewClient.SecondaryPhone = this.NewClient.SecondaryPhone ? this.NewClient.SecondaryPhone.trim() : this.NewClient.SecondaryPhone;
+    // this.NewClient.Fax = this.NewClient.Fax ? this.NewClient.Fax.trim() : this.NewClient.Fax;
+    // this.NewClient.Email = this.NewClient.Email.trim();
+    // this.NewClient.FileTypes = this.NewClient.FileTypes ? this.NewClient.FileTypes.trim() : this.NewClient.FileTypes;
+
+
+
     if (this.isVendor) {
-      this.NewClient.NumberOfCharactersPerLine=null;
-      this.NewClient.FileTypes=null;
+      this.NewClient.NumberOfCharactersPerLine = null;
+      this.NewClient.FileTypes = null;
       this.NewClient.PaymentAmount = null;
       this.NewClient.Currency = null;
       this.NewClient.PaymentType = null;
@@ -294,138 +339,144 @@ export class ClientComponent implements OnInit, AfterViewInit {
       this.NewClient.Vendor_Id = null;
     }
 
-    this.error = "";
-    this.editSuccess = false;
-    this.editProgress = true;
     var namesRegex = /^[a-zA-Z ]*$/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 
 
-    this.NewClient.Vendor_Id = this.vendorIds[this.vendors.indexOf(this.NewClient.Vendor)];
-    this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.indexOf(this.NewClient.ClientVertical)];
+    this.NewClient.Vendor_Id = this.vendorIds[this.vendors.findIndex((item) => item.toLowerCase() == this.NewClient.Vendor.toLowerCase())];
+    this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.findIndex((item) => item.toLowerCase() == this.NewClient.ClientVertical.toLowerCase())];
 
     if (!namesRegex.test(this.NewClient.Name)) {
       this.error = "Name should not contain special characters"
       this.renderer.invokeElementMethod(this.name, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewClient.Name.trim().length > 255) {
       this.error = "Name should not exceed 255 characters"
       this.renderer.invokeElementMethod(this.name, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewClient.ShortName.trim().length > 20) {
       this.error = "Short Name should not exceed 20 characters"
       this.renderer.invokeElementMethod(this.shortName, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (!phoneRegex.test(this.NewClient.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
       this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewClient.SecondaryPhone && !phoneRegex.test(this.NewClient.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
       this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
-      this.editProgress = false;
       return false;
     }
     if (this.NewClient.Fax && !phoneRegex.test(this.NewClient.Fax)) {
       this.error = "Please enter a valid Fax Number "
       this.renderer.invokeElementMethod(this.fax, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!emailRegex.test(this.NewClient.Email)) {
       this.error = "Please enter a valid email";
       this.renderer.invokeElementMethod(this.email, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewClient.ClientVertical_Id) {
       this.error = "Please select valid Client Vertical";
       this.renderer.invokeElementMethod(this.clientVertical, 'focus');
-      this.editProgress = false;
       return false;
     }
-    if (this.clientTypes.indexOf(this.NewClient.ClientType) == -1) {
+    if (this.clientTypes.findIndex((item) => item.toLowerCase() == this.NewClient.ClientType.toLowerCase()) == -1) {
       this.error = "Please select a valid Client Type"
       this.renderer.invokeElementMethod(this.clientType, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     if (!this.NewClient.Vendor_Id && this.NewClient.Vendor) {
       this.error = "Please select valid vendor";
       this.renderer.invokeElementMethod(this.vendor, 'focus');
-      this.editProgress = false;
       return false;
     }
 
     for (var i = 0; i < this.locations.length; i++) {
 
       var element = this.locations[i];
-      element.City_Id = this.masterCityIds[this.masterCities.indexOf(element.City)];
-      element.State_Id = this.masterStateIds[this.masterStates.indexOf(element.State)];
-      element.Country_Id = this.masterCountryIds[this.masterCountries.indexOf(element.Country)];
-      element.TimeZone_Id = this.timezoneIds[this.timezones.indexOf(element.TimeZone)];
+      // element.AddressLine1 = element.AddressLine1.trim();
+      // element.AddressLine2 = element.AddressLine2 ? element.AddressLine2.trim() : element.AddressLine2;
+      // element.ZIP = element.ZIP.trim();
+
+
+      element.City_Id = this.masterCityIds[this.masterCities.findIndex((item) => item.toLowerCase() == element.City.toLowerCase())];
+      element.State_Id = this.masterStateIds[this.masterStates.findIndex((item) => item.toLowerCase() == element.State.toLowerCase())];
+      element.Country_Id = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == element.Country.toLowerCase())];
+      element.TimeZone_Id = this.timezoneIds[this.timezones.findIndex((item) => item.toLowerCase() == element.TimeZone.toLowerCase())];
+
+
+      if (element.AddressLine1.trim().length == 0) {
+        this.error = "Address line 1 should not be empty for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
+      if (element.AddressLine1.trim().length > 255) {
+        this.error = "Address line 1 should not exceed 255 characters for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
+
+      if (element.AddressLine2 && element.AddressLine2.trim().length == 0) {
+        this.error = "Address line 2 should not be empty for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
+      if (element.AddressLine2 && element.AddressLine2.trim().length > 255) {
+        this.error = "Address line 2 should not exceed 255 characters for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
 
       if (!element.Country_Id) {
         this.error = "Please select valid country for location " + (this.locations.indexOf(element) + 1);
-        this.editProgress = false;
         return false;
       }
       if (!element.State_Id) {
         this.error = "Please select valid state for location " + (this.locations.indexOf(element) + 1);
-        this.editProgress = false;
         return false;
       }
 
       if (!element.City_Id) {
         this.error = "Please select valid city for location " + (this.locations.indexOf(element) + 1);
-        this.editProgress = false;
         return false;
       }
 
-
       if (element.ZIP.trim().length > 10) {
         this.error = "ZIP should not exceed 10 characters for location " + (this.locations.indexOf(element) + 1);
-        this.editProgress = false;
+        return false;
+      }
+
+      if (element.ZIP.trim().length == 0) {
+        this.error = "ZIP should not be empty for location " + (this.locations.indexOf(element) + 1);
         return false;
       }
 
       if (!element.TimeZone_Id) {
         this.error = "Please select valid timezone for location " + (this.locations.indexOf(element) + 1);
-        this.editProgress = false;
         return false;
       }
-
     }
-    
-    if(this.locations.filter((item)=>item.IsInvoiceAddress==true).length!=1){
-      this.error="Please choose an invoice address";
+
+    if (this.locations.filter((item) => item.IsInvoiceAddress == true).length != 1) {
+      this.error = "Please choose an invoice address";
       return false;
     }
 
-
-    if (this.NewClient.PaymentType && this.paymentTypes.indexOf(this.NewClient.PaymentType) == -1) {
+    if (this.NewClient.PaymentType && this.paymentTypes.findIndex((item) => item.toLowerCase() == this.NewClient.PaymentType.toLowerCase()) == -1) {
       this.error = "Please select a valid Payment Type"
       this.renderer.invokeElementMethod(this.paymentType, 'focus');
-      this.editProgress = false;
       return false;
     }
 
-    if (this.NewClient.Currency && this.currencies.indexOf(this.NewClient.Currency) == -1) {
+    if (this.NewClient.Currency && this.currencies.findIndex((item) => item.toLowerCase() == this.NewClient.Currency.toLowerCase()) == -1) {
       this.error = "Please select a valid currency"
       this.renderer.invokeElementMethod(this.currency, 'focus');
-      this.editProgress = false;
       return false;
     }
 
@@ -471,5 +522,8 @@ class Location {
   State_Id: number;
   Country_Id: number;
   TimeZone_Id: number;
-
+  cities: Array<string> = new Array<string>();
+  states: Array<string> = new Array<string>();
+  cityIds: Array<number> = new Array<number>();
+  stateIds: Array<number> = new Array<number>();
 }

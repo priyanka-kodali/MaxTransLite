@@ -9,9 +9,12 @@ background:#71F02E!important;
 
 .image-delete{
     position: absolute;
+    left: 15px;
+    background: white;
 }
 
 .imagePreview{
+    height: 140px;
     max-height: 100%;
     max-width: 100%;
 }

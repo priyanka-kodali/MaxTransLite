@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ResetPasswordService } from './reset-password.service';
-import { Router } from '@angular/router';
+import { Router,ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reset-password',
@@ -16,16 +16,13 @@ export class ResetPasswordComponent implements OnInit {
   passwordModel: PasswordModel = new PasswordModel();
   sub: any;
 
-  constructor(private resetPasswordService: ResetPasswordService, private router: Router) {
+  constructor(private resetPasswordService: ResetPasswordService, private router: Router,private activatedRoute : ActivatedRoute) {
     this.error = "";
     this.success = false;
-    this.loading = false;
-    try {
-      this.passwordModel.Key = this.router.url.split('reset-password/')[1];
-    }
-    catch(e){
-      this.router.navigate(['login']);
-    }
+    this.loading = false;    
+    this.sub = this.activatedRoute.params.subscribe(
+      params => this.passwordModel.Key = params['key']
+    );
         
    }
 

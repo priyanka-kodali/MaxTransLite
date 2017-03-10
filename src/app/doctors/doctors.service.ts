@@ -9,11 +9,11 @@ export class DoctorsService {
 
     getDoctors(page : number,count : number,clientId : number){
        let url=ApiUrl + "/api/Doctor/GetDoctors?page="+page+"&count="+count+"&clientId="+clientId;
-       return this.http.get(url).map((data=>data=data.json()));
+       return this.http.get(url).toPromise().then((data=>data=data.json()));
     }
  
     getTemplates(id : number){
-       let url=ApiUrl + "/api/DoctorOld/GetTemplates?DoctorId="+id;
-       return this.http.get(url).map((data=>data=data.json()));
+       let url=ApiUrl + "/api/Doctor/GetTemplates?DoctorId="+id;
+       return this.http.get(url).toPromise().then((data=>data=data.json()));
     }
 }

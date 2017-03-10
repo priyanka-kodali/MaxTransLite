@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { PatientListsService } from './patient-list.service';
 import { ApiUrl } from '../shared/config';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-patient-list',
@@ -12,17 +13,11 @@ import { FileUploader } from '../../../node_modules/ng2-file-upload';
 export class PatientListComponent implements OnInit {
 
 
-  // @ViewChild('uploadEl') uploadElRef: ElementRef;
-
   PatientLists: Array<PatientList> = new Array<PatientList>();
   ChildrenPatientLists: Array<PatientList> = new Array<PatientList>();
   SelectedPatientList: PatientList = new PatientList();
   PatientListModal: boolean;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
-  ModalError: string;
-  Error: string;
+  error: string;
   clients: Array<string> = new Array<string>();
   clientIds: Array<number> = new Array<number>();
   doctors: Array<string> = new Array<string>();
@@ -40,42 +35,49 @@ export class PatientListComponent implements OnInit {
     }]
   });
 
-  constructor(private patientListsService: PatientListsService) {
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
-    this.UpdateSuccess = false;
-    this.ModalError = "";
-    this.Error = "";
+  constructor(private patientListsService: PatientListsService, private masterService: MasterService) {
+    this.masterService.postAlert("remove", "");
+    this.error = "";
     this.PatientListModal = false;
     this.IsClientDataAvailable = false;
   }
 
   ngOnInit() {
-    this.patientListsService.getPatientLists().subscribe(
-      (data) => this.PatientLists = data,
-      (error) => this.Error = "Error fetching Patient Lists"
+    this.masterService.changeLoading(true);
+    this.patientListsService.getPatientLists().then(
+      (data) => {
+        this.PatientLists = data;
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = "Error fetching Patient Lists";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     )
   }
 
   getClients() {
     if (!this.IsClientDataAvailable) {
-      this.patientListsService.getClients().subscribe(
+      this.masterService.changeLoading(true);
+      this.patientListsService.getClients().then(
         (data) => {
           data.forEach(client => {
             this.clients.push(client.Name);
             this.clientIds.push(client.Id);
           });
           this.IsClientDataAvailable = true;
+          this.masterService.changeLoading(false);
         }
       )
     }
   }
 
   clientChanged() {
-    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.indexOf(this.SelectedPatientList.Client)];
-    this.patientListsService.getDoctors(this.SelectedPatientList.Client_Id).subscribe(
+    this.masterService.changeLoading(true);
+    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Client.toLowerCase())];
+    this.patientListsService.getDoctors(this.SelectedPatientList.Client_Id).then(
       (data) => {
-
         this.doctors = new Array<string>();
         this.doctorIds = new Array<number>();
         data.forEach(doctor => {
@@ -83,6 +85,7 @@ export class PatientListComponent implements OnInit {
           this.doctorIds.push(doctor.Id);
         });
         this.IsClientDataAvailable = true;
+        this.masterService.changeLoading(false);
       }
     )
   }
@@ -90,33 +93,23 @@ export class PatientListComponent implements OnInit {
   newPatientList() {
     this.getClients();
     this.PatientListModal = true;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
-    this.UpdateSuccess = false;
-    this.ModalError = "";
-    this.Error = "";
+    this.error = "";
     this.SelectedPatientList = new PatientList();
   }
 
-  postPatientList() {
-    this.UpdateProgress = true;
-    this.UpdateFailed = false;
-    this.UpdateSuccess = false;
-    this.ModalError = "";
-    if (this.SelectedPatientList.ToDate < this.SelectedPatientList.FromDate || new Date(this.SelectedPatientList.FromDate) < new Date()) {
-      this.ModalError = "Please select valid 'From' and 'To' dates";
-      this.UpdateProgress = false;
-      return;
-    }
-    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.indexOf(this.SelectedPatientList.Client)];
-    this.SelectedPatientList.Doctor_Id = this.doctorIds[this.doctors.indexOf(this.SelectedPatientList.Doctor)];
 
-    
-    if (this.SelectedPatientList.Client_Id == undefined) {
-      this.ModalError = "Please select valid client";
-      this.UpdateProgress = false;
+  postPatientList() {
+
+    this.masterService.changeLoading(true);
+
+    if (!this.validate()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
       return;
     }
+
+    this.masterService.postAlert("remove", "");
+
     this.uploader.onBuildItemForm = (item, form) => {
       form.append("FromDate", this.SelectedPatientList.FromDate);
       form.append("ToDate", this.SelectedPatientList.ToDate);
@@ -124,37 +117,64 @@ export class PatientListComponent implements OnInit {
       form.append("Doctor_Id", this.SelectedPatientList.Doctor_Id);
     }
 
-    this.uploader.uploadItem(this.uploader.queue[this.uploader.queue.length - 1]);
+    var file = this.uploader.queue[this.uploader.queue.length - 1];
+    file.withCredentials = false;
+
+    
+      this.uploader.uploadItem(file);
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      this.UpdateProgress = false;
       response = JSON.parse(response);
       if (status != 200) {
-        this.UpdateFailed = true;
+        this.error = "Error adding patient list";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
       }
       if (status == 200) {
-        this.UpdateSuccess = true;
         this.PatientLists.push(response);
         this.SelectedPatientList = new PatientList();
+        this.PatientListModal = false;
         this.uploader.clearQueue();
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "Patient list added successfully");
       }
     };
 
   }
 
-  addPatientList(myPatientList: PatientList) {
-    this.getClients();
-    this.PatientListModal = true;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
-    this.UpdateSuccess = false;
-    this.ModalError = "";
-    this.Error = "";
-    this.SelectedPatientList = new PatientList();
+  validate() {
+
+    this.masterService.postAlert("remove", "");
+
+    var toDate = new Date(this.SelectedPatientList.ToDate);
+    var fromDate = new Date(this.SelectedPatientList.FromDate);
+    if (toDate.getTime() < fromDate.getTime() || fromDate.getTime() < new Date().getTime()) {
+      this.error = "Please select a valid To and From Dates";
+      return false;
+    }
+
+    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Client.toLowerCase())];
+    this.SelectedPatientList.Doctor_Id = this.doctorIds[this.doctors.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Doctor.toLowerCase())];
+
+    if (!this.SelectedPatientList.Client_Id) {
+      this.error = "Please select a valid client";
+      return false;
+    }
+
+    if (this.SelectedPatientList.Doctor && !this.SelectedPatientList.Doctor_Id) {
+      this.error = "Please select a valid client";
+      return false;
+    }
+    return true;
   }
 
-
-
+  downloadFile(url: string) {
+    this.masterService.changeLoading(true);
+    this.masterService.GetURLWithSAS(url).then((data) => {
+      window.open(data);
+      this.masterService.changeLoading(false);
+    })
+  }
 }
 
 

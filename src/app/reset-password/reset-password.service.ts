@@ -9,7 +9,7 @@ export class ResetPasswordService {
 
     resetPassword(model : any) {
         try {
-            let Url = ApiUrl + "api/Account/ResetPassword";
+            let Url = ApiUrl + "/api/Account/ResetPassword";
             let body=model;
             return this.http.post(Url, body);
         }

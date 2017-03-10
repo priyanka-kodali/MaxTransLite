@@ -6,128 +6,128 @@
 				<div>
 					<md-toolbar color="primary">
 						<div class="col-xs-12 p0 m0"><span>Personal Details</span><button md-raised-button type="button" class="pull-right btn-small" *ngIf="!isNewDoctor"
-								(click)="editData()"><span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
+							 (click)="editData()"><span class="glyphicon glyphicon-edit text-success" style="padding: 2px 0 4px 2px;"></span>
 </button> <button md-raised-button class="pull-right btn-small mright5" type="button" (click)="goToList()"><span class="glyphicon glyphicon-list text-success" style="padding: 2px 0 4px 2px"></span>
 </button>
-</div>
-</md-toolbar>
-<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
-	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-		<p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-	</div>
-	<div class="col-md-1 col-sm-2 col-lg-1 col-xs-12">
-		<md-input class="" name="salutation" #salutation [(ngModel)]="NewDoctor.Salutation" placeholder="Salutation" autocomplete="off" type="text"
-			required maxLength="3" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-		<md-input class="" name="firstName" #firstName [(ngModel)]="NewDoctor.FirstName" placeholder="First Name" type="text" autocomplete="off"
-			required maxLength="35" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-3 col-sm-4 col-lg-3 col-xs-12">
-		<md-input class="" name="middleName" #middleName [(ngModel)]="NewDoctor.MiddleName" placeholder="Middle Name" type="text" autocomplete="off"
-			maxLength="20" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-		<md-input class="" name="lastName" #lastName [(ngModel)]="NewDoctor.LastName" placeholder="Last Name" type="text" autocomplete="off"
-			required maxLength="35" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-		<md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewDoctor.PrimaryPhone" placeholder="Primary Phone" autocomplete="off"
-			type="text" required maxLength="15" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-		<md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewDoctor.SecondaryPhone" placeholder="Secondary Phone" autocomplete="off"
-			type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-		<md-input class="" name="email" #email [(ngModel)]="NewDoctor.Email" autocomplete="off" placeholder="Email" type="email" required
-			maxLength="255" [disabled]="inputDisabled"></md-input>
-	</div>
-	<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-		<md-input class="" name="client" #client [(ngModel)]="NewDoctor.Client" autocomplete="off" [typeahead]="clients" autocomplete="off"
-			placeholder="Client" type="text" required [disabled]="inputDisabled"></md-input>
-	</div>
+						</div>
+					</md-toolbar>
+					<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+						<div class="col-md-1 col-sm-2 col-lg-1 col-xs-12">
+							<md-input class="" name="salutation" #salutation [(ngModel)]="NewDoctor.Salutation" placeholder="Salutation*" autocomplete="off"
+							 type="text"  maxLength="3" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input class="" name="firstName" #firstName [(ngModel)]="NewDoctor.FirstName" placeholder="First Name*" type="text" autocomplete="off"
+							  maxLength="35" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-4 col-lg-3 col-xs-12">
+							<md-input class="" name="middleName" #middleName [(ngModel)]="NewDoctor.MiddleName" placeholder="Middle Name" type="text"
+							 autocomplete="off" maxLength="20" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input class="" name="lastName" #lastName [(ngModel)]="NewDoctor.LastName" placeholder="Last Name*" type="text" autocomplete="off"
+							  maxLength="35" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewDoctor.PrimaryPhone" placeholder="Primary Phone*" autocomplete="off"
+							 type="text"  maxLength="15" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewDoctor.SecondaryPhone" placeholder="Secondary Phone"
+							 autocomplete="off" type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
+							<md-input class="" name="email" #email [(ngModel)]="NewDoctor.Email" autocomplete="off" placeholder="Email*" type="email"
+							  maxLength="255" [disabled]="!isNewDoctor"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="client" #client [(ngModel)]="NewDoctor.Client" autocomplete="off" [typeahead]="clients" autocomplete="off"
+							 placeholder="Client*" type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
 
 
-	<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewDoctor">
-		<md-checkbox name="active" [(ngModel)]="NewDoctor.Active" [disabled]="inputDisabled" >Active </md-checkbox>
-	</div>
-</div>
-</div>
-<div>
-	<md-toolbar color="primary">Address Details</md-toolbar>
-	<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
-		<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-			<md-input class="" name="addressLine1" #addressLine1 [(ngModel)]="NewDoctor.AddressLine1" placeholder="Address Line 1" autocomplete="off"
-				type="text" required maxLength="255" [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-			<md-input class="" name="addressLine2" #addressLine2 [(ngModel)]="NewDoctor.AddressLine2" placeholder="Address Line 2" autocomplete="off"
-				type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="country" #country [(ngModel)]="NewDoctor.Country" [typeahead]="countries" autocomplete="off" autocomplete="off"
-				placeholder="Country" type="text" required [disabled]="inputDisabled" (typeaheadOnSelect)="countrySelected()"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="state" #state [(ngModel)]="NewDoctor.State" autocomplete="off" [typeahead]="states" placeholder="State"
-				type="text" required [disabled]="inputDisabled" (typeaheadOnSelect)="stateSelected()"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="city" #city [(ngModel)]="NewDoctor.City" [typeahead]="cities" autocomplete="off" placeholder="City" type="text"
-				required [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="ZIP" #zip [(ngModel)]="NewDoctor.ZIP" placeholder="ZIP" autocomplete="off" type="text" required maxLength="10"
-				[disabled]="inputDisabled"></md-input>
-		</div>
-	</div>
-</div>
-<div>
-	<md-toolbar color="primary">Specialty Details</md-toolbar>
-	<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="dictationMode" #dictationMode [(ngModel)]="NewDoctor.DictationMode" autocomplete="off" [typeahead]="dictationModes"
-				[typeaheadMinLength]="0" placeholder="Dictation Mode" type="text" required [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="jobLevel" #jobLevel [(ngModel)]="NewDoctor.JobLevel" autocomplete="off" [typeahead]="jobLevels"
-				[typeaheadMinLength]="0" placeholder="Job Level" type="text" required [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="voiceGrade" #voiceGrade [(ngModel)]="NewDoctor.VoiceGrade" autocomplete="off" [typeahead]="voiceGrades"
-				[typeaheadMinLength]="0" placeholder="Voice Grade" type="text" required [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="macroPercent" #macroPercent [(ngModel)]="NewDoctor.MacroPercent" autocomplete="off" placeholder="Macro Percent"
-				type="number" [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<md-input class="" name="doctorGroup" #doctorGroup [(ngModel)]="NewDoctor.DoctorGroup" autocomplete="off" placeholder="Doctor Group" [typeahead]="doctorGroups"
-				type="text" [disabled]="inputDisabled" autocomplete="off"></md-input>
-		</div>
-		<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-			<!--Multi Select-->
-			<md-input class="" name="specialty" #specialty [(ngModel)]="specialtySelector" autocomplete="off" (typeaheadOnSelect)="specialtiesChange()"
-				[typeahead]="specialties" placeholder="Specialty" type="text" [disabled]="inputDisabled"></md-input>
-		</div>
-		<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-info" *ngIf="NewDoctor.Specialties.length>0">
-			<span class="mright5">Specialties Selected </span>
-			<span *ngFor="let specialty of NewDoctor.Specialties" class="label label-info mright5">{{specialty}}<span class="label label-danger mleft5 pointer" (click)="removeSpecialty(specialty)">X</span>			</span>
-		</div>
-		<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-			<p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-			<p *ngIf="editSuccess" class="alert alert-success">Doctor Details are updated successfully!</p>
-			<p *ngIf="editProgress" class="alert alert-info">Please wait.....</p>
-		</div>
-		<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
-			<button md-raised-button class="btn-save" [disabled]="inputDisabled||editProgress">Save</button>
-		</div>
-	</div>
-</div>
+						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewDoctor">
+							<md-checkbox name="active" [(ngModel)]="NewDoctor.Active" [disabled]="inputDisabled">Active </md-checkbox>
+						</div>
+					</div>
+				</div>
+				<div>
+					<md-toolbar color="primary">Address Details</md-toolbar>
+					<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+							<md-input class="" name="addressLine1" #addressLine1 [(ngModel)]="NewDoctor.AddressLine1" placeholder="Address Line 1*" autocomplete="off"
+							 type="text"  maxLength="255" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
+							<md-input class="" name="addressLine2" #addressLine2 [(ngModel)]="NewDoctor.AddressLine2" placeholder="Address Line 2" autocomplete="off"
+							 type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="country" #country [(ngModel)]="NewDoctor.Country" [typeahead]="countries" autocomplete="off" autocomplete="off"
+							 placeholder="Country*" type="text"  [disabled]="inputDisabled" (blur)="countrySelected()" (typeaheadOnSelect)="countrySelected()"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="state" #state [(ngModel)]="NewDoctor.State" autocomplete="off" [typeahead]="states" placeholder="State*"
+							 type="text"  [disabled]="inputDisabled" (blur)="stateSelected()" (typeaheadOnSelect)="stateSelected()"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="city" #city [(ngModel)]="NewDoctor.City" [typeahead]="cities" autocomplete="off" placeholder="City*"
+							 type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="ZIP" #zip [(ngModel)]="NewDoctor.ZIP" placeholder="ZIP*" autocomplete="off" type="text" 
+							 maxLength="10" [disabled]="inputDisabled"></md-input>
+						</div>
+					</div>
+				</div>
+				<div>
+					<md-toolbar color="primary">Specialty Details</md-toolbar>
+					<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="dictationMode" #dictationMode [(ngModel)]="NewDoctor.DictationMode" autocomplete="off" [typeahead]="dictationModes"
+							 [typeaheadMinLength]="0" placeholder="Dictation Mode*" type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="NewDoctor.DictationMode=='Toll Free'">
+							<md-input class="" name="idigitalId" #idigitalId [(ngModel)]="NewDoctor.IdigitalId" autocomplete="off" placeholder="IdigitalId*"
+							 type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="NewDoctor.DictationMode=='Toll Free'">
+							<md-input class="" name="idigitalAuthorId" #idigitalAuthorId [(ngModel)]="NewDoctor.IdigitalAuthorId" autocomplete="off" placeholder="Idigital AuthorId*"
+							 type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="jobLevel" #jobLevel [(ngModel)]="NewDoctor.JobLevel" autocomplete="off" [typeahead]="jobLevels"
+							 [typeaheadMinLength]="0" placeholder="Job Level*" type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="voiceGrade" #voiceGrade [(ngModel)]="NewDoctor.VoiceGrade" autocomplete="off" [typeahead]="voiceGrades"
+							 [typeaheadMinLength]="0" placeholder="Voice Grade*" type="text"  [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="macroPercent" #macroPercent [(ngModel)]="NewDoctor.MacroPercent" autocomplete="off" placeholder="Macro Percent"
+							 type="number" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<md-input class="" name="doctorGroup" #doctorGroup [(ngModel)]="NewDoctor.DoctorGroup" autocomplete="off" placeholder="Doctor Group"
+							 [typeahead]="doctorGroups" type="text" [disabled]="inputDisabled" autocomplete="off"></md-input>
+						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+							<!--Multi Select-->
+							<md-input class="" name="specialty" #specialty [(ngModel)]="specialtySelector" autocomplete="off" (blur)="specialtiesChange()" (typeaheadOnSelect)="specialtiesChange()"
+							 [typeahead]="specialties" placeholder="Specialty" type="text" [disabled]="inputDisabled"></md-input>
+						</div>
+						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-info" *ngIf="NewDoctor.Specialties.length>0">
+							<span class="mright5">Specialties Selected </span>
+							<span *ngFor="let specialty of NewDoctor.Specialties" class="label label-info mright5">{{specialty}}<span class="label label-danger mleft5 pointer" (click)="removeSpecialty(specialty)">X</span>							</span>
+						</div>
+						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
+							<button md-raised-button class="btn-save" [disabled]="inputDisabled">Save</button>
+						</div>
+					</div>
+				</div>
 
 
-</form>
-</md-card-content>
-</md-card>
+			</form>
+		</md-card-content>
+	</md-card>
 </div>

@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from './http-client';
 import { ApiUrl } from './shared/config';
+import { Subject } from 'rxjs/Subject';
 
 
 @Injectable()
 export class MasterService {
 
   constructor(private http: HttpClient) { }
-  
+
   getStates(countryId: number) {
     let url = ApiUrl + "/api/MasterData/GetStates?countryId=" + countryId;
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -19,16 +20,15 @@ export class MasterService {
   getCities(stateId: number) {
     let url = ApiUrl + "/api/MasterData/GetCities?stateId=" + stateId;
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
 
-
-    getAllStates() {
+  getAllStates() {
     let url = ApiUrl + "/api/MasterData/GetStates?countryId=0";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -36,9 +36,44 @@ export class MasterService {
   getAllCities() {
     let url = ApiUrl + "/api/MasterData/GetCities?stateId=0";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
 
+    GetURLWithSAS(blobURL: string) {
+    let url = ApiUrl + "/api/MasterData/GetURLWithSAS?url=" + blobURL;
+    try {
+      return this.http.get(url).toPromise().then((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
+
+  //pass data to the main controller for showing loader and setting error success messages
+
+  loading = new Subject<boolean>();
+
+  loadingEmitter$ = this.loading.asObservable();
+
+  changeLoading(value: boolean) {
+    this.loading.next(value);
+  }
+
+  alert = new Subject<Alert>();
+
+  alertEmitter$ = this.alert.asObservable();
+
+  postAlert(type: string, message: string) {
+    var myAlert = new Alert();
+    myAlert.type = type;
+    myAlert.message = message;
+    this.alert.next(myAlert);
+  }
+
+}
+
+
+export class Alert {
+  type: string;  //success,error,info,alert,remove
+  message: string;
 }

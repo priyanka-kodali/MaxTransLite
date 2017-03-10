@@ -9,7 +9,7 @@ export class EmployeesService {
 
     getEmployees(page : number,count : number){
        let url=ApiUrl + "/api/Employee/GetEmployees?page="+page+"&count="+count;
-       return this.http.get(url).map((data=>data=data.json()));
+       return this.http.get(url).toPromise().then((data=>data=data.json()));
     }
 
 

@@ -14,7 +14,7 @@ export class JobAllocationsService {
 
     let url = ApiUrl + "/api/Jobs/GetTeamJobs";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -23,7 +23,7 @@ export class JobAllocationsService {
   getEmployees(){
         let url = ApiUrl + "/api/Jobs/GetEmployeesForAllocation";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -31,7 +31,7 @@ export class JobAllocationsService {
   updateAllocation(job : Job){
        let url = ApiUrl + "/api/Jobs/UpdateAllocation";
     try {
-      return this.http.post(url,job).map((data) => data.json());
+      return this.http.post(url,job).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -41,7 +41,7 @@ export class JobAllocationsService {
       console.log(data);
         
     try {
-      return this.http.post(url,data).map((data) => data.json());
+      return this.http.post(url,data).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -50,7 +50,7 @@ export class JobAllocationsService {
       let url = ApiUrl + "/api/Jobs/SearchJobs";
       
     try {
-      return this.http.post(url,data).map((data) => data.json());
+      return this.http.post(url,data).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }

@@ -10,7 +10,7 @@ export class DefaultAllocationsService {
     getAllocations(page: number, count: number) {
         let url = ApiUrl + "/api/Doctor/GetDefaultAllocations?page=" + page + "&count=" + count;
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }
@@ -18,7 +18,7 @@ export class DefaultAllocationsService {
     searchAllocations(SearchTerm: string) {
         let url = ApiUrl + "/api/Doctor/SearchDefaultAllocation?SearchTerm=" + SearchTerm;
           try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }

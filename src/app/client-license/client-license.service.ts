@@ -9,18 +9,17 @@ export class ClientLicenseService {
 
 
     addLicenseKey(data: any) {
-
         let url = ApiUrl + "/api/Client/AddLicenseKey";
         try {
-            return this.http.post(url, data).map((data => data = data.json()));
+            return this.http.post(url, data).toPromise().then((data => data = data.json()));
         }
         catch (ex) { throw ex; }
     }
 
-    getClientLocations(ClientId : number){
-          let url = ApiUrl + "/api/Client/GetClientLocations?ClientId="+ClientId;
+    getClientLocations(ClientId: number) {
+        let url = ApiUrl + "/api/Client/GetClientLocations?ClientId=" + ClientId;
         try {
-            return this.http.get(url).map((data => data = data.json()));
+            return this.http.get(url).toPromise().then((data => data = data.json()));
         }
         catch (ex) { throw ex; }
     }

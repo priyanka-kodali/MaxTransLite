@@ -10,19 +10,16 @@
         </md-toolbar>
         <div class="col-lg-12 col-md-12 col-sm-12 mtb10">
           <form (submit)="saveChanges()"> 
-            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-              <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-              <p *ngIf="editProgress" class="alert alert-info">Please Wait...</p>
-            </div>
-            <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="client" #client placeholder="Client" [(ngModel)]="defaultAllocation.Client" type="text" autocomplete="off" required [typeahead]="clients" [disabled]="!isNewDefaultAllocation">
+           <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+              <md-input class="" name="client" #client placeholder="Client" [(ngModel)]="defaultAllocation.Client" type="text" autocomplete="off" required
+              [typeahead]="clients" (blur)="getDoctors()" (typeaheadOnSelect)="getDoctors()" [disabled]="!isNewDefaultAllocation" >
               </md-input>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="doctor" #doctor placeholder="Doctor" [(ngModel)]="defaultAllocation.Doctor" type="text" autocomplete="off" required [typeahead]="doctors" [disabled]="!isNewDefaultAllocation" ></md-input>
+              <md-input class="" name="doctor" #doctor placeholder="Doctor" [(ngModel)]="defaultAllocation.Doctor" type="text" autocomplete="off" required [typeahead]="doctors" [typeaheadMinLength]="0" [disabled]="!isNewDefaultAllocation" ></md-input>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="jobLevel" #jobLevel placeholder="Job Level" [(ngModel)]="defaultAllocation.JobLevel" autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="" [typeaheadMinLength]="0" type="text" required
+              <md-input class="" name="jobLevel" #jobLevel placeholder="Job Level" [(ngModel)]="defaultAllocation.JobLevel" autocomplete="off" [disabled]="!isNewDefaultAllocation" [typeahead]="jobLevels" [typeaheadMinLength]="0" type="text" required
                 ></md-input>
             </div>
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
@@ -30,7 +27,7 @@
                 ></md-input>
             </div>
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-              <md-input class="" name="accuracy" placeholder="Accuracy" [(ngModel)]="defaultAllocation.Accuracy" type="number" [disabled]="inputDisabled" max=100 step="0.01" required
+              <md-input class="" name="accuracy" placeholder="Accuracy" [(ngModel)]="defaultAllocation.Accuracy" type="number" [disabled]="inputDisabled" min=1 max=100 step="0.01" required
                 ></md-input>
             </div> 
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
@@ -38,10 +35,6 @@
             </div>
             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewDefaultAllocation" >
                 <md-checkbox [(ngModel)]="defaultAllocation.Inactive" name="inactive"  [disabled]="inputDisabled">Inactive</md-checkbox>
-            </div>
-            <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-              <p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-              <p *ngIf="editSuccess" class="alert alert-success">Allocation Details are updated successfully!</p>
             </div>
             <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
               <button md-raised-button class="btn-save" type="submit" [disabled]="inputDisabled">Save</button>

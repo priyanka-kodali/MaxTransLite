@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EmployeesService } from './employees.service';
+import { MasterService } from '../app.service';
 
 
 @Component({
@@ -25,7 +26,7 @@ export class EmployeesComponent implements OnInit {
   numbers: Array<number>;
   error: string;
 
-  constructor(private router: Router, private employeesService: EmployeesService) {
+  constructor(private router: Router, private employeesService: EmployeesService, private masterService: MasterService) {
     this.sorting = "none";
     this.keys = ["Employee Number", "Name", "Department", "Designation", "Phone", "Email", "Manager"];
     this.page = 1;
@@ -38,21 +39,29 @@ export class EmployeesComponent implements OnInit {
   }
 
   getEmployees() {
+    this.masterService.changeLoading(true);
     try {
-      this.employeesService.getEmployees(this.page, this.count).subscribe(
+      this.employeesService.getEmployees(this.page, this.count).then(
         (data) => {
-        this.mainEmployees = data['employees']; this.employees = this.mainEmployees;
+          this.mainEmployees = data['employees']; this.employees = this.mainEmployees;
           this.pages = data['pages']; this.numbers = new Array<number>(this.pages);
           for (var i = 0; i < this.pages; i++) {
             this.numbers[i] = i + 1;
           }
-          this.error="";
+          this.error = "";
+          this.masterService.changeLoading(false);
         },
-        (error) => { this.error = "Error fetching employees" }
+        (error) => {
+          this.error = "Error fetching employees";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+        }
       )
     }
     catch (e) {
       this.error = "Error processing employee";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
     }
 
   }
@@ -75,6 +84,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   sort(event) {
+    this.masterService.changeLoading(true);
     var sorting = this.sorting;
     var key = event.target.firstChild.data.replace(" ", "");
     if (sorting == "none" || sorting == "des") {
@@ -92,6 +102,7 @@ export class EmployeesComponent implements OnInit {
         return ((y < x) ? -1 : ((y > x) ? 1 : 0));
       });
     }
+    this.masterService.changeLoading(false);
   }
 
   resetEmployees() {
@@ -121,7 +132,7 @@ export class EmployeesComponent implements OnInit {
 class Employee {
   Id: number
   FirstName: string;
-  LastName : string;
+  LastName: string;
   EmployeeNumber: string;
   PrimaryPhone: string;
   Email: string;

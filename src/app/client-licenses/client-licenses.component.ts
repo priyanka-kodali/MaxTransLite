@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ClientLicensesService } from './client-licenses.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-client-licenses',
@@ -12,40 +13,52 @@ export class ClientLicensesComponent implements OnInit {
 
   ClientId: number;
   error: string;
-  editSuccess: boolean;
   private sub: any;
   licenses: Array<License> = new Array<License>();
 
-  constructor(private clientLicensesService: ClientLicensesService, private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor(private clientLicensesService: ClientLicensesService, private masterService: MasterService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.ClientId = 0;
     this.error = "";
-    this.editSuccess = false;
     this.sub = this.activatedRoute.params.subscribe(
       params => this.ClientId = +params['ClientId']
     );
   }
   ngOnInit() {
-    this.clientLicensesService.getLicenseKeys(this.ClientId).subscribe(
-      (data) => this.licenses = data['licenses'],
-      (error) => { this.error = error['_body']; }
+    this.masterService.changeLoading(true);
+
+    this.clientLicensesService.getLicenseKeys(this.ClientId).then(
+      (data) => {
+        this.licenses = data['licenses'];
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = error['_body'];
+        this.masterService.postAlert("error", this.error);
+        this.masterService.changeLoading(false);
+      }
     )
   }
- 
+
   newLicense() {
     this.router.navigate(["client-license", this.ClientId]);
   }
 
   resetLicense(LicenseId: number) {
-    this.editSuccess=false;
-    this.error="";
-    this.clientLicensesService.resetLicense(LicenseId).subscribe(
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
+    this.clientLicensesService.resetLicense(LicenseId).then(
       (data) => {
         this.licenses = this.licenses.filter((item) => item.Id != LicenseId).reverse();
         this.licenses = this.licenses.concat(data);
         this.licenses = this.licenses.reverse();
-        this.editSuccess=true;
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "License Key updated successfully");
       },
-      (error) => { this.error = error['_body']; }
+      (error) => {
+        this.error = error['_body'];
+        this.masterService.postAlert("error", this.error);
+        this.masterService.changeLoading(false);
+      }
     )
   }
 

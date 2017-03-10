@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PayscaleService } from './payscale.service';
+import { MasterService } from '../app.service';
 
 
 @Component({
@@ -17,15 +18,13 @@ export class PayscaleComponent implements OnInit {
   EmpId: number;
   error: string;
   inputDisabled: boolean;
-  editSuccess: boolean;
   EmployeeName: string;
   EmployeeNumber: string;
   isNewEmployee: boolean;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private payscaleService: PayscaleService) {
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private payscaleService: PayscaleService) {
     this.error = "";
     this.inputDisabled = false;
-    this.editSuccess = false;
 
     this.paymentStructure = new PaymentStructure();
     this.sub = this.activatedRoute.params.subscribe(
@@ -36,22 +35,32 @@ export class PayscaleComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.masterService.changeLoading(true);
 
     if (this.isNewEmployee) {
       this.inputDisabled = false;
-      this.editSuccess = false;
+      this.masterService.changeLoading(false);
     }
 
     if (!this.isNewEmployee) {
       try {
-        this.payscaleService.getPayscale(this.EmpId).subscribe(
+        this.payscaleService.getPayscale(this.EmpId).then(
           (data) => {
             this.paymentStructure = data['employeePaymentStructure'];
+            this.masterService.changeLoading(false);
           },
-          (error) => this.error = "Error fetching payscale details"
+          (error) => {
+            this.error = "Error fetching payscale details";
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+          }
         )
       }
-      catch (e) { this.error = "Error processing payscale details" }
+      catch (e) {
+        this.error = "Error processing payscale details";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     }
 
   }
@@ -62,22 +71,40 @@ export class PayscaleComponent implements OnInit {
 
 
   saveChanges() {
-    
-    if(this.isNewEmployee){      
-      this.payscaleService.postPayscale(this.paymentStructure).subscribe(
-        (data) => this.router.navigate(["employees"]),
-        (error) => { this.error = error['_body']; this.editSuccess = false; throw error; }
+
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
+
+    if (this.isNewEmployee) {
+      this.payscaleService.postPayscale(this.paymentStructure).then(
+        (data) => {
+          this.router.navigate(["employees"]);
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "Payscale updated successfully");
+        },
+        (error) => {
+          this.error = error['_body'];
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+          throw error;
+        }
       )
     }
-    
-    else{
-        this.payscaleService.editPayscale(this.paymentStructure).subscribe(
+
+    else {
+      this.payscaleService.editPayscale(this.paymentStructure).then(
         (data) => {
-          this.editSuccess = true;
           this.paymentStructure = data['employeePaymentStructure'];
-          this.inputDisabled=true;
+          this.inputDisabled = true;
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "Payscale updated successfully");
         },
-        (error) => { this.error = error['_body']; this.editSuccess = false; throw error; }
+        (error) => {
+          this.error = error['_body'];
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+          throw error;
+        }
       )
     }
   }
@@ -91,6 +118,6 @@ export class PaymentStructure {
   BankName: string;
   BankBranch: string;
   Employee_Id: number;
-  EmployeeName : string;
-  EmployeeNumber : string;
+  EmployeeName: string;
+  EmployeeNumber: string;
 }

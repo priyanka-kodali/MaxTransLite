@@ -3,12 +3,6 @@
 	<md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 mlr10 p0 md-elevation-z12">
 		<md-card-content class="plr10 ptb5">
 			<h3>Leaves Review</h3>
-			<!--<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">-->
-				<div class="alert alert-success fade in" *ngIf="UpdateSuccess">
-					<a class="close" data-dismiss="alert">&times;</a>
-					<strong>Success!</strong> Leave reviwed sucessfully!
-				</div>
-			<!--</div>-->
 			<table>
 				<thead class="teal500">
 					<tr>
@@ -49,11 +43,6 @@
 				</md-toolbar>
 				<form #newDocForm="ngForm" (submit)="authorizeLeave()">
 
-					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
-						<p *ngIf="UpdateProgress" class="alert alert-info">Please wait....!</p>
-						<p *ngIf="UpdateFailed" class="alert alert-danger">Leave not updated!</p>
-						<p *ngIf="ModalError.length>0" class="alert alert-danger">{{ModalError}}</p>
-					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 p0 bg-white">
 
 						<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 ptop10 bg-brown">
@@ -79,7 +68,7 @@
 							<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12" *ngIf="SelectedLeave.IsReviewer1">
 								<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
 									<md-input class="" name="status1" placeholder="Review Status" [(ngModel)]="SelectedLeave.ReviewStatus1" type="text" [typeaheadMinLength]="0"
-										[typeahead]="['Further Authorization','Granted','Rejected']" (typeaheadOnSelect)="getReviewers()"></md-input>
+										[typeahead]="['Further Authorization','Granted','Rejected']" (blur)="getReviewers()" (typeaheadOnSelect)="getReviewers()"></md-input>
 								</div>
 								<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12" *ngIf="SelectedLeave.ReviewStatus1=='Further Authorization'">
 									<md-input class="" name="reviewer1" placeholder="Reviewer 2" [(ngModel)]="SelectedLeave.Reviewer2" type="text" [typeahead]="Reviewers"></md-input>

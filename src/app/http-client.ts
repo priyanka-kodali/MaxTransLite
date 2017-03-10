@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class HttpClient {
 
+  value = new Subject<object>()
   token: string;
-  constructor(private http: Http, private router: Router) {
+  constructor(private http: Http, private router: Router ) {
     this.http = http;
   }
 
@@ -32,6 +34,7 @@ export class HttpClient {
         headers: headers
       });
     }
+    return this.value.asObservable();   //to avoid error (null reference to promise)
 
   }
 
@@ -43,5 +46,6 @@ export class HttpClient {
         headers: headers
       });
     }
+    return this.value.asObservable();  //to avoid error (null reference to promise)
   }
 }

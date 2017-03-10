@@ -9,12 +9,6 @@ export class DocumentsService {
 
     getDocuments(EmpId : number){
        let url=ApiUrl + "/api/EmployeeDocuments/GetDocuments?EmpId=" + EmpId
-       return this.http.get(url).map((data=>data=data.json()));
+       return this.http.get(url).toPromise().then((data=>data=data.json()));
     }
-
-    postDocument(data : any){
-        let url=ApiUrl + "/api/EmployeeDocuments/AddDocument"
-        return this.http.post(url,data).map((data=>data=data.json()));
-    }
-
 }

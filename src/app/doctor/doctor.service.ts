@@ -11,7 +11,7 @@ export class DoctorService {
   getData() {
     let url = ApiUrl + "/api/MasterData/GetMasterDataForNewDoctor";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -20,7 +20,7 @@ export class DoctorService {
   postDoctor(data: any) {
     let url = ApiUrl + "/api/Doctor/AddDoctor";
     try {
-      return this.http.post(url, data).map((data) => data.json());
+      return this.http.post(url, data).toPromise().then((data) => data.json());
     }
     catch (e) {
       throw e;
@@ -30,7 +30,7 @@ export class DoctorService {
   getDoctor(doctorId: number) {
     let url = ApiUrl + "/api/Doctor/GetDoctor?doctorId=" + doctorId;
     try {
-      return this.http.get(url).map((data) => data = data.json());
+      return this.http.get(url).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;
@@ -41,7 +41,7 @@ export class DoctorService {
   editDoctor(data: any) {
     let url = ApiUrl + "/api/Doctor/EditDoctor";
     try {
-      return this.http.post(url, data).map((data) => data = data.json());
+      return this.http.post(url, data).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;

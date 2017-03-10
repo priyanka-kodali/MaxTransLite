@@ -11,7 +11,7 @@ export class EmployeeService {
   getData() {
     let url = ApiUrl + "/api/MasterData/GetMasterDataForNewEmployee";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -20,7 +20,7 @@ export class EmployeeService {
   getManagers(department: number) {
     let url = ApiUrl + "/api/MasterData/GetManagers?departmentId=" + department
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) {
       throw e;
@@ -30,7 +30,7 @@ export class EmployeeService {
   getDoctorGroups() {
     let url = ApiUrl + "/api/MasterData/GetDoctorGroups";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) {
       throw e;
@@ -40,7 +40,7 @@ export class EmployeeService {
   postGeneral(data: any) {
     let url = ApiUrl + "/api/Employee/AddEmployee";
     try {
-      return this.http.post(url, data).map((data) => data.json());
+      return this.http.post(url, data).toPromise().then((data) => data.json());
     }
     catch (e) {
       throw e;
@@ -50,7 +50,7 @@ export class EmployeeService {
   getEmployee(EmpId: number) {
     let url = ApiUrl + "/api/Employee/GetEmployee?EmpId=" + EmpId;
     try {
-      return this.http.get(url).map((data) => data = data.json());
+      return this.http.get(url).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;
@@ -61,7 +61,7 @@ export class EmployeeService {
   editEmployee(data: any) {
     let url = ApiUrl + "/api/Employee/EditEmployee";
     try {
-      return this.http.post(url, data).map((data) => data = data.json());
+      return this.http.post(url, data).toPromise().then((data) => data = data.json());
     }
     catch (e) {
       throw e;

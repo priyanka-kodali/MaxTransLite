@@ -3,6 +3,7 @@ import { JobsService } from './jobs.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
 import { ApiUrl } from '../shared/config';
+import { MasterService } from '../app.service';
 
 
 
@@ -39,16 +40,12 @@ export class JobsComponent implements OnInit {
   IsFinalUpload: boolean;
   SelectedJob: Job = new Job();
   SelectedJobLevel: string;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
   myUrl: string = ApiUrl + "/api/Jobs/UploadTranscriptFile";
   DownloadURLs: Array<string> = new Array<string>();
   TempBool: boolean;
   PartialDownloadModal: boolean;
   PartialUploadStartTime: string;
   PartialUploadEndTime: string;
-  ModalError: string;
   PatientListModal: boolean
 
   public uploader: FileUploader = new FileUploader({
@@ -59,71 +56,71 @@ export class JobsComponent implements OnInit {
     }]
   });
 
-  constructor(private jobsService: JobsService, private sanitizer: DomSanitizer) {
+  constructor(private jobsService: JobsService, private sanitizer: DomSanitizer, private masterService: MasterService) {
     this.sorting = "none";
     this.keys = ["Employee Number", "Name", "Department", "Designation", "Phone", "Email", "Manager"];
     this.page = 1;
     this.count = 10;
-    this.error = "";
+
     this.MtVisible = true;
     this.QaVisible = true;
     this.AqaVisible = true;
     this.TemplateModal = false;
     this.FileModal = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
     this.PartialDownloadModal = false;
     this.IsFinalUpload = false;
     this.IsPartialUpload = false;
-    this.ModalError = "";
+
     this.PatientListModal = false;
     this.SelectedJob.PatientList = new Array<string>();
   }
 
   ngOnInit() {
-
+    this.masterService.changeLoading(true);
     try {
+      Promise.all([
+        this.jobsService.getMyWorkDetails().then(
+          (data) => this.CurrentJobSummary = data
 
-      this.jobsService.getMyWorkDetails().subscribe(
-        (data) => this.CurrentJobSummary = data
+        ),
+        this.jobsService.getMtJobs().then(
+          (data) => this.MtJobs = data
+        ),
 
-      )
+        this.jobsService.getAqaJobs().then(
+          (data) => this.AqaJobs = data
+        ),
 
-      this.jobsService.getMtJobs().subscribe(
-        (data) => {
-          this.MtJobs = data;
-        }
-      )
-
-      this.jobsService.getAqaJobs().subscribe(
-        (data) => this.AqaJobs = data
-      )
-
-      this.jobsService.getQaJobs().subscribe(
-        (data) => this.QaJobs = data
-      )
-
+        this.jobsService.getQaJobs().then(
+          (data) => this.QaJobs = data
+        )
+      ]).then(() => this.masterService.changeLoading(false));
     }
 
-    catch (e) { }
+    catch (e) {
+      this.error = "Error fetching jobs data";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+    }
 
   }
 
   getJobSummary() {
-    this.jobsService.getMyWorkDetails().subscribe(
+    this.jobsService.getMyWorkDetails().then(
       (data) => this.CurrentJobSummary = data
     )
   }
 
   getTemplates(DoctorId: number) {
-    this.UpdateProgress = true;
+    this.masterService.changeLoading(true);
     this.TemplateModal = !this.TemplateModal;
     this.Templates = new Array<Document>();
-    this.jobsService.getTemplates(DoctorId).subscribe(
-      (data) => { this.Templates = data; this.UpdateProgress = false; }
+    this.jobsService.getTemplates(DoctorId).then(
+      (data) => {
+        this.Templates = data;
+        this.masterService.changeLoading(false);
+      }
     )
-    this.MtJobs[0].PatientList.length
   }
 
   getPatientList(job: Job) {
@@ -133,8 +130,8 @@ export class JobsComponent implements OnInit {
 
   downloadAudioFile(audioURL: string, job: Job, JobLevel: string) {
     this.downloadFile(audioURL);
-    if (job.DT != null && (job.AQA!=null || job.QA!=null)) return;
-    this.jobsService.jobDownloaded(job.JobWorkId).subscribe(
+    if (job.DT != null && (job.AQA != null || job.QA != null)) return;
+    this.jobsService.jobDownloaded(job.JobWorkId).then(
       (data) => job.DT = data
     );
   }
@@ -144,26 +141,21 @@ export class JobsComponent implements OnInit {
     this.SelectedJob = job;
     this.SelectedJobLevel = jobLevel;
     this.IsPartialUpload = false;
-    this.UpdateProgress = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
     this.PartialUploadStartTime = "";
     this.PartialUploadEndTime = "";
-    this.ModalError = "";
+
   }
 
   postJob() {
-
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
     try {
-      this.UpdateProgress = true;
-      this.UpdateSuccess = false;
-      this.UpdateFailed = false;
-      this.ModalError = "";
+
       if (this.PartialUploadEndTime.trim() == this.SelectedJob.Duration.split('-')[1].trim()) {
         this.IsFinalUpload = true;
         if (!confirm("Is this last document?")) {
           this.PartialUploadEndTime = "";
-          this.UpdateProgress = false;
+          this.masterService.changeLoading(false);
           return;
         }
       }
@@ -177,20 +169,21 @@ export class JobsComponent implements OnInit {
       var file = this.uploader.queue[this.uploader.queue.length - 1];
       file.withCredentials = false;
       if (file.file.type != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && file.file.type != "application/msword") {
-        this.ModalError = "Please select a word('.doc. or '.docx') document";
-        this.UpdateProgress = false;
+        this.error = "Please select a word('.doc. or '.docx') document";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
         return;
       }
       this.uploader.uploadItem(file);
 
       this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-        this.UpdateProgress = false;
         response = JSON.parse(response);
         if (status != 200) {
-          this.UpdateFailed = true;
+          this.error = "Error uploading file";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
         }
         if (status == 200) {
-          this.UpdateSuccess = true;
           this.uploader.clearQueue();
           this.getJobSummary();
           switch (this.SelectedJobLevel) {
@@ -205,6 +198,9 @@ export class JobsComponent implements OnInit {
               break;
           }
           this.SelectedJob = new Job();
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "File uploaded successfully");
+          this.FileModal=false;
         }
       };
 
@@ -234,9 +230,8 @@ export class JobsComponent implements OnInit {
   }
 
   getTranscriptFile(job: Job, Level: string, event: Event) {
-    this.UpdateProgress = true;
-    this.error = "";
-     this.jobsService.jobDownloaded(job.JobWorkId).subscribe(
+
+    this.jobsService.jobDownloaded(job.JobWorkId).then(
       (data) => job.DT = data
     );
 
@@ -244,11 +239,19 @@ export class JobsComponent implements OnInit {
       case 'AQA':
         if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
           event.preventDefault();
+          this.masterService.changeLoading(true);
           this.PartialDowloadDocuments = new Array<Document>();
           this.PartialDownloadModal = true;
-          this.jobsService.getPartialDownloadFiles(job.JobWorkId).subscribe(
-            (data) => { this.PartialDowloadDocuments = data; this.UpdateProgress = false; },
-            (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
+          this.jobsService.getPartialDownloadFiles(job.JobWorkId).then(
+            (data) => {
+              this.PartialDowloadDocuments = data;
+              this.masterService.changeLoading(false);
+            },
+            (error) => {
+              this.error = "Error fetching documents";
+              this.masterService.changeLoading(false);
+              this.masterService.postAlert("error", this.error);
+            }
           );
         }
         else {
@@ -260,11 +263,19 @@ export class JobsComponent implements OnInit {
         if (!job.AQA) {
           if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
             event.preventDefault();
+            this.masterService.changeLoading(true);
             this.PartialDowloadDocuments = new Array<Document>();
             this.PartialDownloadModal = true;
-            this.jobsService.getPartialDownloadFiles(job.JobWorkId).subscribe(
-              (data) => { this.PartialDowloadDocuments = data; this.UpdateProgress = false; },
-              (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
+            this.jobsService.getPartialDownloadFiles(job.JobWorkId).then(
+              (data) => {
+                this.PartialDowloadDocuments = data;
+                this.masterService.changeLoading(false);
+              },
+              (error) => {
+                this.error = "Error fetching documents";
+                this.masterService.changeLoading(false);
+                this.masterService.postAlert("error", this.error);
+              }
             );
           }
           else {
@@ -274,11 +285,19 @@ export class JobsComponent implements OnInit {
         else {
           if (job.AQAUrl.indexOf('.docx') == -1 || job.AQAUrl.indexOf('.doc') == -1) {
             event.preventDefault();
+            this.masterService.changeLoading(true);
             this.PartialDowloadDocuments = new Array<Document>();
             this.PartialDownloadModal = true;
-            this.jobsService.getPartialDownloadFiles(job.JobWorkId).subscribe(
-              (data) => { this.PartialDowloadDocuments = data; this.UpdateProgress = false; },
-              (error) => { this.error = "Error fetching documents"; this.UpdateProgress = false; }
+            this.jobsService.getPartialDownloadFiles(job.JobWorkId).then(
+              (data) => {
+                this.PartialDowloadDocuments = data;
+                this.masterService.changeLoading(false);
+              },
+              (error) => {
+                this.error = "Error fetching documents";
+                this.masterService.changeLoading(false);
+                this.masterService.postAlert("error", this.error);
+              }
             );
           }
           else {
@@ -290,7 +309,7 @@ export class JobsComponent implements OnInit {
   }
 
   downloadFile(url: string) {
-    this.jobsService.GetURLWithSAS(url).subscribe((data) => window.open(data))
+    this.jobsService.GetURLWithSAS(url).then((data) => window.open(data))
   }
 
 }
@@ -327,7 +346,7 @@ class Job {
   ShowDownload: boolean;
   ShowUpload: boolean;
   Color: number;
-  JobLevel : number;
+  JobLevel: number;
 }
 
 class JobSummary {

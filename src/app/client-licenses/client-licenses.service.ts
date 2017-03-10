@@ -12,7 +12,7 @@ export class ClientLicensesService {
 
         let url = ApiUrl + "/api/Client/GetLicenseKeys?ClientId="+ClientId;
         try {
-            return this.http.get(url).map((data => data = data.json()));
+            return this.http.get(url).toPromise().then((data => data = data.json()));
         }
         catch (ex) { throw ex; }
     }
@@ -21,7 +21,7 @@ export class ClientLicensesService {
         
         let url = ApiUrl + "/api/Client/ResetLicenseKey?LicenseId="+LicenseId;
         try {
-            return this.http.get(url).map((data => data = data.json()));
+            return this.http.get(url).toPromise().then((data => data = data.json()));
         }
         catch (ex) { throw ex; }
     }

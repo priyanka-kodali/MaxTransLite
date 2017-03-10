@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LeavesService } from './leaves.service';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-leaves',
@@ -13,65 +14,55 @@ export class LeavesComponent implements OnInit {
   AppliedLeaves: Array<Leave> = new Array<Leave>();
   NewLeave: Leave;
   NewLeaveModal: boolean;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
-  Error: string;
+  error: string;
 
-  constructor(private leavesService: LeavesService) {
-    this.Error = "";
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
-
-    this.leavesService.getLeavesCount().subscribe(
-      (data) => this.MyLeavesCount = data,
-      (error) => { }
-    )
-
-    this.leavesService.getAppliedLeaves().subscribe(
-      (data) => this.AppliedLeaves = data,
-      (error) => { }
-    )
+  constructor(private leavesService: LeavesService, private masterService: MasterService) {
+    this.error = "";
   }
 
   ngOnInit() {
+    this.masterService.changeLoading(true);
+    Promise.all([
+      this.leavesService.getLeavesCount().then(
+        (data) => this.MyLeavesCount = data,
+        (error) => { }
+      ),
+      this.leavesService.getAppliedLeaves().then(
+        (data) => this.AppliedLeaves = data,
+        (error) => { }
+      )
+    ]).then(() => this.masterService.changeLoading(false));
   }
 
   newLeave() {
     this.NewLeave = new Leave();
     this.NewLeaveModal = true;
-
-    this.Error = "";
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
+    this.error = "";
   }
 
   applyLeave() {
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = true;
-    this.Error="";  
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
     if (this.NewLeave.ToDate < this.NewLeave.FromDate || new Date(this.NewLeave.FromDate) < new Date()) {
-      this.Error = "Please select valid 'From' and 'To' dates";
-      this.UpdateProgress = false;
+      this.error = "Please select valid 'From' and 'To' dates";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
       return;
     }
 
 
-    this.leavesService.applyLeave(this.NewLeave).subscribe(
+    this.leavesService.applyLeave(this.NewLeave).then(
       (data) => {
-        this.UpdateProgress = false;
         this.AppliedLeaves.push(data);
+        this.masterService.changeLoading(false);
       },
       (error) => {
-        this.UpdateProgress = false;
         if (error['_body'] == "No of Leaves appiled are more than No of Leaves Available") {
-          this.Error = error['_body'];
+          this.error = error['_body'];
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
           return;
         }
-        this.UpdateFailed = true;
       }
     );
 

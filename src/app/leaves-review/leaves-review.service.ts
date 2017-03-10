@@ -12,7 +12,7 @@ export class LeavesReviewService {
 
         let url = ApiUrl + "/api/Leave/GetReviewers";
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
 
@@ -22,7 +22,7 @@ export class LeavesReviewService {
 
         let url = ApiUrl + "/api/Leave/LeavesToReview";
         try {
-            return this.http.get(url).map((data) => data.json());
+            return this.http.get(url).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
 
@@ -32,7 +32,7 @@ export class LeavesReviewService {
     authorizeLeave(data: any) {
         let url = ApiUrl + "/api/Leave/AuthorizeLeave";
         try {
-            return this.http.post(url,data).map((data) => data.json());
+            return this.http.post(url,data).toPromise().then((data) => data.json());
         }
         catch (e) { throw e; }
     }

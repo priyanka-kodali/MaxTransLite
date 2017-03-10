@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorsService } from './doctors.service';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
 import { ApiUrl } from '../shared/config';
+import { MasterService } from '../app.service';
 
 @Component({
   moduleId: module.id,
@@ -28,16 +29,12 @@ export class DoctorsComponent implements OnInit {
   private sub: any;
   CliId: number;
   error: string;
-  ModalError: string;
   SelectedDoctor: Doctor = new Doctor();
   Templates: Array<Template> = new Array<Template>();
   TemplateModal: boolean;
   GetTemplateProgress: boolean;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
   NewTemplate: Template = new Template();
-  myUrl: string = ApiUrl+"/api/Doctor/AddTemplate";
+  myUrl: string = ApiUrl + "/api/Doctor/AddTemplate";
 
   public uploader: FileUploader = new FileUploader({
     url: this.myUrl,
@@ -48,17 +45,14 @@ export class DoctorsComponent implements OnInit {
   });
 
 
-  constructor(private router: Router, private doctorsService: DoctorsService, private activatedRoute: ActivatedRoute) {
+  constructor(private router: Router, private doctorsService: DoctorsService, private activatedRoute: ActivatedRoute, private masterService: MasterService) {
     this.sorting = "none";
     this.keys = ["Name", "Client", "Phone", "Email", "Job Level", "Voice Grade"];
     this.page = 1;
     this.count = 10;
-    this.error = this.ModalError = "";
+    this.error = "";
     this.TemplateModal = false;
     this.GetTemplateProgress = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
     this.sub = this.activatedRoute.params.subscribe(
       params => this.CliId = +params['CliId']
     );
@@ -69,16 +63,21 @@ export class DoctorsComponent implements OnInit {
   }
 
   getDoctors() {
-    this.doctorsService.getDoctors(this.page, this.count, this.CliId).subscribe(
+    this.masterService.changeLoading(true);
+    this.doctorsService.getDoctors(this.page, this.count, this.CliId).then(
       (data) => {
         this.mainDoctors = data['doctors']; this.doctors = this.mainDoctors;
         this.pages = data['pages']; this.numbers = new Array<number>(this.pages);
         for (var i = 0; i < this.pages; i++) {
           this.numbers[i] = i + 1;
         }
-        this.error = "";
+        this.masterService.changeLoading(false);
       },
-      (error) => { this.error = "Error fetching Doctors" }
+      (error) => {
+        this.error = "Error fetching Doctors";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     )
   }
 
@@ -99,12 +98,14 @@ export class DoctorsComponent implements OnInit {
   }
 
   sort(event) {
+    this.masterService.changeLoading(true);
     var sorting = this.sorting;
     var key = event.target.firstChild.data;
     if (sorting == "none" || sorting == "des") {
       this.sorting = "asc";
       this.doctors.sort(function (a, b) {
         var x = a[key]; var y = b[key];
+        this.masterService.changeLoading(false);
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
       });
     }
@@ -113,6 +114,7 @@ export class DoctorsComponent implements OnInit {
       this.sorting = "des";
       this.doctors.sort(function (a, b) {
         var x = a[key]; var y = b[key];
+        this.masterService.changeLoading(false);
         return ((y < x) ? -1 : ((y > x) ? 1 : 0));
       });
     }
@@ -138,37 +140,61 @@ export class DoctorsComponent implements OnInit {
   }
 
   getTemplates(doctor: Doctor) {
-    this.Templates=new Array<Template>();
-    this.ModalError = "";
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
+    this.Templates = new Array<Template>();
     this.SelectedDoctor = doctor;
     this.TemplateModal = true;
     this.GetTemplateProgress = true;
-    this.UpdateProgress = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.doctorsService.getTemplates(this.SelectedDoctor.Id).subscribe(
-      (data) => { this.Templates = data; this.GetTemplateProgress = false; },
-      (error) => { this.ModalError = "Error Fetching Templates"; this.GetTemplateProgress = false; }
+    this.doctorsService.getTemplates(this.SelectedDoctor.Id).then(
+      (data) => {
+        this.Templates = data;
+        this.GetTemplateProgress = false;
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = "Error Fetching Templates";
+        this.GetTemplateProgress = false;
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
   }
 
   updateTemplates() {
-    this.UpdateProgress = true;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.uploader.onBuildItemForm = (item, form) => { form.append("DocId", this.SelectedDoctor.Id);form.append("Name", this.NewTemplate.Name); }
-    this.uploader.uploadAll();
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
+    this.uploader.onBuildItemForm = (item, form) => { form.append("DocId", this.SelectedDoctor.Id); form.append("Name", this.NewTemplate.Name); }
+    
+    var file = this.uploader.queue[this.uploader.queue.length - 1];
+    file.withCredentials = false;
+
+    
+      this.uploader.uploadItem(file);
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      this.UpdateProgress = false;
       response = JSON.parse(response);
-      if (status != 200)
-        this.UpdateFailed = true;
+      if (status != 200) {
+        this.error = "Error occoured while uploading template";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
 
       if (status == 200) {
-        this.UpdateSuccess = true;
-        this.Templates=response;
+        this.Templates = response;
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "Template added successfully");
+        this.uploader.clearQueue();
+        this.NewTemplate=new Template();
       }
     };
+  }
+
+   downloadFile(url: string) {
+    this.masterService.changeLoading(true);
+    this.masterService.GetURLWithSAS(url).then((data) => {
+      window.open(data);
+      this.masterService.changeLoading(false);
+    })
   }
 
 }

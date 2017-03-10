@@ -13,7 +13,7 @@ export class ManagerDashboardService {
 
     let url = ApiUrl + "/api/Dashboard/GetDailyWorkDetails";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -24,7 +24,7 @@ export class ManagerDashboardService {
 
     let url = ApiUrl + "/api/Dashboard/GetDailyWorkStats";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -34,7 +34,7 @@ export class ManagerDashboardService {
       let url = ApiUrl + "/api/Jobs/SearchJobs";
       
     try {
-      return this.http.post(url,data).map((data) => data.json());
+      return this.http.post(url,data).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }

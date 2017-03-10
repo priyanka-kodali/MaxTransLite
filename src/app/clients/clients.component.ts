@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClientsService } from './clients.service';
+import { MasterService } from '../app.service';
 
 @Component({
   moduleId: module.id,
@@ -24,7 +25,7 @@ export class ClientsComponent implements OnInit {
   numbers: Array<number>;
   error: string;
 
-  constructor(private router: Router, private clientsService: ClientsService) {
+  constructor(private router: Router, private clientsService: ClientsService, private masterService: MasterService) {
     this.sorting = "none";
     this.keys = ["Name", "Phone", "Fax", "Email", "Type", "Time Zone", "Vendor"];
     this.page = 1;
@@ -37,16 +38,21 @@ export class ClientsComponent implements OnInit {
   }
 
   getClients() {
-    this.clientsService.getClients(this.page, this.count).subscribe(
+    this.masterService.changeLoading(true);
+    this.clientsService.getClients(this.page, this.count).then(
       (data) => {
-      this.mainClients = data['clients']; this.clients = this.mainClients;
+        this.mainClients = data['clients']; this.clients = this.mainClients;
         this.pages = data['pages']; this.numbers = new Array<number>(this.pages);
         for (var i = 0; i < this.pages; i++) {
           this.numbers[i] = i + 1;
         }
-        this.error="";
+        this.masterService.changeLoading(false);
       },
-      (error) => { this.error = "Error fetching clients" }
+      (error) => {
+        this.error = "Error fetching clients";
+        this.masterService.postAlert("error", this.error);
+        this.masterService.changeLoading(false);
+      }
     )
   }
 
@@ -79,6 +85,7 @@ export class ClientsComponent implements OnInit {
   }
 
   sort(event) {
+    this.masterService.changeLoading(true);
     var sorting = this.sorting;
     if (event.target.firstChild != null) {
       var key = event.target.firstChild.data.replace(" ", "");
@@ -98,7 +105,7 @@ export class ClientsComponent implements OnInit {
         });
       }
     }
-
+    this.masterService.changeLoading(false);
   }
 
   resetClients() {

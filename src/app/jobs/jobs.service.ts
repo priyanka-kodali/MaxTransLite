@@ -12,7 +12,7 @@ export class JobsService {
 
     let url = ApiUrl + "/api/Jobs/GetMtJobs";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -22,7 +22,7 @@ export class JobsService {
 
     let url = ApiUrl + "/api/Jobs/GetAqaJobs";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -31,7 +31,7 @@ export class JobsService {
   getQaJobs() {
     let url = ApiUrl + "/api/Jobs/GetQaJobs";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -41,7 +41,7 @@ export class JobsService {
   getMyWorkDetails() {
     let url = ApiUrl + "/api/Dashboard/GetMyJobDetails";
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -50,7 +50,7 @@ export class JobsService {
   getTemplates(DoctorId: number) {
     let url = ApiUrl + "/api/Doctor/GetTemplates?DoctorId=" + DoctorId;
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }
@@ -58,7 +58,7 @@ export class JobsService {
   jobDownloaded(JobWorkId: number) {
     let url = ApiUrl + "/api/Jobs/JobDownloaded?JobWorkId=" + JobWorkId;
     try {
-      return this.http.post(url, null).map((data) => data.json());
+      return this.http.post(url, null).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -67,7 +67,7 @@ export class JobsService {
   getPartialDownloadFiles(JobWorkId: number) {
     let url = ApiUrl + "/api/Jobs/GetPartialDownloadFiles?JobWorkId=" + JobWorkId;
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
 
@@ -76,7 +76,7 @@ export class JobsService {
   GetURLWithSAS(blobURL: string) {
     let url = ApiUrl + "/api/Jobs/GetURLWithSAS?url=" + blobURL;
     try {
-      return this.http.get(url).map((data) => data.json());
+      return this.http.get(url).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
   }

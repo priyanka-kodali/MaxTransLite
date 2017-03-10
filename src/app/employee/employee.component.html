@@ -11,45 +11,41 @@
 						</div>
 					</md-toolbar>
 					<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
-						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-							<p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-							<p *ngIf="editProgress" class="alert alert-info">Please wait.......</p>
-						</div>
 						<div class="col-lg-10 col-md-12 col-sm-12">
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="firstName" #firstName [(ngModel)]="NewEmployee.FirstName" placeholder="First Name" type="text" required
-									maxLength="35" [disabled]="inputDisabled"></md-input>
+								 maxLength="35" [disabled]="inputDisabled"></md-input>
 							</div>
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="middleName" #middleName [(ngModel)]="NewEmployee.MiddleName" placeholder="Middle Name" type="text"
-									maxLength="20" [disabled]="inputDisabled"></md-input>
+								 maxLength="20" [disabled]="inputDisabled"></md-input>
 							</div>
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="lastName" #lastName [(ngModel)]="NewEmployee.LastName" placeholder="Last Name" type="text" required
-									maxLength="35" [disabled]="inputDisabled"></md-input>
+								 maxLength="35" [disabled]="inputDisabled"></md-input>
 							</div>
-							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12" *ngIf="!isNewEmployee">
 								<md-input class="" name="employeeNumber" #employeeNumber [(ngModel)]="NewEmployee.EmployeeNumber" placeholder="Employee No."
-									type="text" required maxLength="6" [disabled]="!isNewEmployee"></md-input>
+								 type="text" required maxLength="6" [disabled]="!isNewEmployee"></md-input>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
 								<md-input class="" name="primaryPhone" #primaryPhone [(ngModel)]="NewEmployee.PrimaryPhone" placeholder="Primary Phone" type="text"
-									required maxLength="15" [disabled]="inputDisabled"></md-input>
+								 required maxLength="15" [disabled]="inputDisabled"></md-input>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
 								<md-input class="" name="secondaryPhone" #secondaryPhone [(ngModel)]="NewEmployee.SecondaryPhone" placeholder="Secondary Phone"
-									type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
+								 type="text" maxLength="15" [disabled]="inputDisabled"></md-input>
 							</div>
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="email" #email [(ngModel)]="NewEmployee.Email" placeholder="Email" type="email" required maxLength="255"
-									[disabled]="inputDisabled"></md-input>
+								 [disabled]="!isNewEmployee"></md-input>
 							</div>
 							<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 								<md-input class="" name="dob" #dob [(ngModel)]="NewEmployee.DOB" placeholder="Date of Birth" type="date" required [disabled]="inputDisabled"></md-input>
 							</div>
 							<div class="col-md-2 col-sm-3 col-lg-2 col-xs-12">
 								<md-input class="" name="bloodGroup" #bloodGroup [(ngModel)]="NewEmployee.BloodGroup" placeholder="Blood Group" type="text"
-									required [disabled]="inputDisabled" [typeaheadMinLength]="0" [typeahead]="bloodGroups"></md-input>
+								 required [disabled]="inputDisabled" [typeaheadMinLength]="0" [typeahead]="bloodGroups"></md-input>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
 								<md-input class="" name="PAN" #pan [(ngModel)]="NewEmployee.PAN" placeholder="PAN" type="text" [disabled]="inputDisabled"></md-input>
@@ -60,17 +56,19 @@
 						</div>
 						<div class="col-lg-2 col-md-12 col-sm-12 col-sm-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
-								<button md-raised-button color="primary" class="file-button" type="button" [disabled]="inputDisabled" *ngIf="!hideFileButton">
+								<!--<button md-raised-button color="primary" class="file-button" type="button" [disabled]="inputDisabled" *ngIf="!hideFileButton">
                                     <label for="imageInput">
                                         Photo
                                     </label>
-                                </button>
+                                </button>-->
 								<input type="file" accept="image/*" #photo name="photo" value="Photo" class="file-input" id="imageInput" ng2FileSelect [uploader]="uploader"
-									(change)="imagePreview($event)" [disabled]="inputDisabled"/>
+								 (change)="imagePreview($event)" [disabled]="inputDisabled" />
 							</div>
-							<div *ngIf="hideFileButton">
+							<div>
 								<img src={{ImageSrc}} class="imagePreview" required>
-								<span class="label label-danger image-delete pointer" (click)="removeImage()">X</span>
+								<label for="imageInput" class="image-delete pointer">
+                                	<span class="glyphicon glyphicon-edit text-success" style="padding:3px;"></span>
+								</label>
 							</div>
 						</div>
 					</div>
@@ -80,23 +78,23 @@
 					<div class="col-lg-12 col-md-12 col-sm-12 mtb10">
 						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
 							<md-input class="" name="addressLine1" #addressLine1 [(ngModel)]="NewEmployee.AddressLine1" placeholder="Address Line 1"
-								type="text" required maxLength="255" [disabled]="inputDisabled"></md-input>
+							 type="text" required maxLength="255" [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
 							<md-input class="" name="addressLine2" #addressLine2 [(ngModel)]="NewEmployee.AddressLine2" placeholder="Address Line 2"
-								type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
+							 type="text" maxLength="255" [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="country" #country [(ngModel)]="NewEmployee.Country" [typeahead]="countries" autocomplete="off" (typeaheadOnSelect)="countrySelected()"
-								placeholder="Country" type="text" required [disabled]="inputDisabled"></md-input>
+							 placeholder="Country" type="text" required [disabled]="inputDisabled" (blur)="countrySelected()"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="state" #state [(ngModel)]="NewEmployee.State" autocomplete="off" [typeahead]="states" (typeaheadOnSelect)="stateSelected()"
-								placeholder="State" type="text" required [disabled]="inputDisabled"></md-input>
+							 placeholder="State" type="text" required [disabled]="inputDisabled" (blur)="stateSelected()"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="city" #city [(ngModel)]="NewEmployee.City" [typeahead]="cities" autocomplete="off" placeholder="City"
-								type="text" required [disabled]="inputDisabled"></md-input>
+							 type="text" required [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="ZIP" #zip [(ngModel)]="NewEmployee.ZIP" placeholder="ZIP" type="text" required maxLength="10" [disabled]="inputDisabled"></md-input>
@@ -109,56 +107,51 @@
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="doj" #doj [(ngModel)]="NewEmployee.DOJ" placeholder="Date of Joining" type="date" required [disabled]="inputDisabled"></md-input>
 						</div>
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="!isNewEmployee">
+							<md-input class="" name="dor" #dor [(ngModel)]="NewEmployee.DOR" placeholder="Date of Resignation" type="date" [disabled]="inputDisabled"></md-input>
+						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="provisionalPeriod" #provisionalPeriod [(ngModel)]="NewEmployee.ProvisionalPeriod" min="0" max="24"
-								placeholder="Provisional Period (Months)" type="number" [disabled]="inputDisabled"></md-input>
+							 placeholder="Provisional Period (Months)" type="number" [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="employmentType" #employmentType [(ngModel)]="NewEmployee.EmploymentType" autocomplete="off" [typeahead]="employmentTypes"
-								[typeaheadMinLength]="0" placeholder="Employement Type" type="text" required [disabled]="inputDisabled"></md-input>
+							 [typeaheadMinLength]="0" placeholder="Employement Type" type="text" required [disabled]="inputDisabled"></md-input>
 						</div>
 
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="designation" #designation [(ngModel)]="NewEmployee.Designation" autocomplete="off" [typeahead]="designations"
-								placeholder="Designation" [typeaheadMinLength]="0" type="text" required [disabled]="inputDisabled"></md-input>
+							 placeholder="Designation" [typeaheadMinLength]="0" type="text" required [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="department" #department [(ngModel)]="NewEmployee.Department" autocomplete="off" [typeahead]="departments"
-								placeholder="Department" [typeaheadMinLength]="0" (typeaheadOnSelect)="departmentChange()" type="text" required [disabled]="inputDisabled"></md-input>
+							 placeholder="Department" [typeaheadMinLength]="0" (typeaheadOnSelect)="departmentChange()" type="text" required [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="manager" #manager [(ngModel)]="NewEmployee.Manager" placeholder="Head/Manager" [typeahead]="managers"
-								type="text" [disabled]="inputDisabled" autocomplete="off"></md-input>
+							 type="text" [disabled]="inputDisabled" autocomplete="off"></md-input>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input class="" name="role" #role [(ngModel)]="NewEmployee.Role" required placeholder="Role" type="text" [typeahead]="roles"
-								[disabled]="inputDisabled"></md-input>
+							 [disabled]="inputDisabled" [typeaheadMinLength]="0"></md-input>
 						</div>
-						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
+						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12" *ngIf="NewEmployee.Department=='MT'">
 							<md-input class="" name="doctorGroup" [(ngModel)]="doctorGroupSelector" placeholder="Doctor Group" [typeahead]="doctorGroups"
-								(typeaheadOnSelect)="doctorGroupChange()" type="text" [disabled]="inputDisabled" autocomplete="off"></md-input>
+							 (typeaheadOnSelect)="doctorGroupChange()" type="text" [typeaheadMinLength]="0" [disabled]="inputDisabled" autocomplete="off"></md-input>
 						</div>
 						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 well well-sm" *ngIf="NewEmployee.DoctorGroups.length>0">
 							<span class="mright5">Doctor Groups Selected </span>
 							<span *ngFor="let group of NewEmployee.DoctorGroups" class="label label-info mright5">{{group}}<span class="label label-danger mleft5 pointer" (click)="removeDoctorGroup(group)">X</span>							</span>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
-							<md-input class="" name="specialty" [(ngModel)]="specialtySelector" autocomplete="off" (typeaheadOnSelect)="specialtiesChange()"
-								[typeahead]="specialties" placeholder="Specialty" type="text" [disabled]="inputDisabled"></md-input>
-						</div>
-						<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!isNewDoctor">
-							<md-checkbox name="active" [(ngModel)]="NewEmployee.Active" [disabled]="inputDisabled" >Active </md-checkbox>
+							<md-input class="" name="specialty" *ngIf="NewEmployee.Department=='MT'" [(ngModel)]="specialtySelector" autocomplete="off" (typeaheadOnSelect)="specialtiesChange()"
+							 [typeahead]="specialties" placeholder="Specialty" type="text" [disabled]="inputDisabled"></md-input>
 						</div>
 						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 well well-sm" *ngIf="NewEmployee.Specialties.length>0">
 							<span class="mright5">Specialties Selected </span>
 							<span *ngFor="let specialty of NewEmployee.Specialties" class="label label-info mright5">{{specialty}}<span class="label label-danger mleft5 pointer" (click)="removeSpecialty(specialty)">X</span>							</span>
 						</div>
 
-						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
-							<p *ngIf="error.length>0" class="alert alert-danger">{{error}}</p>
-							<p *ngIf="editProgress" class="alert alert-info">Please wait.......</p>
-							<p *ngIf="editSuccess" class="alert alert-success">Employee Details are updated successfully!</p>
-						</div>
 						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
 							<button md-raised-button class="btn-save" [disabled]="inputDisabled">Save</button>
 						</div>

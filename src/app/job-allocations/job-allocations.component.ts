@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { JobAllocationsService } from './job-allocations.service';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-job-allocations',
@@ -12,22 +13,20 @@ export class JobAllocationsComponent implements OnInit {
 
   Jobs: Array<Job> = new Array<Job>();
   DuplicateJobs: Array<Job> = new Array<Job>();
-  Error: string;
-  ModalError: string;
-  ModalWarning: string;
+  error: string;
+  warning: string;
   Employees: Array<string> = new Array<string>();
   EmployeeIds: Array<number> = new Array<number>();
   EditAllocationModal: boolean;
-  UpdateSuccess: boolean;
   SelectedJob: Job = new Job();
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
   MTDisabled: boolean;
   AQADisabled: boolean;
   QADisabled: boolean;
   MTHidden: boolean;
   AQAHidden: boolean;
   QAHidden: boolean;
+  splitMTDisabled :boolean;
+  splitAQADisabled : boolean;
   SplitAllocationModal: boolean;
   SplitAllocationChildJobs: Array<SplitJob>;
   NoOfSplits: number;
@@ -38,12 +37,9 @@ export class JobAllocationsComponent implements OnInit {
   SplitJobsStartTime: number;
   SearchItem: Search = new Search();
 
-  constructor(private jobAllocationsService: JobAllocationsService) {
-    this.Error = this.ModalError = this.ModalWarning = "";
+  constructor(private jobAllocationsService: JobAllocationsService, private masterService: MasterService) {
+    this.error = this.error = this.warning = "";
     this.EditAllocationModal = false;
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
     this.MTDisabled = false;
     this.AQADisabled = false;
     this.QADisabled = false;
@@ -51,12 +47,22 @@ export class JobAllocationsComponent implements OnInit {
     this.AQAHidden = false;
     this.QAHidden = false;
     this.isDataAvailable = false;
+    this.splitAQADisabled=false;
+    this.splitMTDisabled=false;
   }
 
   ngOnInit() {
-    this.jobAllocationsService.getJobs().subscribe(
-      (data) => { { this.Jobs = data; this.DuplicateJobs=data;} },
-      (error) => this.Error = "Error fetching jobs"
+    this.masterService.changeLoading(true);
+    this.jobAllocationsService.getJobs().then(
+      (data) => {
+        this.Jobs = data; this.DuplicateJobs = data;
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = "Error fetching jobs";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     )
   }
 
@@ -156,13 +162,10 @@ export class JobAllocationsComponent implements OnInit {
 
   editAllocation(job: Job) {
     this.EditAllocationModal = true;
-    this.UpdateFailed = false;
-    this.UpdateSuccess = false;
-    this.ModalError = "";
-    this.SelectedJob=job;//this.DuplicateJobs.filter((item)=>item.JobId==job.JobId)[0];
-    if(this.SelectedJob.MT==null)this.SelectedJob.MT=="";
-    if(this.SelectedJob.AQA==null)this.SelectedJob.AQA=="";
-    if(this.SelectedJob.QA==null)this.SelectedJob.QA=="";
+    this.SelectedJob = job;//this.DuplicateJobs.filter((item)=>item.JobId==job.JobId)[0];
+    if (this.SelectedJob.MT == null) this.SelectedJob.MT == "";
+    if (this.SelectedJob.AQA == null) this.SelectedJob.AQA == "";
+    if (this.SelectedJob.QA == null) this.SelectedJob.QA == "";
     this.statusChanged();
     this.levelChanged();
     this.getEmployees();
@@ -170,55 +173,82 @@ export class JobAllocationsComponent implements OnInit {
 
   getEmployees() {
     if (this.isDataAvailable) return;
-    this.jobAllocationsService.getEmployees().subscribe(
+    this.masterService.changeLoading(true);
+    this.jobAllocationsService.getEmployees().then(
       (data) => {
         data.forEach(element => {
           this.Employees.push(element.Name);
           this.EmployeeIds.push(element.Id);
           this.isDataAvailable = true;
+          this.masterService.changeLoading(false);
         });
       }
     )
   }
 
   updateAllocation() {
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.ModalError = "";
+
+    this.masterService.changeLoading(true);
+
+    if (!this.validateAllocation()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      return;
+    }
+
+    this.masterService.postAlert("remove", "");
+
     try {
-      this.SelectedJob.MTId = this.EmployeeIds[this.Employees.indexOf(this.SelectedJob.MT)];
-      this.SelectedJob.AQAId = this.EmployeeIds[this.Employees.indexOf(this.SelectedJob.AQA)];
-      this.SelectedJob.QAId = this.EmployeeIds[this.Employees.indexOf(this.SelectedJob.QA)];
-
-      if (this.SelectedJob.MT && !this.SelectedJob.MTId) {
-        this.ModalError = "Please select valid MT"
-        return;
-      }
-
-      if (this.SelectedJob.AQA && !this.SelectedJob.AQAId) {
-        this.ModalError = "Please select valid AQA"
-        return;
-      }
-
-      if (this.SelectedJob.QA && !this.SelectedJob.QAId) {
-        this.ModalError = "Please select valid QA"
-        return;
-      }
-
-      this.jobAllocationsService.updateAllocation(this.SelectedJob).subscribe(
+      this.jobAllocationsService.updateAllocation(this.SelectedJob).then(
         (data) => {
           this.Jobs = this.Jobs.filter((item) => item.JobId != data['JobId']);
           this.Jobs.push(data);
-          this.UpdateSuccess = true;
           this.Jobs.sort(function (a, b) { return a.JobId - b.JobId; });
-          this.DuplicateJobs=this.Jobs;
+          this.DuplicateJobs = this.Jobs;
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "Job details updated successfully");
 
         },
-        (error) => this.UpdateFailed = true
+        (error) => {
+          this.error = "Error updating job details";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+        }
       )
     }
     catch (e) {
-      this.UpdateFailed = false;
+      this.error = "Error updating job details";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+    }
+  }
+
+  validateAllocation() {
+    this.masterService.postAlert("remove", "");
+    try {
+      this.SelectedJob.MTId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SelectedJob.MT)];
+      this.SelectedJob.AQAId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SelectedJob.AQA)];
+      this.SelectedJob.QAId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SelectedJob.QA)];
+
+      if (this.SelectedJob.MT && !this.SelectedJob.MTId) {
+        this.error = "Please select valid MT"
+        return false;
+      }
+
+      if (this.SelectedJob.AQA && !this.SelectedJob.AQAId) {
+        this.error = "Please select valid AQA"
+        return false;
+      }
+
+      if (this.SelectedJob.QA && !this.SelectedJob.QAId) {
+        this.error = "Please select valid QA"
+        return false;
+      }
+
+      return true;
+    }
+    catch (e) {
+
     }
   }
 
@@ -232,13 +262,12 @@ export class JobAllocationsComponent implements OnInit {
     this.statusChanged();
     this.levelChanged();
     this.getEmployees();
-    this.ModalError = "";
-    this.UpdateFailed = false;
-    this.UpdateSuccess = false;
+    this.error = "";
+    this.splitAQADisabled=false;
+    this.splitMTDisabled=false;
   }
 
   employeeForSplitSelected(i: number, level: string) {
-    this.ModalError = "";
     var splitJob = this.SplitAllocationChildJobs[i];
     switch (level) {
       case 'MT':
@@ -248,7 +277,7 @@ export class JobAllocationsComponent implements OnInit {
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
           if (splitJob.MT != "" && this.SplitAllocationChildJobs[k].MT == splitJob.MT) {
-            this.ModalWarning = "Multiple jobs are having same MT";
+            this.warning = "Multiple jobs are having same MT";
           }
         }
         break;
@@ -259,7 +288,7 @@ export class JobAllocationsComponent implements OnInit {
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
           if (splitJob.AQA != "" && this.SplitAllocationChildJobs[k].AQA == splitJob.AQA) {
-            this.ModalWarning = "Multiple jobs are having same AQA";
+            this.warning = "Multiple jobs are having same AQA";
           }
         }
         break;
@@ -270,11 +299,12 @@ export class JobAllocationsComponent implements OnInit {
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
           if (splitJob.QA != "" && this.SplitAllocationChildJobs[k].QA == splitJob.QA) {
-            this.ModalWarning = "Multiple jobs are having same QA";
+            this.warning = "Multiple jobs are having same QA";
           }
         }
         break;
     }
+    this.masterService.postAlert("alert", this.warning);
   }
 
   splitNumberChange() {
@@ -300,28 +330,64 @@ export class JobAllocationsComponent implements OnInit {
       job.StartTime = this.SplitAllocationChildJobs[i - 1].EndTime;
       job.EndTime = this.SplitAllocationChildJobs[0].StartTime + ((i + 1) * SplitTime);
       this.SplitAllocationChildJobs.push(job);
+      if (this.SelectedJob.Status == "Pending at AQA" || this.SelectedJob.Status == "Pending at QA") 
+      {
+        this.SplitAllocationChildJobs[i].MT=this.SelectedJob.MT;
+        this.SplitAllocationChildJobs[i].MTId=this.SelectedJob.MTId;
+        this.splitMTDisabled=true;
+      }
+      if (this.SelectedJob.JobLevel == "L1-L2-L3" || this.SelectedJob.Status == "Pending at QA") 
+      {
+        this.SplitAllocationChildJobs[i].AQA=this.SelectedJob.AQA;
+        this.SplitAllocationChildJobs[i].AQAId=this.SelectedJob.AQAId;
+        this.splitAQADisabled=true;
+      }
     }
 
   }
 
   splitAllocation() {
+    this.masterService.changeLoading(true);
+
+    if (!this.validateSplitAllocations()) {
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+      return;
+    }
+
+    this.masterService.postAlert("remove", "");
+
+    this.jobAllocationsService.splitAllocation(this.SplitAllocationChildJobs).then(
+      (data) => {
+        this.Jobs = data;
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "Jobs splitted successfully");
+      },
+      (error) => {
+        this.error = "Error splitting Jobs";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
+    );
+  }
+
+  validateSplitAllocations() {
     this.SplitAllocationChildJobs[0].StartTime = this.SplitJobsStartTime;
-    this.ModalError = "";
-    this.UpdateFailed = false;
-    this.UpdateSuccess = false;
+    this.error = "";
     var total = 0;
     this.SplitAllocationChildJobs.forEach(element => {
       total += element.EndTime - element.StartTime;
     })
 
     if (total != this.SelectedJob.TotalMinutes) {
-      this.ModalError = "Please check allocation durations";
+      this.error = "Please check allocation durations";
+      return false;
     }
 
     for (var i = 1; i < this.NoOfSplits; i++) {
       if (this.SplitAllocationChildJobs[i].StartTime != this.SplitAllocationChildJobs[i - 1].EndTime) {
-        this.ModalError = "Please check allocation durations";
-        return;
+        this.error = "Please check allocation durations";
+        return false;
       }
     }
 
@@ -339,34 +405,33 @@ export class JobAllocationsComponent implements OnInit {
         this.SplitAllocationChildJobs[i].QA = this.SplitAllocationChildJobs[i].QA.trim();
       }
 
-      this.SplitAllocationChildJobs[i].MTId = this.EmployeeIds[this.Employees.indexOf(this.SplitAllocationChildJobs[i].MT)];
-      this.SplitAllocationChildJobs[i].AQAId = this.EmployeeIds[this.Employees.indexOf(this.SplitAllocationChildJobs[i].AQA)];
-      this.SplitAllocationChildJobs[i].QAId = this.EmployeeIds[this.Employees.indexOf(this.SplitAllocationChildJobs[i].QA)];
+      this.SplitAllocationChildJobs[i].MTId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SplitAllocationChildJobs[i].MT)];
+      this.SplitAllocationChildJobs[i].AQAId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SplitAllocationChildJobs[i].AQA)];
+      this.SplitAllocationChildJobs[i].QAId = this.EmployeeIds[this.Employees.findIndex((item)=>item.toLowerCase()==this.SplitAllocationChildJobs[i].QA)];
 
       if (this.SplitAllocationChildJobs[i].MT && !this.SplitAllocationChildJobs[i].MTId) {
-        this.ModalError = "Please select valid MT for Split " + (i + 1);
-        return;
+        this.error = "Please select valid MT for Split " + (i + 1);
+        return false;
       }
 
       if (this.SplitAllocationChildJobs[i].AQA && !this.SplitAllocationChildJobs[i].AQAId) {
-        this.ModalError = "Please select valid AQA for Split " + (i + 1);
-        return;
+        this.error = "Please select valid AQA for Split " + (i + 1);
+        return false;
       }
 
       if (this.SplitAllocationChildJobs[i].QA && !this.SplitAllocationChildJobs[i].QAId) {
-        this.ModalError = "Please select valid QA for Split " + (i + 1);
-        return;
+        this.error = "Please select valid QA for Split " + (i + 1);
+        return false;
       }
 
     }
-
-    this.jobAllocationsService.splitAllocation(this.SplitAllocationChildJobs).subscribe(
-      (data) => { this.Jobs = data, this.UpdateSuccess = true; },
-      (error) => this.UpdateFailed = true
-    );
+    return true;
   }
 
   search() {
+    this.masterService.changeLoading(true);
+    this.masterService.postAlert("remove", "");
+
     this.SearchItem.FromDate = this.SearchItem.FromDate == null ? "" : this.SearchItem.FromDate.trim();
     this.SearchItem.ToDate = this.SearchItem.ToDate == null ? "" : this.SearchItem.ToDate.trim();
     this.SearchItem.Doctor = this.SearchItem.Doctor == null ? "" : this.SearchItem.Doctor.trim();
@@ -377,9 +442,13 @@ export class JobAllocationsComponent implements OnInit {
     this.SearchItem.Status = this.SearchItem.Status == null ? "" : this.SearchItem.Status.trim();
 
 
-    this.jobAllocationsService.searchJobs(this.SearchItem).subscribe(
-      (data) => { this.Jobs = data; this.DuplicateJobs=data; this.Error = ""; },
-      (error) => this.Error = "Error fetching jobs"
+    this.jobAllocationsService.searchJobs(this.SearchItem).then(
+      (data) => { this.Jobs = data; this.DuplicateJobs = data; },
+      (error) => {
+        this.error = "Error fetching jobs";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
 
 

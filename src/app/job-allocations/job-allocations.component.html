@@ -44,7 +44,6 @@
 				</div>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs p0">
-				<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 alert alert-danger mbottom5" *ngIf="Error.length>0">{{Error}}</div>
 				<table>
 					<thead class="orange200">
 						<tr table-header>
@@ -63,7 +62,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr *ngFor="let job of Jobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1" [class.bg-green]="job.Color==0" >
+						<tr *ngFor="let job of Jobs" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
+						 [class.bg-green]="job.Color==0">
 							<td>{{job.JobDate}}</td>
 							<td>{{job.JobNumber}}</td>
 							<td>{{job.Duration}}</td>
@@ -95,12 +95,6 @@
 					<div class="col-xs-12 p0 m0"><span>Allocate Job</span> <button md-raised-button class="pull-right btn-small" (click)="closeEditAllocationModal()"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
 				</md-toolbar>
 				<form #newDocForm="ngForm" (submit)="updateAllocation()">
-
-					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
-						<p *ngIf="UpdateSuccess" class="alert alert-success">Job details updated sucessfully!</p>
-						<p *ngIf="UpdateFailed" class="alert alert-danger">Job details are not updated!</p>
-						<p *ngIf="ModalError.length>0" class="alert alert-danger">{{ModalError}}</p>
-					</div>
 					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 p0 bg-white">
 
 						<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 ptop10 bg-brown">
@@ -114,7 +108,7 @@
 
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
 								<md-input class="" name="client" placeholder="Client" title="SeletedJob.Client" [(ngModel)]="SelectedJob.ClientShortName"
-									type="text" disabled></md-input>
+								 type="text" disabled></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
@@ -126,31 +120,31 @@
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="level" placeholder="Job Level" [(ngModel)]="SelectedJob.JobLevel" type="text" (change)="statusChanged()"
-									(typeaheadOnSelect)="levelChanged()" [typeaheadMinLength]="0" [typeahead]="['L1','L1-L3','L1-L2-L3']"></md-input>
+								 (typeaheadOnSelect)="levelChanged()" [typeaheadMinLength]="0" [typeahead]="['L1','L1-L3','L1-L2-L3']"></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
 								<md-input class="" name="status" placeholder="Status" [(ngModel)]="SelectedJob.Status" type="text" (change)="statusChanged()"
-									(typeaheadOnSelect)="statusChanged()" [typeaheadMinLength]="0" [typeahead]="['No Dictation','Repeat']"></md-input>
+								 (typeaheadOnSelect)="statusChanged()" [typeaheadMinLength]="0" [typeahead]="['No Dictation','Repeat']"></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-						     	<md-input class="" name="defaultTAT" placeholder="Default TAT" [(ngModel)]="SelectedJob.DefaultTAT" type="number" min=0></md-input>						
+								<md-input class="" name="defaultTAT" placeholder="Default TAT" [(ngModel)]="SelectedJob.DefaultTAT" type="number" min=0></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!MTHidden">
 								<md-input class="" name="MT" placeholder="MT" [(ngModel)]="SelectedJob.MT" [typeahead]="Employees" autocomplete="off" type="text"
-									[disabled]="MTDisabled" (typeaheadOnSelect)="mtChanged()" ></md-input>
+								 [disabled]="MTDisabled" (blur)="mtChanged()" (typeaheadOnSelect)="mtChanged()"></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!AQAHidden">
 								<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="SelectedJob.AQA" [typeahead]="Employees" autocomplete="off"
-									type="text" [disabled]="AQADisabled" (typeaheadOnSelect)="aqaChanged()" ></md-input>
+								 type="text" [disabled]="AQADisabled" (blur)="aqaChanged()" (typeaheadOnSelect)="aqaChanged()"></md-input>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!QAHidden">
-								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off"
-								 	type="text" [disabled]="QADisabled" (typeaheadOnSelect)="qaChanged()"></md-input>
+								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off" type="text"
+								 [disabled]="QADisabled" (blur)="qaChanged()" (typeaheadOnSelect)="qaChanged()"></md-input>
 							</div>
 
 							<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
@@ -175,12 +169,6 @@
 					<div class="col-xs-12 p0 m0"><span>Split Job</span> <button md-raised-button class="pull-right btn-small" (click)="SplitAllocationModal=!SplitAllocationModal"><span class="glyphicon glyphicon-remove text-danger" style="padding: 2px 0 4px 2px;"></span></button></div>
 				</md-toolbar>
 				<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 bg-white p0">
-					<div class="col-xs-12">
-						<p *ngIf="UpdateSuccess" class="alert alert-success">Job details updated sucessfully!</p>
-						<p *ngIf="UpdateFailed" class="alert alert-danger">Job details are not updated!</p>
-						<p *ngIf="ModalError.length>0" class="alert alert-danger">{{ModalError}}</p>
-						<p *ngIf="ModalWarning.length>0" class="alert alert-warning">{{ModalWarning}}</p>
-					</div>
 					<div class="row m0 ptop5 main-job-details">
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
 							<md-input class="" name="jobDate" placeholder="JobDate" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input>
@@ -190,7 +178,7 @@
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
 							<md-input class="" name="client" placeholder="Client" title="Selected.Client" [(ngModel)]="SelectedJob.ClientShortName" type="text"
-								disabled></md-input>
+							 disabled></md-input>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
 							<md-input class="" name="doctor" placeholder="Doctor" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input>
@@ -204,7 +192,7 @@
 
 						<div class="col-md-1 col-sm-3 col-lg-1 col-xs-12">
 							<md-input class="" name="splits" placeholder="No of Splits" [(ngModel)]="NoOfSplits" type="text" min=2 max=5 step=1 autocomplete="off"
-								(change)="splitNumberChange()" (keyup)="splitNumberChange()"></md-input>
+							 (change)="splitNumberChange()" (keyup)="splitNumberChange()"></md-input>
 						</div>
 					</div>
 					<div class="row m0 split-job-details ">
@@ -219,16 +207,16 @@
 								<md-input class="" name="endTime" placeholder="End Time" [(ngModel)]="newSplitJob.EndTime" type="text"></md-input>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!MTHidden">
-								<md-input class="" name="MT" placeholder="MT" [(ngModel)]="newSplitJob.MT" (typeaheadOnSelect)="employeeForSplitSelected(i,'MT')"
-								[typeahead]="Employees" type="text"></md-input>
+								<md-input class="" name="MT" placeholder="MT" [(ngModel)]="newSplitJob.MT" (blur)="employeeForSplitSelected(i,'MT')" (typeaheadOnSelect)="employeeForSplitSelected(i,'MT')" [disabled]="splitMTDisabled"
+								 [typeahead]="Employees" type="text"></md-input>
 							</div>
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12"  *ngIf="!AQAHidden">
-								<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="newSplitJob.AQA" (typeaheadOnSelect)="employeeForSplitSelected(i,'AQA')"
-								[typeahead]="Employees" type="text"></md-input>
+							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!AQAHidden">
+								<md-input class="" name="AQA" placeholder="AQA" [(ngModel)]="newSplitJob.AQA" (blur)="employeeForSplitSelected(i,'AQA')" (typeaheadOnSelect)="employeeForSplitSelected(i,'AQA')" [disabled]="splitAQATDisabled"
+								 [typeahead]="Employees" type="text"></md-input>
 							</div>
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12"  *ngIf="!QAHidden">
-								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="newSplitJob.QA" (typeaheadOnSelect)="employeeForSplitSelected(i,'QA')"
-								[typeahead]="Employees" type="text"></md-input>
+							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!QAHidden">
+								<md-input class="" name="QA" placeholder="QA" [(ngModel)]="newSplitJob.QA" (blur)="employeeForSplitSelected(i,'QA')" (typeaheadOnSelect)="employeeForSplitSelected(i,'QA')" [disabled]="splitQADisabled"
+								 [typeahead]="Employees" type="text"></md-input>
 							</div>
 						</div>
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ManagerDashboardService } from './manager-dashboard.service';
+import { MasterService } from '../app.service';
 
 @Component({
   selector: 'app-manager-dashboard',
@@ -10,35 +11,31 @@ import { ManagerDashboardService } from './manager-dashboard.service';
 export class ManagerDashboardComponent implements OnInit {
 
   Jobs: Array<Job> = new Array<Job>();
-  DailyStatistics : DailyStats =new DailyStats();
-  Error: string;
-  UpdateSuccess: boolean;
-  UpdateFailed: boolean;
-  UpdateProgress: boolean;
+  DailyStatistics: DailyStats = new DailyStats();
+  error: string;
   SearchItem: Search = new Search();
 
-  constructor(private managerDashboardService: ManagerDashboardService) {
-    this.Error = "";
-    this.UpdateSuccess = false;
-    this.UpdateFailed = false;
-    this.UpdateProgress = false;
-  }
+  constructor(private managerDashboardService: ManagerDashboardService, private masterService: MasterService) {
+    this.error = "";
+   }
 
   ngOnInit() {
-    this.managerDashboardService.getJobs().subscribe(
-      (data) => { { this.Jobs = data; } },
-      (error) => this.Error = "Error fetching jobs"
-    )
-
-
-    this.managerDashboardService.getStats().subscribe(
-      (data) => this.DailyStatistics = data,
-      (error) => {}
-    )
+    this.masterService.changeLoading(true);
+    Promise.all([
+      this.managerDashboardService.getJobs().then(
+        (data) => this.Jobs = data,
+        (error) => { }
+      ),
+      this.managerDashboardService.getStats().then(
+        (data) => this.DailyStatistics = data,
+        (error) => { }
+      )
+    ]).then(() => this.masterService.changeLoading(false));
   }
 
 
   search() {
+    this.masterService.changeLoading(true);
     this.SearchItem.FromDate = this.SearchItem.FromDate == null ? "" : this.SearchItem.FromDate.trim();
     this.SearchItem.ToDate = this.SearchItem.ToDate == null ? "" : this.SearchItem.ToDate.trim();
     this.SearchItem.Doctor = this.SearchItem.Doctor == null ? "" : this.SearchItem.Doctor.trim();
@@ -49,9 +46,16 @@ export class ManagerDashboardComponent implements OnInit {
     this.SearchItem.Status = this.SearchItem.Status == null ? "" : this.SearchItem.Status.trim();
 
 
-    this.managerDashboardService.searchJobs(this.SearchItem).subscribe(
-      (data) => { this.Jobs = data; this.Error = ""; },
-      (error) => this.Error = "Error fetching jobs"
+    this.managerDashboardService.searchJobs(this.SearchItem).then(
+      (data) => {
+        this.Jobs = data;
+        this.masterService.changeLoading(false);
+      },
+      (error) => {
+        this.error = "Error fetching jobs";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
     );
 
 

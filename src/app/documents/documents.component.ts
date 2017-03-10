@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentsService } from './documents.service';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
 import { ApiUrl } from '../shared/config';
+import { MasterService } from '../app.service';
 
 
 @Component({
@@ -20,19 +21,15 @@ export class DocumentsComponent implements OnInit {
   mainDocuments: Array<any>
   documents: Array<any>;
   NewDocument: Document;
-  uploadSuccess: boolean
   sorting: string;
   NewDocumentModal: boolean;
   EmpId: number;
   private sub: any;
-  modalError: string;
   error: string;
   nextButton: boolean;
   EmployeeName: string
   EmployeeNumber: string
   isNewEmployee: boolean;
-
-
 
 
   public uploader: FileUploader = new FileUploader({
@@ -45,11 +42,10 @@ export class DocumentsComponent implements OnInit {
   });
 
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private documentService: DocumentsService) {
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private documentService: DocumentsService) {
     this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
     this.sorting = "none";
     this.error = "";
-    this.modalError = "";
     this.sub = this.activatedRoute.params.subscribe(
       params => this.EmpId = +params['EmpId']
     );
@@ -57,9 +53,10 @@ export class DocumentsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.nextButton = this.isNewEmployee;
+    this.nextButton = true;
+    this.masterService.changeLoading(true);
     try {
-      this.documentService.getDocuments(this.EmpId).subscribe(
+      this.documentService.getDocuments(this.EmpId).then(
         (data) => {
           this.mainDocuments = data['documents']; this.documents = this.mainDocuments;
           this.EmployeeName = data['Name']; this.EmployeeNumber = data['EmployeeNumber'];
@@ -68,13 +65,19 @@ export class DocumentsComponent implements OnInit {
             element.DocumentDate = element.DocumentDate == null ? null : element.DocumentDate.split("T")[0];
           }
           );
-          this.error = "";
+          this.masterService.changeLoading(false);
         },
-        (error) => { this.error = "Error fetching documents"; }
+        (error) => {
+          this.error = "Error fetching documents";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+        }
       );
     }
     catch (e) {
       this.error = "Error fetching documents";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
     }
 
   }
@@ -96,6 +99,7 @@ export class DocumentsComponent implements OnInit {
   }
 
   sort(event) {
+    this.masterService.changeLoading(true);
     var sorting = this.sorting;
     var key = event.target.firstChild.data.replace(" ", "");
     if (sorting == "none" || sorting == "des") {
@@ -113,27 +117,30 @@ export class DocumentsComponent implements OnInit {
         return ((y < x) ? -1 : ((y > x) ? 1 : 0));
       });
     }
-
-
+    this.masterService.changeLoading(false);
   }
 
   newDocument() {
     this.NewDocumentModal = true;
-    this.uploadSuccess = false;
     this.NewDocument = new Document();
     this.NewDocument.Employee_Id = this.EmpId;
   }
 
   uploadDocument() {
+    this.masterService.changeLoading(true);
 
-    this.error = "";
-    this.uploadSuccess = false;
+    this.masterService.postAlert("remove", "");
+
 
     this.uploader.onBuildItemForm = (item, form) => {
       form.append("documentData", JSON.stringify(this.NewDocument));
     }
 
-    this.uploader.uploadAll();
+    var file = this.uploader.queue[this.uploader.queue.length - 1];
+    file.withCredentials = false;
+
+    
+      this.uploader.uploadItem(file);
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       response = JSON.parse(response);
@@ -141,17 +148,31 @@ export class DocumentsComponent implements OnInit {
       if (status == 200) {
         this.mainDocuments.push(response);
         this.documents = this.mainDocuments;
-        this.uploadSuccess = true;
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "Document added successfully");
+        this.NewDocument=new Document();
+        this.NewDocumentModal=false;
       }
 
       if (status != 200) {
         this.error = "An error occoured while uploading the document";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
       }
     }
   }
 
   navigateToPayscale() {
     this.router.navigate(["/new-employee", "payscale", this.EmpId]);
+  }
+
+
+  downloadFile(url: string) {
+    this.masterService.changeLoading(true);
+    this.masterService.GetURLWithSAS(url).then((data) => {
+      window.open(data);
+      this.masterService.changeLoading(false);
+    })
   }
 }
 
