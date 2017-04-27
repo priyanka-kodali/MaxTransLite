@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, AfterViewInit, Renderer, ViewChild } from '@angular/core';
 import { ClientLicenseService } from './client-license.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../app.service';
@@ -9,7 +9,7 @@ import { MasterService } from '../app.service';
   styleUrls: ['./client-license.component.scss'],
   providers: [ClientLicenseService]
 })
-export class ClientLicenseComponent implements OnInit {
+export class ClientLicenseComponent implements OnInit, AfterViewInit {
 
 
   private sub: any;
@@ -19,8 +19,13 @@ export class ClientLicenseComponent implements OnInit {
   locations: Array<string> = new Array<string>();
 
 
-  constructor(private clientLicenseService: ClientLicenseService, private masterService: MasterService, private router: Router, private activatedRoute: ActivatedRoute) {
+  @ViewChild("licenseKey") licenseKey: ElementRef;
+  @ViewChild("location") location: ElementRef;
+
+
+  constructor(private clientLicenseService: ClientLicenseService, private masterService: MasterService, private router: Router, private activatedRoute: ActivatedRoute, private renderer: Renderer) {
     this.ClientId = 0;
+    this.masterService.postAlert("remove", "");
     this.error = "";
     this.sub = this.activatedRoute.params.subscribe(
       params => this.ClientId = +params['ClientId']
@@ -28,8 +33,12 @@ export class ClientLicenseComponent implements OnInit {
     this.license.ClientId = this.ClientId;
   }
 
+  ngAfterViewInit() {
+  }
+
   ngOnInit() {
 
+    this.masterService.postAlert("remove", "");
     this.masterService.changeLoading(true);
     this.clientLicenseService.getClientLocations(this.ClientId).then(
       (data) => {
@@ -43,27 +52,36 @@ export class ClientLicenseComponent implements OnInit {
     this.masterService.changeLoading(true);
     this.masterService.postAlert("remove", "");
 
-    if (this.locations.findIndex((item)=>item.toLowerCase()==this.license.Location.toLowerCase()) == -1) {
-      this.error = "Please select a valid location";
+    this.license.LicenseKey = this.license.LicenseKey.trim();
+
+    if (this.license.LicenseKey.length == 0) {
+      this.error = "License key should not be empty";
       this.masterService.postAlert("error", this.error);
+      this.renderer.invokeElementMethod(this.licenseKey.nativeElement, 'focus');
       this.masterService.changeLoading(false);
       return;
     }
 
-    if (this.license.LicenseKey.trim().length > 0 && this.license.Location.trim().length > 0) {
-      this.clientLicenseService.addLicenseKey(this.license).then(
-        (data) => {
-          this.masterService.changeLoading(false);
-          this.masterService.postAlert("success", "License added successfully");
-          this.router.navigate(['client-licenses', this.ClientId]);
-        },
-        (error) => {
-          this.error = error['_body'];
-          this.masterService.changeLoading(false);
-          this.masterService.postAlert("error", this.error);
-        }
-      )
+    if (this.locations.findIndex((item) => item.toLowerCase() == this.license.Location.toLowerCase()) == -1) {
+      this.error = "Please select a valid location";
+      this.masterService.postAlert("error", this.error);
+      this.renderer.invokeElementMethod(this.location.nativeElement, 'focus');
+      this.masterService.changeLoading(false);
+      return;
     }
+
+    this.clientLicenseService.addLicenseKey(this.license).then(
+      (data) => {
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "License added successfully");
+        this.router.navigate(['client-licenses', this.ClientId]);
+      },
+      (error) => {
+        this.error = error['_body'];
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+      }
+    );
   }
 
 

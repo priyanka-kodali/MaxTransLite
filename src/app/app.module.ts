@@ -2,19 +2,20 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import {  RouterModule } from '@angular/router';
-import { MdInputModule } from '@angular2-material/input';
-import { MdCardModule } from '@angular2-material/card';
-import { MdToolbarModule } from '@angular2-material/toolbar';
-import { MdButtonModule } from '@angular2-material/button';
-import { MdCheckboxModule } from '@angular2-material/checkbox';
-import { MdRadioModule, MdUniqueSelectionDispatcher } from '@angular2-material/radio';
+import { RouterModule } from '@angular/router';
+import { MaterialModule } from '@angular/material'
+// import { MdInputModule } from '@angular2-material/input';
+// import { MdCardModule } from '@angular2-material/card';
+// import { MdToolbarModule } from '@angular2-material/toolbar';
+// import { MdButtonModule } from '@angular2-material/button';
+// import { MdCheckboxModule } from '@angular2-material/checkbox';
+// import { MdRadioModule, MdUniqueSelectionDispatcher } from '@angular2-material/radio';
 import { TypeaheadModule, ComponentLoaderFactory, PositioningService } from 'ng2-bootstrap';
 import { FileUploadModule } from 'ng2-file-upload';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 
-import { AppRoutingModule, routingComponents,routes } from './app.routes';
+import { AppRoutingModule, routingComponents, routes } from './app.routes';
 
 import { HttpClient } from './http-client';
 
@@ -73,18 +74,19 @@ import { MasterService } from './app.service';
     FormsModule,
     HttpModule,
     AppRoutingModule,
-    MdInputModule,
-    MdCardModule,
-    MdToolbarModule,
-    MdButtonModule,
-    MdCheckboxModule,
-    MdRadioModule,
+    MaterialModule,
+    // MdInputModule,
+    // MdCardModule,
+    // MdToolbarModule,
+    // MdButtonModule,
+    // MdCheckboxModule,
+    // MdRadioModule,
     TypeaheadModule,
     FileUploadModule,
     SimpleNotificationsModule,
     RouterModule.forRoot(routes, { useHash: true })
   ],
-  providers: [HttpClient, MdUniqueSelectionDispatcher, ComponentLoaderFactory, PositioningService],
+  providers: [HttpClient, ComponentLoaderFactory, PositioningService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

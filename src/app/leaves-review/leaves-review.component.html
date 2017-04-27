@@ -16,14 +16,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let leave of Leaves">
+					<tr *ngFor="let leave of Leaves; let i=index">
 						<td>{{leave.Employee}}</td>
 						<td>{{leave.FromDate | date}}</td>
 						<td>{{leave.ToDate | date}}</td>
 						<td>{{leave.NoOfDays}} </td>
 						<td>{{leave.LeaveType}} </td>
 						<td>{{leave.FinalStatus}} </td>
-						<td style="width:88px"><button md-raised-button (click)="review(leave)">Review</button></td>
+						<td style="width:88px"><button md-raised-button (click)="review(i)">Review</button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -48,35 +48,35 @@
 						<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 ptop10 bg-brown">
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input class="" name="fromDate" placeholder="From Date" [(ngModel)]="SelectedLeaveFromDate" type="date" disabled></md-input>
+								<md-input-container>   <input mdInput class="" name="fromDate" placeholder="From Date" [(ngModel)]="SelectedLeaveFromDate" type="date" disabled></md-input-container>
 							</div>
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input class="" name="toDate" placeholder="To Date" [(ngModel)]="SelectedLeaveToDate" type="date" disabled></md-input>
+								<md-input-container>   <input mdInput class="" name="toDate" placeholder="To Date" [(ngModel)]="SelectedLeaveToDate" type="date" disabled></md-input-container>
 							</div>
 							<div class="col-md-1 col-sm-3 col-lg-1 col-xs-6">
-								<md-input class="" name="leaveType" placeholder="Leave Type" [(ngModel)]="SelectedLeave.LeaveType" disabled></md-input>
+								<md-input-container>   <input mdInput class="" name="leaveType" placeholder="Leave Type" [(ngModel)]="SelectedLeave.LeaveType" disabled></md-input-container>
 							</div>
 							<div class="col-md-1 col-sm-3 col-lg-1 col-xs-6">
-								<md-input class="" name="noOfDays" placeholder="No of Days" [(ngModel)]="SelectedLeave.NoOfDays" disabled></md-input>
+								<md-input-container>   <input mdInput class="" name="noOfDays" placeholder="No of Days" [(ngModel)]="SelectedLeave.NoOfDays" disabled></md-input-container>
 							</div>
 							<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-								<md-input class="" name="comments" placeholder="Comments" [(ngModel)]="SelectedLeave.Comments" type="text" disabled></md-input>
+								<md-input-container>   <input mdInput class="" name="comments" placeholder="Comments" [(ngModel)]="SelectedLeave.Comments" type="text" disabled></md-input-container>
 							</div>
 							<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-								<md-input class="" name="reviewComments" placeholder="Review Comments" [(ngModel)]="SelectedLeave.ReviewComments" type="text"></md-input>
+								<md-input-container>   <input mdInput class="" name="reviewComments" placeholder="Review Comments" [(ngModel)]="SelectedLeave.ReviewComments" type="text"></md-input-container>
 							</div>
 							<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12" *ngIf="SelectedLeave.IsReviewer1">
 								<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-									<md-input class="" name="status1" placeholder="Review Status" [(ngModel)]="SelectedLeave.ReviewStatus1" type="text" [typeaheadMinLength]="0"
-										[typeahead]="['Further Authorization','Granted','Rejected']" (blur)="getReviewers()" (typeaheadOnSelect)="getReviewers()"></md-input>
+									<md-input-container>   <input mdInput class="" name="status1" placeholder="Review Status" [(ngModel)]="SelectedLeave.ReviewStatus1" type="text" [typeaheadMinLength]="0"
+										[typeahead]="['Further Authorization','Granted','Rejected']" (typeaheadOnSelect)="getReviewers()"></md-input-container>
 								</div>
 								<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12" *ngIf="SelectedLeave.ReviewStatus1=='Further Authorization'">
-									<md-input class="" name="reviewer1" placeholder="Reviewer 2" [(ngModel)]="SelectedLeave.Reviewer2" type="text" [typeahead]="Reviewers"></md-input>
+									<md-input-container>   <input mdInput class="" name="reviewer1" placeholder="Reviewer 2" [(ngModel)]="SelectedLeave.Reviewer2" type="text" [typeahead]="Reviewers"></md-input-container>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12" *ngIf="!SelectedLeave.IsReviewer1">
-								<md-input class="" name="status2" placeholder="Review Status" [(ngModel)]="SelectedLeave.ReviewStatus2" type="text" [typeaheadMinLength]="0"
-									[typeahead]="['Granted','Rejected']"></md-input>
+								<md-input-container>   <input mdInput class="" name="status2" placeholder="Review Status" [(ngModel)]="SelectedLeave.ReviewStatus2" type="text" [typeaheadMinLength]="0"
+									[typeahead]="['Granted','Rejected']"></md-input-container>
 							</div>
 
 							<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">

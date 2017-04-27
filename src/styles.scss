@@ -1,7 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
-@import '../node_modules/@angular2-material/core/style/theme-functions';
-@import '../node_modules/@angular2-material/core/style/palette';
+@import '~@angular/material/core/theming/all-theme';
 
+@include mat-core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue.
+$app-primary: mat-palette($mat-teal);
+$app-accent:  mat-palette($mat-purple, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$app-warn:    mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($app-theme);
 
 
 .loader-small {
@@ -68,7 +85,7 @@ cursor: pointer;
     height: 53px!important;
 } 
 
-md-input{
+md-input-container{
     width:100%;
     height:48px; /*chrome has diff height for date*/
 }
@@ -90,6 +107,10 @@ input[type='file']{
 
 .file-button{
     padding: 0!important;
+}
+
+.mat-input-container{
+    width: 100%!important;
 }
 
 .file-button label{
@@ -324,7 +345,7 @@ font-family: roboto;
 
 
 thead{    
-      background:md-color($md-teal,500) !important;
+      background:mat-color($mat-teal,500) !important;
 }
 
     thead tr{
@@ -350,21 +371,21 @@ thead{
 
 table.light-blue50{
     tbody{
-      background:md-color($md-light-blue,50) !important;
+      background:mat-color($mat-light-blue,50) !important;
     }
 }
 
 
 table.pink50{
     tbody{
-      background:md-color($md-pink,50) !important;
+      background:mat-color($mat-pink,50) !important;
     }
 }
 
 
 table.light-green100{
     tbody{
-       background:md-color($md-light-green,100) !important;
+       background:mat-color($mat-light-green,100) !important;
     }
 }
 
@@ -385,88 +406,88 @@ table.light-green100{
 }
 
 .redA200-text{
-    color: md-color($md-red,A200) !important;
+    color: mat-color($mat-red,A200) !important;
 }
 
 .amberA700-text{
-    color: md-color($md-amber,A700) !important;
+    color: mat-color($mat-amber,A700) !important;
 }
 
 .green300-text{
-        color: md-color($md-green,300) !important;
+        color: mat-color($mat-green,300) !important;
 }
 
 .red300{
-        background: md-color($md-red,300) !important;
+        background: mat-color($mat-red,300) !important;
 }
 
 .redA200{
-        background: md-color($md-red,A200) !important;
+        background: mat-color($mat-red,A200) !important;
 }
 
 .red900{
-        background: md-color($md-red,900) !important;
+        background: mat-color($mat-red,900) !important;
 }
 
 .green300{
-        background: md-color($md-green,300) !important;
+        background: mat-color($mat-green,300) !important;
 }
 
 .green500{
-        background: md-color($md-green,500) !important;
+        background: mat-color($mat-green,500) !important;
 }
 
 .orange300{
-        background: md-color($md-orange,300) !important;
+        background: mat-color($mat-orange,300) !important;
 }
 
 .purple300{
-        background: md-color($md-purple,300) !important;
+        background: mat-color($mat-purple,300) !important;
 }
 
 
 
 .orange200{
-       background:md-color($md-orange,200) !important;
+       background:mat-color($mat-orange,200) !important;
 }
 
 .orange50{
-       background:md-color($md-orange,50) !important;
+       background:mat-color($mat-orange,50) !important;
 }
 
 
 .green200{
-       background:md-color($md-green,200) !important;
+       background:mat-color($mat-green,200) !important;
 }
 
 .green50{
-       background:md-color($md-green,50) !important;
+       background:mat-color($mat-green,50) !important;
 }
 
 .purple200{
-       background:md-color($md-purple,200) !important;
+       background:mat-color($mat-purple,200) !important;
 }
 
 .purple50{
-       background:md-color($md-purple,50) !important;
+       background:mat-color($mat-purple,50) !important;
 }
 
 .teal500{
-       background:md-color($md-teal,500) !important;
+       background:mat-color($mat-teal,500) !important;
 }
 
 .teal300{
-       background:md-color($md-teal,300) !important;
+       background:mat-color($mat-teal,300) !important;
 }
 
 .blue300{
-       background:md-color($md-blue,300) !important;
+       background:mat-color($mat-blue,300) !important;
 }
 .pink300{
-       background:md-color($md-pink,300) !important;
+       background:mat-color($mat-pink,300) !important;
 }
 
 .pink50{
-       background:md-color($md-pink,50) !important;
+       background:mat-color($mat-pink,50) !important;
 }
 

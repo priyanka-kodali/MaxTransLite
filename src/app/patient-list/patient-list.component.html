@@ -63,24 +63,24 @@
           <div class="row p0 m0">
             <form (submit)="postPatientList()" #myForm>
               <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-                <md-input class="" name="client" placeholder="Client" [(ngModel)]="SelectedPatientList.Client" type="text" [typeahead]="clients"
-                  required (blur)="clientChanged()" (typeaheadOnSelect)="clientChanged()"></md-input>
+                <md-input-container>   <input mdInput class="" name="client" #client placeholder="Client" [(ngModel)]="SelectedPatientList.Client" type="text" [typeahead]="clients"
+                  required (blur)="clientChanged()" (typeaheadOnSelect)="clientChanged()" autocomplete="off"></md-input-container>
               </div>
 
               <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-                <md-input class="" name="name" placeholder="Doctor" [(ngModel)]="SelectedPatientList.Doctor" type="text" [typeahead]="doctors"></md-input>
+                <md-input-container>   <input mdInput class="" name="name" #doctor placeholder="Doctor" autocomplete="off" [(ngModel)]="SelectedPatientList.Doctor" type="text" [typeahead]="doctors"></md-input-container>
               </div>
 
               <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-                <md-input class="" name="fromdate" placeholder="From Date" [(ngModel)]="SelectedPatientList.FromDate" type="date" required></md-input>
+                <md-input-container>   <input mdInput class="" name="fromdate" #fromDate placeholder="From Date" [(ngModel)]="SelectedPatientListFromDate" type="date" required></md-input-container>
               </div>
 
               <div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-                <md-input class="" name="todate" placeholder="To Date" [(ngModel)]="SelectedPatientList.ToDate" type="date" required></md-input>
+                <md-input-container>   <input mdInput class="" name="todate" #toDate placeholder="To Date" [(ngModel)]="SelectedPatientListToDate" type="date" required></md-input-container>
               </div>
 
               <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-                <input #uploadEl type="file" ng2FileSelect [uploader]="uploader" name="patient_list" required/>
+                <input  type="file" ng2FileSelect [uploader]="uploader" multiple/>
               </div>
 
               <div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">

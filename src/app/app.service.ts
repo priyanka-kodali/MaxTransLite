@@ -41,8 +41,17 @@ export class MasterService {
     catch (e) { throw e; }
   }
 
-    GetURLWithSAS(blobURL: string) {
+  GetURLWithSAS(blobURL: string) {
     let url = ApiUrl + "/api/MasterData/GetURLWithSAS?url=" + blobURL;
+    try {
+      return this.http.get(url).toPromise().then((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
+
+
+  getNotificationCount(){
+     let url = ApiUrl + "/api/Dashboard/GetNotificationsCount";
     try {
       return this.http.get(url).toPromise().then((data) => data.json());
     }

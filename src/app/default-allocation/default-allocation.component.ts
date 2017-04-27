@@ -40,6 +40,7 @@ export class DefaultAllocationComponent implements OnInit, AfterViewInit {
 
 
   constructor(private renderer: Renderer, private masterService: MasterService, private defaultAllocationService: DefaultAllocationService, private router: Router, private activatedRoute: ActivatedRoute) {
+    this.masterService.postAlert("remove", "");
     this.DAId = 0;
     this.error = "";
     this.editSuccess = false;
@@ -112,10 +113,18 @@ export class DefaultAllocationComponent implements OnInit, AfterViewInit {
   }
 
   getDoctors() {
+    if (!this.defaultAllocation.Client) {
+      return;
+    }
     this.masterService.changeLoading(true);
-    var ClientId = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.defaultAllocation.Client.toLowerCase())];
+    var ClientId = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.defaultAllocation.Client.toLowerCase())];
     this.doctors = new Array<string>();
     this.doctorIds = new Array<number>();
+
+    if (!ClientId) {
+      this.masterService.changeLoading(false);
+      return;
+    }
     this.defaultAllocationService.getDoctors(ClientId).then(
       (data) => {
         data['doctors'].forEach(doctor => {
@@ -155,8 +164,9 @@ export class DefaultAllocationComponent implements OnInit, AfterViewInit {
         (data) => {
           this.defaultAllocation = data;
           this.inputDisabled = true;
+          this.isNewDefaultAllocation = false;
           this.masterService.changeLoading(false);
-            this.masterService.postAlert("success", "Default Allocation Added successfully");
+          this.masterService.postAlert("success", "Default Allocation Added successfully");
         },
         (error) => {
           this.error = error['_body'];
@@ -172,7 +182,7 @@ export class DefaultAllocationComponent implements OnInit, AfterViewInit {
           this.defaultAllocation = data;
           this.inputDisabled = true;
           this.masterService.changeLoading(false);
-            this.masterService.postAlert("success", "Default Allocation Updated successfully");
+          this.masterService.postAlert("success", "Default Allocation Updated successfully");
         },
         (error) => {
           this.error = error['_body'];
@@ -188,33 +198,33 @@ export class DefaultAllocationComponent implements OnInit, AfterViewInit {
 
     this.masterService.postAlert("remove", "");
 
-    if(!this.isNewDefaultAllocation){
+    if (!this.isNewDefaultAllocation) {
       return true;
     }
 
-    this.defaultAllocation.Doctor_Id = this.doctorIds[this.doctors.findIndex((item)=>item.toLowerCase()==this.defaultAllocation.Doctor.toLowerCase())];
-    this.defaultAllocation.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.defaultAllocation.Client.toLowerCase())];
-    this.defaultAllocation.Employee_Id = this.employeeIds[this.employees.findIndex((item)=>item.toLowerCase()==this.defaultAllocation.Employee.toLowerCase())];
+    this.defaultAllocation.Doctor_Id = this.doctorIds[this.doctors.findIndex((item) => item.toLowerCase() == this.defaultAllocation.Doctor.toLowerCase())];
+    this.defaultAllocation.Client_Id = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.defaultAllocation.Client.toLowerCase())];
+    this.defaultAllocation.Employee_Id = this.employeeIds[this.employees.findIndex((item) => item.toLowerCase() == this.defaultAllocation.Employee.toLowerCase())];
 
     if (!this.defaultAllocation.Client_Id) {
       this.error = "Please select valid client";
-      this.renderer.invokeElementMethod(this.client, 'focus');
+      this.renderer.invokeElementMethod(this.client.nativeElement, 'focus');
       return false;
     }
     if (!this.defaultAllocation.Doctor_Id) {
       this.error = "Please select valid doctor";
-      this.renderer.invokeElementMethod(this.doctor, 'focus');
+      this.renderer.invokeElementMethod(this.doctor.nativeElement, 'focus');
       return false;
     }
     if (!this.defaultAllocation.Employee_Id) {
       this.error = "Please select valid employee";
-      this.renderer.invokeElementMethod(this.employee, 'focus');
+      this.renderer.invokeElementMethod(this.employee.nativeElement, 'focus');
       return false;
     }
 
-    if (this.jobLevels.findIndex((item)=>item.toLowerCase()==this.defaultAllocation.JobLevel.toLowerCase()) == -1) {
+    if (this.jobLevels.findIndex((item) => item.toLowerCase() == this.defaultAllocation.JobLevel.toLowerCase()) == -1) {
       this.error = "Please select a valid Job Level"
-      this.renderer.invokeElementMethod(this.jobLevel, 'focus');
+      this.renderer.invokeElementMethod(this.jobLevel.nativeElement, 'focus');
       return false;
     }
 

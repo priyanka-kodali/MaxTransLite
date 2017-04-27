@@ -26,6 +26,7 @@ export class ClientsComponent implements OnInit {
   error: string;
 
   constructor(private router: Router, private clientsService: ClientsService, private masterService: MasterService) {
+    this.masterService.postAlert("remove", "");
     this.sorting = "none";
     this.keys = ["Name", "Phone", "Fax", "Email", "Type", "Time Zone", "Vendor"];
     this.page = 1;

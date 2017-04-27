@@ -61,7 +61,7 @@ export class JobsComponent implements OnInit {
     this.keys = ["Employee Number", "Name", "Department", "Designation", "Phone", "Email", "Manager"];
     this.page = 1;
     this.count = 10;
-
+    this.masterService.postAlert("remove", "");
     this.MtVisible = true;
     this.QaVisible = true;
     this.AqaVisible = true;
@@ -84,15 +84,15 @@ export class JobsComponent implements OnInit {
 
         ),
         this.jobsService.getMtJobs().then(
-          (data) => this.MtJobs = data
+          (data) => this.MtJobs = data["MtJobs"]
         ),
 
         this.jobsService.getAqaJobs().then(
-          (data) => this.AqaJobs = data
+          (data) => this.AqaJobs = data["AqaJobs"]
         ),
 
         this.jobsService.getQaJobs().then(
-          (data) => this.QaJobs = data
+          (data) => this.QaJobs = data["QaJobs"]
         )
       ]).then(() => this.masterService.changeLoading(false));
     }
@@ -117,7 +117,7 @@ export class JobsComponent implements OnInit {
     this.Templates = new Array<Document>();
     this.jobsService.getTemplates(DoctorId).then(
       (data) => {
-        this.Templates = data;
+        this.Templates = data["Templates"];
         this.masterService.changeLoading(false);
       }
     )
@@ -130,17 +130,23 @@ export class JobsComponent implements OnInit {
 
   downloadAudioFile(audioURL: string, job: Job, JobLevel: string) {
     this.downloadFile(audioURL);
-    if (job.DT != null && (job.AQA != null || job.QA != null)) return;
-    this.jobsService.jobDownloaded(job.JobWorkId).then(
-      (data) => job.DT = data
-    );
+    if (!job.DT && !job.AQA && !job.QA) {
+      this.jobsService.jobDownloaded(job.JobWorkId).then(
+        (data) => job.DT = data
+      );
+    }
   }
 
   uploadFile(job: Job, jobLevel: string) {
     this.FileModal = true;
     this.SelectedJob = job;
     this.SelectedJobLevel = jobLevel;
-    this.IsPartialUpload = false;
+    if (this.SelectedJob.LevelStatus == "Partial") {
+      this.IsPartialUpload = true;
+    }
+    else {
+      this.IsPartialUpload = false;
+    }
     this.PartialUploadStartTime = "";
     this.PartialUploadEndTime = "";
 
@@ -179,7 +185,7 @@ export class JobsComponent implements OnInit {
       this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
         response = JSON.parse(response);
         if (status != 200) {
-          this.error = "Error uploading file";
+          this.error = response;
           this.masterService.changeLoading(false);
           this.masterService.postAlert("error", this.error);
         }
@@ -200,7 +206,7 @@ export class JobsComponent implements OnInit {
           this.SelectedJob = new Job();
           this.masterService.changeLoading(false);
           this.masterService.postAlert("success", "File uploaded successfully");
-          this.FileModal=false;
+          this.FileModal = false;
         }
       };
 
@@ -210,8 +216,25 @@ export class JobsComponent implements OnInit {
     }
   }
 
+  readFile($event) {
+    try{
+    var file: File = $event.target.files[0];
+    var myReader: FileReader = new FileReader();
+
+    myReader.onloadend = function (e) {
+      // you can perform an action with readed data here
+      console.log(myReader.result);
+    }
+
+    myReader.readAsText(file);
+    }
+    catch(e){
+      console.log(e);      
+    }
+  }
+
   checkboxChanged(job: Job, jobLevel: string) {
-    job.ShowUpload = job.ShowDownload = !job.Selected;
+    // job.ShowUpload = job.ShowDownload = !job.Selected;
     this.DownloadURLs.push(job.AudioURL);
     // switch(jobLevel){
     //   case 'MT': this.MtJobs.forEach(element=>{
@@ -231,9 +254,11 @@ export class JobsComponent implements OnInit {
 
   getTranscriptFile(job: Job, Level: string, event: Event) {
 
-    this.jobsService.jobDownloaded(job.JobWorkId).then(
-      (data) => job.DT = data
-    );
+    if (!job.DT) {
+      this.jobsService.jobDownloaded(job.JobWorkId).then(
+        (data) => job.DT = data
+      );
+    }
 
     switch (Level) {
       case 'AQA':
@@ -343,10 +368,10 @@ class Job {
   PatientList: Array<string>;
   MTUrl: string;
   AQAUrl: string;
-  ShowDownload: boolean;
-  ShowUpload: boolean;
   Color: number;
   JobLevel: number;
+  LevelStatus: string;
+  OriginalFileName: string;
 }
 
 class JobSummary {

@@ -58,9 +58,10 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
 
   constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientService: ClientService) {
+    this.masterService.postAlert("remove", "");
     this.NewClient = new Client();
     this.error = "";
-    this.masterService.postAlert("remove", "");
+    this.isVendor = false;
     this.isIndirectClient = false;
     this.clientTypes = ['Direct Client', 'Indirect Client', 'Vendor'];
     this.paymentTypes = ['Fixed', 'FTE', 'Per Unit'];
@@ -74,7 +75,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
     this.locations[0].IsInvoiceAddress = true;
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
+  }
 
   ngOnInit() {
 
@@ -147,10 +150,14 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   InvoiceAddressSelected(i: number) {
-    this.locations.forEach(element => {
-      element.IsInvoiceAddress = false;
-    });
-    this.locations[i].IsInvoiceAddress = true;
+    // this.locations.forEach(element => {      
+    //   element.IsInvoiceAddress = false;
+    // });
+    for (var k = 0; k < this.locations.length; k++) {
+      if (k != i)
+        this.locations[k].IsInvoiceAddress = false;
+    }
+    // this.locations[i].IsInvoiceAddress = !this.locations[i].IsInvoiceAddress;
   }
 
   getMasterData() {
@@ -204,14 +211,18 @@ export class ClientComponent implements OnInit, AfterViewInit {
   }
 
   countrySelected(index: number) {
-    this.locations[index].City = "";
-    this.locations[index].State = "";
-    this.getStates(index);
+    if (this.locations[index].Country) {
+      this.locations[index].City = "";
+      this.locations[index].State = "";
+      this.getStates(index);
+    }
   }
 
   stateSelected(index: number) {
-    this.locations[index].City = "";
-    this.getCities(index);
+    if (this.locations[index].State) {
+      this.locations[index].City = "";
+      this.getCities(index);
+    }
   }
 
   getStates(index: number) {
@@ -271,6 +282,25 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
     this.masterService.postAlert("remove", "");
 
+
+    this.NewClient.Name = this.NewClient.Name.trim()
+    this.NewClient.ShortName = this.NewClient.ShortName.trim();
+    this.NewClient.PrimaryPhone = this.NewClient.PrimaryPhone.trim();
+    this.NewClient.SecondaryPhone = this.NewClient.SecondaryPhone ? this.NewClient.SecondaryPhone.trim() : this.NewClient.SecondaryPhone;
+    this.NewClient.Fax = this.NewClient.Fax ? this.NewClient.Fax.trim() : this.NewClient.Fax;
+    this.NewClient.Email = this.NewClient.Email.trim();
+    this.NewClient.FileTypes = this.NewClient.FileTypes ? this.NewClient.FileTypes.trim() : this.NewClient.FileTypes;
+
+    for (var i = 0; i < this.locations.length; i++) {
+
+      var element = this.locations[i];
+      element.AddressLine1 = element.AddressLine1.trim();
+      element.AddressLine2 = element.AddressLine2 ? element.AddressLine2.trim() : element.AddressLine2;
+      element.Landmark = element.Landmark ? element.Landmark.trim() : element.Landmark;
+      element.ZIP = element.ZIP.trim();
+
+    }
+
     this.NewClient.Locations = this.locations;
 
     try {
@@ -283,6 +313,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
             this.inputDisabled = true;
             this.masterService.changeLoading(false);
             this.masterService.postAlert("success", "Client added successfully");
+            this.isNewClient = false;
           },
           (error) => {
             this.error = error['_body'];
@@ -317,16 +348,6 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
     this.masterService.postAlert("remove", "");
 
-    // this.NewClient.Name = this.NewClient.Name.trim()
-    // this.NewClient.ShortName = this.NewClient.ShortName.trim();
-    // this.NewClient.PrimaryPhone = this.NewClient.PrimaryPhone.trim();
-    // this.NewClient.SecondaryPhone = this.NewClient.SecondaryPhone ? this.NewClient.SecondaryPhone.trim() : this.NewClient.SecondaryPhone;
-    // this.NewClient.Fax = this.NewClient.Fax ? this.NewClient.Fax.trim() : this.NewClient.Fax;
-    // this.NewClient.Email = this.NewClient.Email.trim();
-    // this.NewClient.FileTypes = this.NewClient.FileTypes ? this.NewClient.FileTypes.trim() : this.NewClient.FileTypes;
-
-
-
     if (this.isVendor) {
       this.NewClient.NumberOfCharactersPerLine = null;
       this.NewClient.FileTypes = null;
@@ -339,75 +360,101 @@ export class ClientComponent implements OnInit, AfterViewInit {
       this.NewClient.Vendor_Id = null;
     }
 
-    var namesRegex = /^[a-zA-Z ]*$/;
+    var namesRegex = /^[a-zA-Z0-9 ]*$/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 
 
-    this.NewClient.Vendor_Id = this.vendorIds[this.vendors.findIndex((item) => item.toLowerCase() == this.NewClient.Vendor.toLowerCase())];
+    this.NewClient.Vendor_Id = this.NewClient.Vendor ? this.vendorIds[this.vendors.findIndex((item) => item.toLowerCase() == this.NewClient.Vendor.toLowerCase())] : null;
     this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.findIndex((item) => item.toLowerCase() == this.NewClient.ClientVertical.toLowerCase())];
 
     if (!namesRegex.test(this.NewClient.Name)) {
       this.error = "Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.name, 'focus');
+      this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClient.Name.trim().length == 0) {
+      this.error = "Name should not be empty"
+      this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
       return false;
     }
     if (this.NewClient.Name.trim().length > 255) {
       this.error = "Name should not exceed 255 characters"
-      this.renderer.invokeElementMethod(this.name, 'focus');
+      this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClient.ShortName.trim().length == 0) {
+      this.error = "Short Name should not be empty"
+      this.renderer.invokeElementMethod(this.shortName.nativeElement, 'focus');
       return false;
     }
     if (this.NewClient.ShortName.trim().length > 20) {
       this.error = "Short Name should not exceed 20 characters"
-      this.renderer.invokeElementMethod(this.shortName, 'focus');
+      this.renderer.invokeElementMethod(this.shortName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClient.PrimaryPhone.trim().length == 0) {
+      this.error = "Primary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
       return false;
     }
     if (!phoneRegex.test(this.NewClient.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
-      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClient.SecondaryPhone && this.NewClient.SecondaryPhone.trim().length == 0) {
+      this.error = "Secondary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewClient.SecondaryPhone && !phoneRegex.test(this.NewClient.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
-      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClient.Fax && this.NewClient.Fax.trim().length == 0) {
+      this.error = "Fax  should not be empty"
+      this.renderer.invokeElementMethod(this.fax.nativeElement, 'focus');
       return false;
     }
     if (this.NewClient.Fax && !phoneRegex.test(this.NewClient.Fax)) {
       this.error = "Please enter a valid Fax Number "
-      this.renderer.invokeElementMethod(this.fax, 'focus');
+      this.renderer.invokeElementMethod(this.fax.nativeElement, 'focus');
       return false;
     }
 
+    if (this.NewClient.Email.trim().length == 0) {
+      this.error = "Email should not be empty"
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
+      return false;
+    }
     if (!emailRegex.test(this.NewClient.Email)) {
       this.error = "Please enter a valid email";
-      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewClient.ClientVertical_Id) {
       this.error = "Please select valid Client Vertical";
-      this.renderer.invokeElementMethod(this.clientVertical, 'focus');
+      this.renderer.invokeElementMethod(this.clientVertical.nativeElement, 'focus');
       return false;
     }
     if (this.clientTypes.findIndex((item) => item.toLowerCase() == this.NewClient.ClientType.toLowerCase()) == -1) {
       this.error = "Please select a valid Client Type"
-      this.renderer.invokeElementMethod(this.clientType, 'focus');
+      this.renderer.invokeElementMethod(this.clientType.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewClient.Vendor_Id && this.NewClient.Vendor) {
       this.error = "Please select valid vendor";
-      this.renderer.invokeElementMethod(this.vendor, 'focus');
+      this.renderer.invokeElementMethod(this.vendor.nativeElement, 'focus');
       return false;
     }
 
     for (var i = 0; i < this.locations.length; i++) {
 
       var element = this.locations[i];
-      // element.AddressLine1 = element.AddressLine1.trim();
-      // element.AddressLine2 = element.AddressLine2 ? element.AddressLine2.trim() : element.AddressLine2;
-      // element.ZIP = element.ZIP.trim();
-
 
       element.City_Id = this.masterCityIds[this.masterCities.findIndex((item) => item.toLowerCase() == element.City.toLowerCase())];
       element.State_Id = this.masterStateIds[this.masterStates.findIndex((item) => item.toLowerCase() == element.State.toLowerCase())];
@@ -430,6 +477,15 @@ export class ClientComponent implements OnInit, AfterViewInit {
       }
       if (element.AddressLine2 && element.AddressLine2.trim().length > 255) {
         this.error = "Address line 2 should not exceed 255 characters for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
+
+      if (element.Landmark && element.Landmark.trim().length == 0) {
+        this.error = "Landmark should not be empty for location " + (this.locations.indexOf(element) + 1);
+        return false;
+      }
+      if (element.Landmark && element.Landmark.trim().length > 255) {
+        this.error = "Landmark should not exceed 255 characters for location " + (this.locations.indexOf(element) + 1);
         return false;
       }
 
@@ -470,13 +526,13 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
     if (this.NewClient.PaymentType && this.paymentTypes.findIndex((item) => item.toLowerCase() == this.NewClient.PaymentType.toLowerCase()) == -1) {
       this.error = "Please select a valid Payment Type"
-      this.renderer.invokeElementMethod(this.paymentType, 'focus');
+      this.renderer.invokeElementMethod(this.paymentType.nativeElement, 'focus');
       return false;
     }
 
     if (this.NewClient.Currency && this.currencies.findIndex((item) => item.toLowerCase() == this.NewClient.Currency.toLowerCase()) == -1) {
       this.error = "Please select a valid currency"
-      this.renderer.invokeElementMethod(this.currency, 'focus');
+      this.renderer.invokeElementMethod(this.currency.nativeElement, 'focus');
       return false;
     }
 

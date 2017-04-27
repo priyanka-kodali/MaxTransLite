@@ -17,11 +17,11 @@ export class ClientLicensesService {
         catch (ex) { throw ex; }
     }
 
-    resetLicense(LicenseId : number){
+    resetLicense(License : any){
         
-        let url = ApiUrl + "/api/Client/ResetLicenseKey?LicenseId="+LicenseId;
+        let url = ApiUrl + "/api/Client/ResetLicenseKey";
         try {
-            return this.http.get(url).toPromise().then((data => data = data.json()));
+            return this.http.post(url,License).toPromise().then((data => data = data.json()));
         }
         catch (ex) { throw ex; }
     }

@@ -31,7 +31,7 @@
                     </form>
                 </div>
                 <div class="col-lg-12 col-md-12 col-sm-12 mbottom5 ofs">
-                   <table>
+                    <table>
                         <thead (click)="sort($event)">
                             <tr table-header>
                                 <th>Client</th>
@@ -46,7 +46,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let allocation of allocations">
-                                <td>{{allocation.Client}}</td>
+                                <td [title]="allocation.Client">{{allocation.ClientShortName}}</td>
                                 <td>{{allocation.Doctor}}</td>
                                 <td>{{allocation.JobLevel}}</td>
                                 <td>{{allocation.Employee}}</td>
@@ -58,14 +58,14 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-align" >
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-align">
                     <ul class="pagination p0 m0">
                         <li (click)="changePage(page-1)"><span aria-hidden="true" *ngIf="page>1">&laquo;</span></li>
                         <li *ngFor="let number of numbers" (click)="changePage(number)" [class.active]="number==page"><span aria-hidden="true">{{number}}</span></li>
                         <li (click)="changePage(page+1)" *ngIf="allocations.length==count"><span aria-hidden="true">&raquo;</span></li>
                     </ul>
                 </div>
-            </div> 
+            </div>
         </md-card-content>
     </md-card>
 </div>

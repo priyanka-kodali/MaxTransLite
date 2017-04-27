@@ -27,7 +27,8 @@ export class EmployeesComponent implements OnInit {
   error: string;
 
   constructor(private router: Router, private employeesService: EmployeesService, private masterService: MasterService) {
-    this.sorting = "none";
+        this.masterService.postAlert("remove", "");
+this.sorting = "none";
     this.keys = ["Employee Number", "Name", "Department", "Designation", "Phone", "Email", "Manager"];
     this.page = 1;
     this.count = 10;

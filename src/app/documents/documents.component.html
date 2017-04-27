@@ -61,16 +61,16 @@
 							<input type="file" name="document" value="Document" id="documentInput" ng2FileSelect [uploader]="uploader">
 						</div>
 						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-							<md-input class="" name="category" placeholder="Category" [(ngModel)]="NewDocument.Category" type="text" required maxLength="15"></md-input>
+							<md-input-container>   <input mdInput class="" name="category" placeholder="Category" [(ngModel)]="NewDocument.Category" type="text" required maxLength="15"></md-input-container>
 						</div>
 						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-							<md-input class="" name="documentDate" placeholder="Document Date" [(ngModel)]="NewDocument.DocumentDate" type="date"></md-input>
+							<md-input-container>   <input mdInput class="" name="documentDate" placeholder="Document Date" [(ngModel)]="NewDocument.DocumentDate" type="date"></md-input-container>
 						</div>
 						<div class="col-md-3 col-sm-6 col-lg-4 col-xs-12">
-							<md-input class="" name="keyword" placeholder="Keywords" [(ngModel)]="NewDocument.Keywords" type="text" maxLength="50"></md-input>
+							<md-input-container>   <input mdInput class="" name="keyword" placeholder="Keywords" [(ngModel)]="NewDocument.Keywords" type="text" maxLength="50"></md-input-container>
 						</div>
 						<div class="col-md-9 col-sm-12 col-lg-8 col-xs-12">
-							<md-input class="" name="notes" placeholder="Notes" [(ngModel)]="NewDocument.Notes" type="text" maxLength="255"></md-input>
+							<md-input-container>   <input mdInput class="" name="notes" placeholder="Notes" [(ngModel)]="NewDocument.Notes" type="text" maxLength="255"></md-input-container>
 						</div>
 						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
 							<button md-raised-button class="file-button btn-save" type="submit" value="Submit" [disabled]="!newDocForm.valid">Submit </button>

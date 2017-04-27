@@ -63,9 +63,8 @@ export class DoctorComponent implements OnInit, AfterViewInit {
     this.masterService.postAlert("remove", "");
     this.NewDoctor = new Doctor();
     this.NewDoctor.Specialties = new Array<string>();
-    this.dictationModes = ['Dictaphone', 'Toll Free', 'Email'];
+    this.dictationModes = ['Dictaphone', 'Toll Free', 'Dictaphone & Toll Free' , 'Email'];
     this.jobLevels = ['L1', 'L1-L3', 'L1-L2-L3'];
-    this.voiceGrades = ['A', 'B', 'C', 'D'];
     this.error = "";
     this.sub = this.activatedRoute.params.subscribe(
       params => this.DocId = +params['DocId']
@@ -74,7 +73,9 @@ export class DoctorComponent implements OnInit, AfterViewInit {
     this.isDataAvailable = false;
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.renderer.invokeElementMethod(this.salutation.nativeElement, 'focus');
+  }
 
   ngOnInit() {
 
@@ -157,6 +158,7 @@ export class DoctorComponent implements OnInit, AfterViewInit {
           this.doctorGroups.push(group.Name);
           this.doctorGroupIds.push(group.Id);
         });
+        this.voiceGrades=data["voiceGrades"];
         this.specialties = data['specialties'];
 
         //TO REMOVE EXISTING SPECIALITIES FROM LOCAL MASTER DATA
@@ -176,9 +178,22 @@ export class DoctorComponent implements OnInit, AfterViewInit {
   }
 
   countrySelected() {
+    if (this.NewDoctor.Country) {
+      this.NewDoctor.State = "";
+      this.NewDoctor.City = "";
+      this.getStates();
+    }
+  }
+
+  stateSelected() {
+    if (this.NewDoctor.State) {
+      this.NewDoctor.City = "";
+      this.getCities();
+    }
+  }
+
+  getStates() {
     this.masterService.changeLoading(true);
-    this.NewDoctor.State = "";
-    this.NewDoctor.City = "";
     this.states = new Array<string>();
     this.stateIds = new Array<number>();
     var countryId = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewDoctor.Country.toLowerCase())];
@@ -195,9 +210,8 @@ export class DoctorComponent implements OnInit, AfterViewInit {
     )
   }
 
-  stateSelected() {
+  getCities() {
     this.masterService.changeLoading(true);
-    this.NewDoctor.City = "";
     this.cities = new Array<string>();
     this.cityIds = new Array<number>();
     var stateId = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewDoctor.State.toLowerCase())];
@@ -216,9 +230,11 @@ export class DoctorComponent implements OnInit, AfterViewInit {
 
   specialtiesChange() {
     this.specialtySelector = this.specialtySelector ? this.specialtySelector.trim() : this.specialtySelector;
-    if (this.NewDoctor.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) { }
+    if (this.NewDoctor.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) {
+      return;
+    }
     else {
-      if (this.NewDoctor.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) == -1) {
+      if (this.specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) == -1) {
         return;
       }
       this.specialties = this.specialties.filter((item) => item != this.specialtySelector);
@@ -252,6 +268,21 @@ export class DoctorComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    this.NewDoctor.Salutation = this.NewDoctor.Salutation.trim();
+    this.NewDoctor.FirstName = this.NewDoctor.FirstName.trim();
+    this.NewDoctor.MiddleName = this.NewDoctor.MiddleName ? this.NewDoctor.MiddleName.trim() : this.NewDoctor.MiddleName;
+    this.NewDoctor.LastName = this.NewDoctor.LastName.trim();
+    this.NewDoctor.PrimaryPhone = this.NewDoctor.PrimaryPhone.trim();
+    this.NewDoctor.SecondaryPhone = this.NewDoctor.SecondaryPhone ? this.NewDoctor.SecondaryPhone.trim() : this.NewDoctor.SecondaryPhone;
+    this.NewDoctor.Email = this.NewDoctor.Email.trim();
+    this.NewDoctor.Client = this.NewDoctor.Client.trim();
+    this.NewDoctor.AddressLine1 = this.NewDoctor.AddressLine1.trim();
+    this.NewDoctor.AddressLine2 = this.NewDoctor.AddressLine2 ? this.NewDoctor.AddressLine2.trim() : this.NewDoctor.AddressLine2;
+    this.NewDoctor.ZIP = this.NewDoctor.ZIP.trim();
+    this.NewDoctor.IdigitalId = this.NewDoctor.IdigitalId ? this.NewDoctor.IdigitalId.trim() : this.NewDoctor.IdigitalId;
+    this.NewDoctor.IdigitalAuthorId = this.NewDoctor.IdigitalAuthorId ? this.NewDoctor.IdigitalAuthorId.trim() : this.NewDoctor.IdigitalAuthorId;
+
+
     this.masterService.postAlert("remove", "");
 
     try {
@@ -262,7 +293,8 @@ export class DoctorComponent implements OnInit, AfterViewInit {
           this.inputDisabled = true;
           this.masterService.changeLoading(false);
           this.masterService.postAlert("success", "Doctor added successfully");
-          this.isNewDoctor=false;
+         this.specialtySelector="";
+          this.isNewDoctor = false;
         },
           (error) => {
             this.error = error['_body'];
@@ -300,19 +332,7 @@ export class DoctorComponent implements OnInit, AfterViewInit {
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 
-    this.NewDoctor.Salutation = this.NewDoctor.Salutation.trim();
-    this.NewDoctor.FirstName = this.NewDoctor.FirstName.trim();
-    this.NewDoctor.MiddleName = this.NewDoctor.MiddleName ? this.NewDoctor.MiddleName.trim() : this.NewDoctor.MiddleName;
-    this.NewDoctor.LastName = this.NewDoctor.LastName.trim();
-    this.NewDoctor.PrimaryPhone = this.NewDoctor.PrimaryPhone.trim();
-    this.NewDoctor.SecondaryPhone = this.NewDoctor.SecondaryPhone ? this.NewDoctor.SecondaryPhone.trim() : this.NewDoctor.SecondaryPhone;
-    this.NewDoctor.Email = this.NewDoctor.Email.trim();
-    this.NewDoctor.Client = this.NewDoctor.Client.trim();
-    this.NewDoctor.AddressLine1 = this.NewDoctor.AddressLine1.trim();
-    this.NewDoctor.AddressLine2 = this.NewDoctor.AddressLine2 ? this.NewDoctor.AddressLine2.trim() : this.NewDoctor.AddressLine2;
-    this.NewDoctor.ZIP = this.NewDoctor.ZIP.trim();
-   
-   
+
     this.NewDoctor.City_Id = this.cityIds[this.cities.findIndex((item) => item.toLowerCase() == this.NewDoctor.City.toLowerCase())];
     this.NewDoctor.State_Id = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewDoctor.State.toLowerCase())];
     this.NewDoctor.Country_Id = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewDoctor.Country.toLowerCase())];
@@ -328,183 +348,183 @@ export class DoctorComponent implements OnInit, AfterViewInit {
 
     if (this.NewDoctor.Salutation.trim().length > 5) {
       this.error = "Salutation should not exceed 5 characters"
-      this.renderer.invokeElementMethod(this.salutation, 'focus');
+      this.renderer.invokeElementMethod(this.salutation.nativeElement, 'focus');
       return false;
     }
 
     if (this.NewDoctor.Salutation.trim().length == 0) {
       this.error = "Salutation should not be empty"
-      this.renderer.invokeElementMethod(this.salutation, 'focus');
+      this.renderer.invokeElementMethod(this.salutation.nativeElement, 'focus');
       return false;
     }
 
-     if (this.NewDoctor.FirstName.trim().length == 0) {
+    if (this.NewDoctor.FirstName.trim().length == 0) {
       this.error = "First Name should not be empty"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewDoctor.FirstName)) {
       this.error = "First Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.FirstName.trim().length > 35) {
       this.error = "First Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.MiddleName && this.NewDoctor.MiddleName.trim().length == 0) {
       this.error = "Middle Name should not be empty"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewDoctor.MiddleName)) {
       this.error = "Middle Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.MiddleName && this.NewDoctor.MiddleName.trim().length > 20) {
       this.error = "Middle Name should not exceed 20 characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.LastName.trim().length == 0) {
       this.error = "Last Name should not be empty"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewDoctor.LastName)) {
       this.error = "Last Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.LastName.trim().length > 35) {
       this.error = "Last Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.PrimaryPhone.trim().length == 0) {
       this.error = "Primary Phone should not be empty"
-      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
       return false;
     }
     if (!phoneRegex.test(this.NewDoctor.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
-      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.SecondaryPhone && this.NewDoctor.SecondaryPhone.trim().length == 0) {
       this.error = "Secondary Phone should not be empty"
-      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.SecondaryPhone && !phoneRegex.test(this.NewDoctor.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
-      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.Email.trim().length == 0) {
       this.error = "Email should not be empty"
-      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
       return false;
     }
     if (!emailRegex.test(this.NewDoctor.Email)) {
       this.error = "Please enter a valid email";
-      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
       return false;
-    }    
+    }
     if (!this.NewDoctor.Client_Id) {
       this.error = "Please select valid client";
-      this.renderer.invokeElementMethod(this.client, 'focus');
+      this.renderer.invokeElementMethod(this.client.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.AddressLine1.trim().length == 0) {
       this.error = "Address should not be empty"
-      this.renderer.invokeElementMethod(this.addressLine1, 'focus');
+      this.renderer.invokeElementMethod(this.addressLine1.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.AddressLine1.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
-      this.renderer.invokeElementMethod(this.addressLine1, 'focus');
+      this.renderer.invokeElementMethod(this.addressLine1.nativeElement, 'focus');
       return false;
     }
 
     if (this.NewDoctor.AddressLine2 && this.NewDoctor.AddressLine2.trim().length == 0) {
       this.error = "Address should not be empty"
-      this.renderer.invokeElementMethod(this.addressLine2, 'focus');
+      this.renderer.invokeElementMethod(this.addressLine2.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.AddressLine2 && this.NewDoctor.AddressLine2.trim().length > 255) {
       this.error = "Address should not exceed 255 characters"
-      this.renderer.invokeElementMethod(this.addressLine2, 'focus');
+      this.renderer.invokeElementMethod(this.addressLine2.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewDoctor.Country_Id) {
       this.error = "Please select valid country";
-      this.renderer.invokeElementMethod(this.country, 'focus');
+      this.renderer.invokeElementMethod(this.country.nativeElement, 'focus');
       return false;
     }
     if (!this.NewDoctor.State_Id) {
       this.error = "Please select valid state";
-      this.renderer.invokeElementMethod(this.state, 'focus');
+      this.renderer.invokeElementMethod(this.state.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewDoctor.City_Id) {
       this.error = "Please select valid city";
-      this.renderer.invokeElementMethod(this.city, 'focus');
+      this.renderer.invokeElementMethod(this.city.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.ZIP.trim().length == 0) {
       this.error = "ZIP should not be empty"
-      this.renderer.invokeElementMethod(this.zip, 'focus');
+      this.renderer.invokeElementMethod(this.zip.nativeElement, 'focus');
       return false;
     }
     if (this.NewDoctor.ZIP.trim().length > 10) {
       this.error = "ZIP should not exceed 10 characters"
-      this.renderer.invokeElementMethod(this.zip, 'focus');
+      this.renderer.invokeElementMethod(this.zip.nativeElement, 'focus');
       return false;
     }
 
     if (this.dictationModes.findIndex((item) => item.toLowerCase() == this.NewDoctor.DictationMode.toLowerCase()) == -1) {
       this.error = "Please select a valid Dictation Mode"
-      this.renderer.invokeElementMethod(this.dictationMode, 'focus');
+      this.renderer.invokeElementMethod(this.dictationMode.nativeElement, 'focus');
       return false;
     }
 
-    if (this.NewDoctor.DictationMode != "Toll Free") {
+    if (this.NewDoctor.DictationMode != "Toll Free" && this.NewDoctor.DictationMode != "Dictaphone & Toll Free") {
       this.NewDoctor.IdigitalId = null;
       this.NewDoctor.IdigitalAuthorId = null;
     }
 
-    if(this.NewDoctor.IdigitalId && this.NewDoctor.IdigitalId.trim().length ==0){
+    if (this.NewDoctor.IdigitalId && this.NewDoctor.IdigitalId.trim().length == 0) {
       this.error = "Idigital Id should not be empty"
-      this.renderer.invokeElementMethod(this.idigitalId, 'focus');
+      this.renderer.invokeElementMethod(this.idigitalId.nativeElement, 'focus');
       return false;
     }
-    
-    if(this.NewDoctor.IdigitalAuthorId && this.NewDoctor.IdigitalAuthorId.trim().length ==0){
+
+    if (this.NewDoctor.IdigitalAuthorId && this.NewDoctor.IdigitalAuthorId.trim().length == 0) {
       this.error = "Idigital Author Id should not be empty"
-      this.renderer.invokeElementMethod(this.idigitalAuthorId, 'focus');
+      this.renderer.invokeElementMethod(this.idigitalAuthorId.nativeElement, 'focus');
       return false;
     }
 
     if (this.jobLevels.findIndex((item) => item.toLowerCase() == this.NewDoctor.JobLevel.toLowerCase()) == -1) {
       this.error = "Please select a valid Job Level"
-      this.renderer.invokeElementMethod(this.jobLevel, 'focus');
+      this.renderer.invokeElementMethod(this.jobLevel.nativeElement, 'focus');
       return false;
     }
 
     if (this.voiceGrades.findIndex((item) => item.toLowerCase() == this.NewDoctor.VoiceGrade.toLowerCase()) == -1) {
       this.error = "Please select a valid Voice Grade"
-      this.renderer.invokeElementMethod(this.voiceGrade, 'focus');
+      this.renderer.invokeElementMethod(this.voiceGrade.nativeElement, 'focus');
       return false;
     }
 
-    if (!this.NewDoctor.DoctorGroup_Id) {
+    if (this.NewDoctor.DoctorGroup && !this.NewDoctor.DoctorGroup_Id) {
       this.error = "Please select valid Doctor Group";
-      this.renderer.invokeElementMethod(this.doctorGroup, 'focus');
+      this.renderer.invokeElementMethod(this.doctorGroup.nativeElement, 'focus');
       return false;
     }
 

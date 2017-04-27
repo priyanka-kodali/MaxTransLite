@@ -1,6 +1,6 @@
 <div class="my-nav-bar">
   <div class="logo">
-    <img src="../logo.png" alt="">
+  <a (click)="navigateTo('dashboard')" ><img src="images/logo.png" alt=""></a>
   </div>
     <nav>
       <ul class="nav" *ngIf="isLoggedIn()">
@@ -24,17 +24,17 @@
             <li><a (click)="navigateTo('client-employees')">Client Employee</a></li>
           </ul>
         </li>
-        <li class="dropdown" ><a href=""><span class="glyphicon glyphicon-comment notification-icon"></span> <span class="badge redA200 notification-badge">1</span> </a>
+        <li class="dropdown" ><a href=""><span class="glyphicon glyphicon-comment notification-icon"></span> <span class="badge redA200 notification-badge">{{NotificationCount}}</span> </a>
           <ul class="dropdown-menu dropdown-menu-right">
-            <li><a (click)="navigateTo('logout')">Messages <span class="badge">0 new</span> </a></li>
-            <li><a (click)="navigateTo('logout')">Notices <span class="badge">0 new</span></a></li>
-            <li *ngIf="isInRole('Manager')" ><a (click)="navigateTo('leaves-review')">Leave Reviews <span class="badge">0 new</span></a></li>
+            <li><a (click)="navigateTo('dashboard')">Messages <span class="badge">{{MessageCount}} new</span> </a></li>
+            <li><a (click)="navigateTo('dashboard')">Notices <span class="badge">{{NoticeCount}} new</span></a></li>
+            <li *ngIf="isInRole('Manager')" ><a (click)="navigateTo('leaves-review')">Leave Reviews <span class="badge">{{LeaveReviewCount}} new</span></a></li>
           </ul>        
         </li>
          <li class="dropdown">
           <a>Hi {{getDisplayName()}}!</a>
           <ul class="dropdown-menu dropdown-menu-right">
-            <li><a (click)="navigateTo('logout')">Edit Profile</a></li>
+            <li><a (click)="navigateTo('dashboard')">Edit Profile</a></li>
             <li><a (click)="navigateTo('change-password')">Change Password</a></li>
             <li><a (click)="navigateTo('logout')">Logout</a></li>
           </ul>
@@ -60,5 +60,5 @@
 <ngb-alert [type]="danger" >Hello</ngb-alert>
 </div>-->
 
-<simple-notifications [options]="options"></simple-notifications>
+<simple-notifications [options]="options" (onCreate)="onCreate($event)"></simple-notifications>
 

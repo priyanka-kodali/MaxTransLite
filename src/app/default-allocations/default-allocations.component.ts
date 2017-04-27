@@ -23,7 +23,8 @@ export class DefaultAllocationsComponent implements OnInit {
   error: string;
 
   constructor(private router: Router, private defaultAllocationsService: DefaultAllocationsService, private masterService: MasterService) {
-    this.keys = ["Client", "Doctor", "Job Level", "Employee", "Accuracy", "Minutes"];
+       this.masterService.postAlert("remove", "");
+ this.keys = ["Client", "Doctor", "Job Level", "Employee", "Accuracy", "Minutes"];
     this.sorting = "none";
     this.page = 1;
     this.count = 10;
@@ -114,6 +115,7 @@ export class DefaultAllocationsComponent implements OnInit {
 class DefaultAllocation {
   Id: number;
   Client: string;
+  ClientShortName: string;
   Doctor: string;
   Employee: string;
   JobLevel: string;

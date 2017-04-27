@@ -15,23 +15,23 @@
            </div>
             <p *ngIf="successFlag" class="alert alert-success">Employee Payscale Details are updated successfully!</p>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="gross" placeholder="CTC" [(ngModel)]="paymentStructure.Gross" type="text" required [disabled]="inputDisabled">
-              </md-input>
+              <md-input-container>   <input mdInput class="" name="gross" placeholder="CTC" [(ngModel)]="paymentStructure.Gross" type="text" required [disabled]="inputDisabled">
+              </md-input-container>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="bankName" placeholder="Bank Name" [(ngModel)]="paymentStructure.BankName" type="text" required [disabled]="inputDisabled"></md-input>
+              <md-input-container>   <input mdInput class="" name="bankName" placeholder="Bank Name" [(ngModel)]="paymentStructure.BankName" type="text" required [disabled]="inputDisabled"></md-input-container>
             </div>
             <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-              <md-input class="" name="bankBranch" placeholder="Bank Branch" [(ngModel)]="paymentStructure.BankBranch" type="text" required
-                [disabled]="inputDisabled"></md-input>
+              <md-input-container>   <input mdInput class="" name="bankBranch" placeholder="Bank Branch" [(ngModel)]="paymentStructure.BankBranch" type="text" required
+                [disabled]="inputDisabled"></md-input-container>
             </div>
             <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-              <md-input class="" name="bankAccNo" placeholder="Bank Account No" [(ngModel)]="paymentStructure.BankAccNo" type="text" required
-                [disabled]="inputDisabled"></md-input>
+              <md-input-container>   <input mdInput class="" name="bankAccNo" placeholder="Bank Account No" [(ngModel)]="paymentStructure.BankAccNo" type="text" required
+                [disabled]="inputDisabled"></md-input-container>
             </div>
             <div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-              <md-input class="" name="accountName" placeholder="Account Name" [(ngModel)]="paymentStructure.BankAccName" type="text" required
-                [disabled]="inputDisabled"></md-input>
+              <md-input-container>   <input mdInput class="" name="accountName" placeholder="Account Name" [(ngModel)]="paymentStructure.BankAccName" type="text" required
+                [disabled]="inputDisabled"></md-input-container>
             </div>
             <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
               <button md-raised-button class="btn-save" type="submit" [disabled]="inputDisabled">Save</button>

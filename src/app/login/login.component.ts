@@ -25,7 +25,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.error = "";
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.renderer.invokeElementMethod(this.username.nativeElement, 'focus');
+  }
 
   ngOnInit() {
     this.masterService.postAlert("remove", "");
@@ -45,7 +47,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     if (this.User.username.trim().length == 0) {
       this.error = "Please enter valid username";
       this.masterService.postAlert("error", this.error);
-      this.renderer.invokeElementMethod(this.username, 'focus');
+      this.renderer.invokeElementMethod(this.username.nativeElement, 'focus');
       this.masterService.changeLoading(false);
       return;
     }
@@ -53,7 +55,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     if (this.User.password.trim().length == 0) {
       this.error = "Please enter valid password";
       this.masterService.postAlert("error", this.error);
-      this.renderer.invokeElementMethod(this.password, 'focus');
+      this.renderer.invokeElementMethod(this.password.nativeElement, 'focus');
       this.masterService.changeLoading(false);
       return;
     }

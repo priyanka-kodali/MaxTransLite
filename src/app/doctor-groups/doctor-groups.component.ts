@@ -20,7 +20,8 @@ export class DoctorGroupsComponent implements OnInit {
 
 
   constructor(private doctorGroupsService: DoctorGroupsService, private masterService: MasterService) {
-    this.error = "";
+        this.masterService.postAlert("remove", "");
+this.error = "";
     this.ViewDoctorGroupModal = false;
     this.AddDoctorGroupModal = false;
   }

@@ -16,7 +16,8 @@ export class ManagerDashboardComponent implements OnInit {
   SearchItem: Search = new Search();
 
   constructor(private managerDashboardService: ManagerDashboardService, private masterService: MasterService) {
-    this.error = "";
+        this.masterService.postAlert("remove", "");
+this.error = "";
    }
 
   ngOnInit() {
@@ -43,7 +44,7 @@ export class ManagerDashboardComponent implements OnInit {
     this.SearchItem.MT = this.SearchItem.MT == null ? "" : this.SearchItem.MT.trim();
     this.SearchItem.AQA = this.SearchItem.AQA == null ? "" : this.SearchItem.AQA.trim();
     this.SearchItem.QA = this.SearchItem.QA == null ? "" : this.SearchItem.QA.trim();
-    this.SearchItem.Status = this.SearchItem.Status == null ? "" : this.SearchItem.Status.trim();
+    this.SearchItem.JobStatus = this.SearchItem.JobStatus == null ? "" : this.SearchItem.JobStatus.trim();
 
 
     this.managerDashboardService.searchJobs(this.SearchItem).then(
@@ -76,7 +77,7 @@ export class Job {
   QAId: number;
   QA: string;
   TAT: string;
-  Status: string;
+  JobStatus: string;
   JobLevel: string;
   Duration: string;
   ClientShortName: string;
@@ -90,7 +91,7 @@ export class Job {
 class Search {
   Doctor: string;
   Client: string;
-  Status: string;
+  JobStatus: string;
   MT: string;
   AQA: string;
   QA: string;

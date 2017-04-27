@@ -6,7 +6,7 @@ import { Subject } from 'rxjs/Subject';
 @Injectable()
 export class HttpClient {
 
-  value = new Subject<object>()
+  value = new Subject<Object>()
   token: string;
   constructor(private http: Http, private router: Router ) {
     this.http = http;

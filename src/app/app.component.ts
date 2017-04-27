@@ -1,7 +1,8 @@
-import { Component, OnInit, } from '@angular/core';
+import { Component, OnInit, Compiler } from '@angular/core';
 import { Router } from '@angular/router';
 import { MasterService } from './app.service';
 import { Subscription } from 'rxjs';
+import { MdSnackBar } from '@angular/material';
 import { SimpleNotificationsComponent, NotificationsService } from 'angular2-notifications';
 
 @Component({
@@ -19,6 +20,11 @@ export class AppComponent implements OnInit {
   public info: string;
   public success: string;
   public error: string;
+  public errorNotificationId: string;
+  NoticeCount: number;
+  LeaveReviewCount: number;
+  MessageCount: number;
+  NotificationCount: number;
 
   public options = {
     position: ["bottom", "right"],
@@ -28,14 +34,17 @@ export class AppComponent implements OnInit {
     clickToClose: true,
   }
 
-  constructor(private router: Router, private masterService: MasterService, private notificationsService: NotificationsService) {
+  constructor(private snackBar: MdSnackBar, private router: Router, private masterService: MasterService, private notificationsService: NotificationsService, private _compiler: Compiler) {
     this.loading = false;
     this.error = "";
     this.success = "";
-    this.info = ""
+    this.info = "";
+    this.errorNotificationId = "";
+    this.NoticeCount = this.LeaveReviewCount = this.MessageCount = this.NotificationCount = 0;
   }
 
   ngOnInit() {
+    this._compiler.clearCache();
     this.subscription = this.masterService.loadingEmitter$.subscribe(
       (loading) => {
         this.loading = loading;
@@ -43,17 +52,38 @@ export class AppComponent implements OnInit {
     );
 
     this.subscription = this.masterService.alertEmitter$.subscribe(
+
       (alert) => {
         switch (alert.type) {
           case "success": this.notificationsService.success('Success', alert.message); break;
           case "error": this.notificationsService.error('Error', alert.message, { timeOut: 0 }); break;
           case "warning": this.notificationsService.alert('Warning', alert.message); break;
           case "info": this.notificationsService.info('Info', alert.message); break;
-          case "remove": this.notificationsService.remove(); break;
+          case "remove":
+            if (this.errorNotificationId.trim().length > 0) {
+              this.notificationsService.remove(this.errorNotificationId);
+              this.errorNotificationId = "";
+            }
+            break;
         }
       }
     )
 
+    this.masterService.getNotificationCount().then(
+      (data) => {
+        this.NoticeCount = data["NoticeCount"];
+        this.LeaveReviewCount = data["LeaveReviewCount"];
+        this.MessageCount = data["MessageCount"];
+        this.NotificationCount = data["NotificationCount"];
+      }
+    )
+
+  }
+
+  onCreate(event) {
+    if (event["type"] == "error") {
+      this.errorNotificationId = event["id"];
+    }
   }
 
 

@@ -79,18 +79,18 @@
 				<form #newDocForm="ngForm" (submit)="applyLeave()">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mtb10 bg-white">
 
-						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input class="" name="fromDate" placeholder="From Date" [(ngModel)]="NewLeave.FromDate" type="date" required></md-input>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input-container>   <input mdInput class="" name="fromDate" placeholder="From Date" [(ngModel)]="NewLeave.FromDate" type="date" required></md-input-container>
 						</div>
-						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input class="" name="toDate" placeholder="To Date" [(ngModel)]="NewLeave.ToDate" type="date" required></md-input>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input-container>   <input mdInput class="" name="toDate" placeholder="To Date" [(ngModel)]="NewLeave.ToDate" type="date" required></md-input-container>
 						</div>
-						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input class="" name="leaveType" placeholder="Leave Type" [(ngModel)]="NewLeave.LeaveType" [typeaheadMinLength]="0" [typeahead]="['Casual Leave','Privilege Leave','Special Leave']"
-							 type="text" required></md-input>
+						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+							<md-input-container>   <input mdInput class="" name="leaveType" placeholder="Leave Type" [(ngModel)]="NewLeave.LeaveType" [typeaheadMinLength]="0" [typeahead]="['Casual Leave','Privilege Leave','Special Leave']"
+							 type="text" required></md-input-container>
 						</div>
-						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12">
-							<md-input class="" name="comments" placeholder="Comments" [(ngModel)]="NewLeave.Comments" type="text"></md-input>
+						<div class="col-md-12 col-sm-6 col-lg-12 col-xs-12">
+							<md-input-container>   <input mdInput class="" name="comments" placeholder="Comments" [(ngModel)]="NewLeave.Comments" type="text" required></md-input-container>
 						</div>
 
 						<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">

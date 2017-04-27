@@ -46,7 +46,8 @@ export class DoctorsComponent implements OnInit {
 
 
   constructor(private router: Router, private doctorsService: DoctorsService, private activatedRoute: ActivatedRoute, private masterService: MasterService) {
-    this.sorting = "none";
+        this.masterService.postAlert("remove", "");
+this.sorting = "none";
     this.keys = ["Name", "Client", "Phone", "Email", "Job Level", "Voice Grade"];
     this.page = 1;
     this.count = 10;
@@ -148,7 +149,7 @@ export class DoctorsComponent implements OnInit {
     this.GetTemplateProgress = true;
     this.doctorsService.getTemplates(this.SelectedDoctor.Id).then(
       (data) => {
-        this.Templates = data;
+        this.Templates = data["Templates"];
         this.GetTemplateProgress = false;
         this.masterService.changeLoading(false);
       },

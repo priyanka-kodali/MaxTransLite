@@ -29,6 +29,7 @@ export class ClientEmployeesComponent implements OnInit {
   error: string;
 
   constructor(private router: Router, private masterService: MasterService, private clientEmployeesService: ClientEmployeesService, private activatedRoute: ActivatedRoute) {
+    this.masterService.postAlert("remove", "");
     this.sorting = "none";
     this.keys = ["Client", "Name", "Phone", "Email", "Department"];
     this.page = 1;
@@ -97,7 +98,7 @@ export class ClientEmployeesComponent implements OnInit {
         return ((y < x) ? -1 : ((y > x) ? 1 : 0));
       });
     }
-    
+
     this.masterService.changeLoading(false);
   }
 

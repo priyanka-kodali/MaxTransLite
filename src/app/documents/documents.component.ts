@@ -43,7 +43,8 @@ export class DocumentsComponent implements OnInit {
 
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private documentService: DocumentsService) {
-    this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
+        this.masterService.postAlert("remove", "");
+this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
     this.sorting = "none";
     this.error = "";
     this.sub = this.activatedRoute.params.subscribe(

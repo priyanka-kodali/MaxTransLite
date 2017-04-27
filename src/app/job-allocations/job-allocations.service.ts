@@ -16,7 +16,7 @@ export class JobAllocationsService {
     try {
       return this.http.get(url).toPromise().then((data) => data.json());
     }
-    catch (e) { throw e; }
+    catch (e) { throw e; } 
 
   }
 
@@ -37,8 +37,7 @@ export class JobAllocationsService {
   }
 
   splitAllocation(data : any){
-      let url = ApiUrl + "/api/Jobs/SplitAllocation";    
-      console.log(data);
+      let url = ApiUrl + "/api/Jobs/SplitAllocation"; 
         
     try {
       return this.http.post(url,data).toPromise().then((data) => data.json());

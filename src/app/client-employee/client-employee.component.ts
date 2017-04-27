@@ -38,6 +38,7 @@ export class ClientEmployeeComponent implements OnInit, AfterViewInit {
 
   constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientEmployeeService: ClientEmployeeService) {
     this.error = "";
+    this.masterService.postAlert("remove", "");
     this.sub = this.activatedRoute.params.subscribe(
       params => this.CliEmpId = +params['CliEmpId'] //get client employee id (if exists) from url
     );
@@ -79,6 +80,7 @@ export class ClientEmployeeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+      this.renderer.invokeElementMethod(this.client.nativeElement, 'focus');
   }
 
   getMasterData() {
@@ -115,6 +117,16 @@ export class ClientEmployeeComponent implements OnInit, AfterViewInit {
       this.masterService.postAlert("error", this.error);
       return;
     }
+
+    this.NewClientEmployee.FirstName = this.NewClientEmployee.FirstName.trim();
+    this.NewClientEmployee.MiddleName = this.NewClientEmployee.MiddleName ? this.NewClientEmployee.MiddleName.trim() : this.NewClientEmployee.MiddleName;
+    this.NewClientEmployee.LastName = this.NewClientEmployee.LastName.trim();
+    this.NewClientEmployee.PrimaryPhone = this.NewClientEmployee.PrimaryPhone.trim();
+    this.NewClientEmployee.SecondaryPhone = this.NewClientEmployee.SecondaryPhone ? this.NewClientEmployee.SecondaryPhone.trim() : this.NewClientEmployee.SecondaryPhone;
+    this.NewClientEmployee.Fax = this.NewClientEmployee.Fax ? this.NewClientEmployee.Fax.trim() : this.NewClientEmployee.Fax;
+    this.NewClientEmployee.Email = this.NewClientEmployee.Email.trim();
+    this.NewClientEmployee.Department = this.NewClientEmployee.Department.trim();
+
     this.masterService.postAlert("remove", "");
 
     if (this.isNewClientEmployee) {
@@ -124,6 +136,7 @@ export class ClientEmployeeComponent implements OnInit, AfterViewInit {
           this.inputDisabled = true; //disable input fields
           this.masterService.changeLoading(false);
           this.masterService.postAlert("success", "Client Employee added successfully");
+          this.isNewClientEmployee = false;
         },
         (error) => {
           this.error = error['_body'];
@@ -153,71 +166,106 @@ export class ClientEmployeeComponent implements OnInit, AfterViewInit {
   validate() {
 
     this.masterService.postAlert("remove", "");
-    var namesRegex = /^[a-zA-Z ]*$/;
+    var namesRegex = /^[a-zA-Z 0-9 ]*$/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-   var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+    var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
 
-    this.NewClientEmployee.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.NewClientEmployee.Client.toLowerCase())] //map client names to their Id
+    this.NewClientEmployee.Client_Id = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.NewClientEmployee.Client.toLowerCase())] //map client names to their Id
 
     if (!this.NewClientEmployee.Client_Id) {
       this.error = "Please select valid client";
-      this.renderer.invokeElementMethod(this.client, 'focus');
+      this.renderer.invokeElementMethod(this.client.nativeElement, 'focus');
       return false;
     }
 
-
-    if (this.NewClientEmployee.FirstName.trim().length > 35) {
-      this.error = "First Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+    if (this.NewClientEmployee.FirstName.trim().length == 0) {
+      this.error = "First Name should not be empty"
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
       return false;
     }
-
     if (!namesRegex.test(this.NewClientEmployee.FirstName)) {
       this.error = "First Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.FirstName.trim().length > 35) {
+      this.error = "First Name should not exceed 35 characters"
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.MiddleName && this.NewClientEmployee.MiddleName.trim().length == 0) {
+      this.error = "Middle Name should not be empty"
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewClientEmployee.MiddleName)) {
       this.error = "Middle Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (this.NewClientEmployee.MiddleName && this.NewClientEmployee.MiddleName.trim().length > 20) {
       this.error = "Middle Name should not exceed 20 characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
-
-    if (this.NewClientEmployee.LastName.trim().length > 35) {
-      this.error = "Last Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+    if (this.NewClientEmployee.LastName.trim().length == 0) {
+      this.error = "Last Name should not be empty"
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewClientEmployee.LastName)) {
       this.error = "Last Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
-
+    if (this.NewClientEmployee.LastName.trim().length > 35) {
+      this.error = "Last Name should not exceed 35 characters"
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.PrimaryPhone.trim().length == 0) {
+      this.error = "Primary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
+      return false;
+    }
     if (!phoneRegex.test(this.NewClientEmployee.PrimaryPhone)) {
       this.error = "Please enter a valid Primary Phone Number "
-      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.SecondaryPhone && this.NewClientEmployee.SecondaryPhone.trim().length == 0) {
+      this.error = "Secondary Phone should not be empty"
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewClientEmployee.SecondaryPhone && !phoneRegex.test(this.NewClientEmployee.SecondaryPhone)) {
       this.error = "Please enter a valid Secondary Phone Number "
-      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.Fax && this.NewClientEmployee.Fax.trim().length == 0) {
+      this.error = "Faxshould not be empty"
+      this.renderer.invokeElementMethod(this.fax.nativeElement, 'focus');
       return false;
     }
     if (this.NewClientEmployee.Fax && !phoneRegex.test(this.NewClientEmployee.Fax)) {
       this.error = "Please enter a valid Fax Number "
-      this.renderer.invokeElementMethod(this.fax, 'focus');
+      this.renderer.invokeElementMethod(this.fax.nativeElement, 'focus');
       return false;
     }
-
+    if (this.NewClientEmployee.Email.trim().length == 0) {
+      this.error = "Email should not be empty"
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
+      return false;
+    }
     if (!emailRegex.test(this.NewClientEmployee.Email)) {
       this.error = "Please enter a valid email";
-      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewClientEmployee.Department.trim().length == 0) {
+      this.error = "Department should not be empty"
+      this.renderer.invokeElementMethod(this.department.nativeElement, 'focus');
       return false;
     }
 

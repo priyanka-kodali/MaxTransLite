@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, Renderer, ElementRef, OnInit } from '@angular/core';
 import { PatientListsService } from './patient-list.service';
 import { ApiUrl } from '../shared/config';
 import { FileUploader } from '../../../node_modules/ng2-file-upload';
@@ -16,6 +16,8 @@ export class PatientListComponent implements OnInit {
   PatientLists: Array<PatientList> = new Array<PatientList>();
   ChildrenPatientLists: Array<PatientList> = new Array<PatientList>();
   SelectedPatientList: PatientList = new PatientList();
+  SelectedPatientListFromDate: string;
+  SelectedPatientListToDate: string;
   PatientListModal: boolean;
   error: string;
   clients: Array<string> = new Array<string>();
@@ -27,6 +29,13 @@ export class PatientListComponent implements OnInit {
   myUrl: string = ApiUrl + "/api/Doctor/AddPatientList";
 
 
+  @ViewChild("client") client: ElementRef;
+  @ViewChild("doctor") doctor: ElementRef;
+  @ViewChild("fromDate") fromDate: ElementRef;
+  @ViewChild("toDate") toDate: ElementRef;
+  @ViewChild("fileUpload") fileUpload: ElementRef;
+
+
   public uploader: FileUploader = new FileUploader({
     url: this.myUrl,
     headers: [{
@@ -35,7 +44,7 @@ export class PatientListComponent implements OnInit {
     }]
   });
 
-  constructor(private patientListsService: PatientListsService, private masterService: MasterService) {
+  constructor(private patientListsService: PatientListsService, private masterService: MasterService, private renderer: Renderer) {
     this.masterService.postAlert("remove", "");
     this.error = "";
     this.PatientListModal = false;
@@ -43,6 +52,10 @@ export class PatientListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getPatientLists();
+  }
+
+  getPatientLists() {
     this.masterService.changeLoading(true);
     this.patientListsService.getPatientLists().then(
       (data) => {
@@ -74,8 +87,14 @@ export class PatientListComponent implements OnInit {
   }
 
   clientChanged() {
+    if (!this.SelectedPatientList.Client) {
+      return;
+    }
+    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.SelectedPatientList.Client.toLowerCase())];
+    if (!this.SelectedPatientList.Client_Id) {
+      return;
+    }
     this.masterService.changeLoading(true);
-    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Client.toLowerCase())];
     this.patientListsService.getDoctors(this.SelectedPatientList.Client_Id).then(
       (data) => {
         this.doctors = new Array<string>();
@@ -86,7 +105,8 @@ export class PatientListComponent implements OnInit {
         });
         this.IsClientDataAvailable = true;
         this.masterService.changeLoading(false);
-      }
+      },
+      (error) => this.masterService.changeLoading(false)
     )
   }
 
@@ -95,8 +115,9 @@ export class PatientListComponent implements OnInit {
     this.PatientListModal = true;
     this.error = "";
     this.SelectedPatientList = new PatientList();
+    this.SelectedPatientListFromDate = new Date().toISOString().split("T")[0];
+    this.SelectedPatientListToDate = new Date().toISOString().split("T")[0];
   }
-
 
   postPatientList() {
 
@@ -117,28 +138,49 @@ export class PatientListComponent implements OnInit {
       form.append("Doctor_Id", this.SelectedPatientList.Doctor_Id);
     }
 
-    var file = this.uploader.queue[this.uploader.queue.length - 1];
-    file.withCredentials = false;
+    this.uploader.queue.forEach(element => {
+      element.withCredentials = false;
+    });
 
-    
-      this.uploader.uploadItem(file);
+    try {
+      this.uploader.uploadAll();
 
-    this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      response = JSON.parse(response);
-      if (status != 200) {
-        this.error = "Error adding patient list";
-        this.masterService.changeLoading(false);
-        this.masterService.postAlert("error", this.error);
-      }
-      if (status == 200) {
-        this.PatientLists.push(response);
+      this.uploader.onCompleteAll = () => {
         this.SelectedPatientList = new PatientList();
+        this.getPatientLists();
         this.PatientListModal = false;
         this.uploader.clearQueue();
         this.masterService.changeLoading(false);
         this.masterService.postAlert("success", "Patient list added successfully");
+      };
+      this.uploader.onErrorItem = () => {
+        this.error = "Error adding patient list";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
       }
-    };
+
+      // this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+      //   response = JSON.parse(response);
+      //   if (status != 200) {
+      //     this.error = "Error adding patient list";
+      //     this.masterService.changeLoading(false);
+      //     this.masterService.postAlert("error", this.error);
+      //   }
+      //   if (status == 200) {
+      //     this.PatientLists.push(response);
+      //     this.SelectedPatientList = new PatientList();
+      //     this.PatientListModal = false;
+      //     this.uploader.clearQueue();
+      //     this.masterService.changeLoading(false);
+      //     this.masterService.postAlert("success", "Patient list added successfully");
+      //   }
+      // };
+    }
+    catch (e) {
+      this.error = "Error adding patient list";
+      this.masterService.changeLoading(false);
+      this.masterService.postAlert("error", this.error);
+    }
 
   }
 
@@ -146,23 +188,37 @@ export class PatientListComponent implements OnInit {
 
     this.masterService.postAlert("remove", "");
 
-    var toDate = new Date(this.SelectedPatientList.ToDate);
-    var fromDate = new Date(this.SelectedPatientList.FromDate);
-    if (toDate.getTime() < fromDate.getTime() || fromDate.getTime() < new Date().getTime()) {
-      this.error = "Please select a valid To and From Dates";
-      return false;
-    }
+    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item) => item.toLowerCase() == this.SelectedPatientList.Client.toLowerCase())];
+    if (this.SelectedPatientList.Doctor) this.SelectedPatientList.Doctor_Id = this.doctorIds[this.doctors.findIndex((item) => item.toLowerCase() == this.SelectedPatientList.Doctor.toLowerCase())];
 
-    this.SelectedPatientList.Client_Id = this.clientIds[this.clients.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Client.toLowerCase())];
-    this.SelectedPatientList.Doctor_Id = this.doctorIds[this.doctors.findIndex((item)=>item.toLowerCase()==this.SelectedPatientList.Doctor.toLowerCase())];
+    this.SelectedPatientList.FromDate = new Date(this.SelectedPatientListFromDate);
+    this.SelectedPatientList.ToDate = new Date(this.SelectedPatientListToDate);
 
     if (!this.SelectedPatientList.Client_Id) {
       this.error = "Please select a valid client";
+      this.renderer.invokeElementMethod(this.client.nativeElement, 'focus');
       return false;
     }
 
     if (this.SelectedPatientList.Doctor && !this.SelectedPatientList.Doctor_Id) {
-      this.error = "Please select a valid client";
+      this.error = "Please select a valid Doctor";
+      this.renderer.invokeElementMethod(this.doctor.nativeElement, 'focus');
+      return false;
+    }
+
+    var toDate = new Date(this.SelectedPatientList.ToDate);
+    var fromDate = new Date(this.SelectedPatientList.FromDate);
+    var now = new Date().setHours(0, 0, 0, 0);
+
+    if (fromDate.getTime() < now) {
+      this.error = "Please select a valid From Date";
+      this.renderer.invokeElementMethod(this.toDate.nativeElement, 'focus');
+      return false;
+    }
+
+    if (toDate.getTime() < fromDate.getTime()) {
+      this.error = "Please select a valid To and From Dates";
+      this.renderer.invokeElementMethod(this.fromDate.nativeElement, 'focus');
       return false;
     }
     return true;

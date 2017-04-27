@@ -30,7 +30,7 @@ export class DoctorDashboardComponent implements OnInit {
 
     this.SearchItem.FromDate = this.SearchItem.FromDate == null ? "" : this.SearchItem.FromDate.trim();
     this.SearchItem.ToDate = this.SearchItem.ToDate == null ? "" : this.SearchItem.ToDate.trim();
-    this.SearchItem.Status = this.SearchItem.Status == null ? "" : this.SearchItem.Status.trim();
+    this.SearchItem.JobStatus = this.SearchItem.JobStatus == null ? "" : this.SearchItem.JobStatus.trim();
     this.SearchItem.JobNumber = this.SearchItem.JobNumber == null ? "" : this.SearchItem.JobNumber.trim();
 
 
@@ -48,12 +48,12 @@ export class Job {
   JobNumber: string;
   JobDate: string;
   TAT: string;
-  Status: string;
+  JobStatus: string;
   Duration: string;
 }
 
 class Search {
-  Status: string;
+  JobStatus: string;
   FromDate: string;
   ToDate: string;
   JobNumber : string;

@@ -17,7 +17,8 @@ export class LeavesComponent implements OnInit {
   error: string;
 
   constructor(private leavesService: LeavesService, private masterService: MasterService) {
-    this.error = "";
+        this.masterService.postAlert("remove", "");
+this.error = "";
   }
 
   ngOnInit() {
@@ -55,6 +56,9 @@ export class LeavesComponent implements OnInit {
       (data) => {
         this.AppliedLeaves.push(data);
         this.masterService.changeLoading(false);
+          this.masterService.postAlert("success", "Leave Applied Succesfully!");
+          this.NewLeaveModal=false;
+          this.NewLeave=new Leave();
       },
       (error) => {
         if (error['_body'] == "No of Leaves appiled are more than No of Leaves Available") {

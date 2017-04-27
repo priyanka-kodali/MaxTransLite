@@ -83,6 +83,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   });
 
   constructor(private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private employeeService: EmployeeService, private renderer: Renderer) {
+    this.masterService.postAlert("remove", "");
     this.NewEmployee = new Employee();
     this.NewEmployee.Specialties = new Array<string>();
     this.NewEmployee.DoctorGroups = new Array<string>();
@@ -97,7 +98,9 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     this.isDataAvailable = false;
   }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
+  }
 
   ngOnInit() {
 
@@ -107,6 +110,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       this.inputDisabled = false;
       this.getMasterData();
       this.ImageSrc = "../images/dummy-profile-pic.png";
+      this.NewEmployee.ProvisionalPeriod=0;
     }
 
     if (!this.isNewEmployee) {
@@ -261,8 +265,13 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   specialtiesChange() {
-    if (this.NewEmployee.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) { }
+    if (this.NewEmployee.Specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) > -1) {
+      return;
+    }
     else {
+      if (this.specialties.findIndex((item) => item.toLowerCase() == this.specialtySelector.toLowerCase()) == -1) {
+        return;
+      }
       this.specialties = this.specialties.filter((item) => item != this.specialtySelector);
       this.NewEmployee.Specialties.push(this.specialtySelector);
       this.specialtySelector = null;
@@ -282,8 +291,17 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   doctorGroupChange() {
-    if (this.NewEmployee.DoctorGroups.findIndex((item) => item.toLowerCase() == this.doctorGroupSelector.toLowerCase()) > -1) { }
+    if(!this.doctorGroupSelector){
+      return;
+    }
+    if (this.NewEmployee.DoctorGroups.findIndex((item) => item.toLowerCase() == this.doctorGroupSelector.toLowerCase()) > -1) {
+      return;
+    }
     else {
+      if (this.doctorGroups.findIndex((item) => item.toLowerCase() == this.doctorGroupSelector.toLowerCase()) == -1) {
+        return;
+      }
+
       this.doctorGroups = this.doctorGroups.filter((item) => item != this.doctorGroupSelector);
       this.NewEmployee.DoctorGroups.push(this.doctorGroupSelector);
       this.doctorGroupSelector = null;
@@ -308,9 +326,22 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   countrySelected() {
+    if (this.NewEmployee.Country) {
+      this.NewEmployee.State = "";
+      this.NewEmployee.City = "";
+      this.getStates();
+    }
+  }
+
+  stateSelected() {
+    if (this.NewEmployee.State) {
+      this.NewEmployee.City = "";
+      this.getCities();
+    }
+  }
+
+  getStates() {
     this.masterService.changeLoading(true);
-    this.NewEmployee.State = "";
-    this.NewEmployee.City = "";
     this.states = new Array<string>();
     this.stateIds = new Array<number>();
     var countryId = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewEmployee.Country.toLowerCase())];
@@ -319,19 +350,16 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.masterService.getStates(countryId).then(
-      (data) => {
-        data['states'].forEach(state => {
-          this.states.push(state.Name);
-          this.stateIds.push(state.Id);
-        });
+      (data) => data['states'].forEach(state => {
+        this.states.push(state.Name);
+        this.stateIds.push(state.Id);
         this.masterService.changeLoading(false);
-      }
+      })
     )
   }
 
-  stateSelected() {
+  getCities() {
     this.masterService.changeLoading(true);
-    this.NewEmployee.City = "";
     this.cities = new Array<string>();
     this.cityIds = new Array<number>();
     var stateId = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewEmployee.State.toLowerCase())];
@@ -340,15 +368,12 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.masterService.getCities(stateId).then(
-      (data) => {
-        data['cities'].forEach(city => {
-          this.cities.push(city.Name);
-          this.cityIds.push(city.Id);
-        });
+      (data) => data['cities'].forEach(city => {
+        this.cities.push(city.Name);
+        this.cityIds.push(city.Id);
         this.masterService.changeLoading(false);
-      }
+      })
     )
-
   }
 
   saveChanges() {
@@ -361,11 +386,25 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    this.NewEmployee.FirstName = this.NewEmployee.FirstName.trim();
+    this.NewEmployee.MiddleName = this.NewEmployee.MiddleName ? this.NewEmployee.MiddleName.trim() : this.NewEmployee.MiddleName;
+    this.NewEmployee.LastName = this.NewEmployee.LastName.trim();
+    this.NewEmployee.PrimaryPhone = this.NewEmployee.PrimaryPhone.trim();
+    this.NewEmployee.SecondaryPhone = this.NewEmployee.SecondaryPhone ? this.NewEmployee.SecondaryPhone.trim() : this.NewEmployee.SecondaryPhone;
+    this.NewEmployee.Email = this.NewEmployee.Email.trim();
+    this.NewEmployee.PAN = this.NewEmployee.PAN ? this.NewEmployee.PAN.trim() : this.NewEmployee.PAN;
+    this.NewEmployee.Aadhar = this.NewEmployee.Aadhar ? this.NewEmployee.Aadhar.trim() : this.NewEmployee.Aadhar;
+    this.NewEmployee.AddressLine1 = this.NewEmployee.AddressLine1.trim();
+    this.NewEmployee.AddressLine2 = this.NewEmployee.AddressLine2 ? this.NewEmployee.AddressLine2.trim() : this.NewEmployee.AddressLine2;
+    this.NewEmployee.ZIP = this.NewEmployee.ZIP.trim();
+
+
     this.masterService.postAlert("remove", "");
 
     this.uploader.onBuildItemForm = (item, form) => {
       form.append("employeeData", JSON.stringify(this.NewEmployee));
     }
+
 
     var file = this.uploader.queue[this.uploader.queue.length - 1];
     file.withCredentials = false;
@@ -385,13 +424,17 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
             this.masterService.postAlert("error", this.error);
           }
           if (status == 200) {
-            this.NewEmployee = response["employee"];
-            this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
-            this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
-            this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
-            this.inputDisabled = true;
-            this.masterService.changeLoading(false);
-            this.masterService.postAlert("success", "Employee added successfully");
+            // this.NewEmployee = response["employee"];
+            // this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
+            // this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
+            // this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
+            // this.inputDisabled = true;
+            // this.masterService.changeLoading(false);
+            // this.masterService.postAlert("success", "Employee added successfully");
+            // this.isNewEmployee = false;
+            // this.specialtySelector="";
+            // this.doctorGroupSelector="";
+            this.router.navigate(["new-employee","documents",response["employee"]["Id"]]);      
           }
         }
       }
@@ -434,80 +477,98 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
 
     this.masterService.postAlert("remove", "");
 
-    var namesRegex = /^[a-zA-Z ]*$/;
+    var namesRegex = /^[a-zA-Z 0-9 ]*$/;
     var employeeNumberRegex = /^[A-Za-z]{3}[0-9]{4}/;
     var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var phoneRegex = /^^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
     var panRegex = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}/;
     var aadharRegex = /^[0-9]{12}/;
-
-
-
-
     this.NewEmployee.City_Id = this.cityIds[this.cities.findIndex((item) => item.toLowerCase() == this.NewEmployee.City.toLowerCase())];
     this.NewEmployee.State_Id = this.stateIds[this.states.findIndex((item) => item.toLowerCase() == this.NewEmployee.State.toLowerCase())];
     this.NewEmployee.Country_Id = this.countryIds[this.countries.findIndex((item) => item.toLowerCase() == this.NewEmployee.Country.toLowerCase())];
     this.NewEmployee.Designation_Id = this.designationIds[this.designations.findIndex((item) => item.toLowerCase() == this.NewEmployee.Designation.toLowerCase())];
     this.NewEmployee.Department_Id = this.departmentIds[this.departments.findIndex((item) => item.toLowerCase() == this.NewEmployee.Department.toLowerCase())];
-    this.NewEmployee.Manager_Id = this.managerIds[this.managers.findIndex((item) => item.toLowerCase() == this.NewEmployee.Manager.toLowerCase())];
+    if (this.NewEmployee.Manager) {
+      this.NewEmployee.Manager_Id = this.managerIds[this.managers.findIndex((item) => item.toLowerCase() == this.NewEmployee.Manager.toLowerCase())];
+    }
     this.NewEmployee.Role_Id = this.roleIds[this.roles.findIndex((item) => item.toLowerCase() == this.NewEmployee.Role.toLowerCase())];
 
 
 
+    if (this.NewEmployee.FirstName.trim().length == 0) {
+      this.error = "First Name should not be empty";
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
+      return false;
+    }
     if (!namesRegex.test(this.NewEmployee.FirstName)) {
-      this.error = "First Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.error = "First Name should not contain special characters";
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
       return false;
     }
     if (this.NewEmployee.FirstName.trim().length > 35) {
-      this.error = "First Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.firstName, 'focus');
+      this.error = "First Name should not exceed 35 characters";
+      this.renderer.invokeElementMethod(this.firstName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewEmployee.MiddleName && this.NewEmployee.MiddleName.trim().length == 0) {
+      this.error = "Middle Name should not be empty";
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewEmployee.MiddleName)) {
-      this.error = "Middle Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.error = "Middle Name should not contain special characters";
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
       return false;
     }
     if (this.NewEmployee.MiddleName && this.NewEmployee.MiddleName.trim().length > 20) {
-      this.error = "Middle Name should not exceed 20 characters"
-      this.renderer.invokeElementMethod(this.middleName, 'focus');
+      this.error = "Middle Name should not exceed 20 characters";
+      this.renderer.invokeElementMethod(this.middleName.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewEmployee.LastName.trim().length == 0) {
+      this.error = "Last Name should not be empty";
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (!namesRegex.test(this.NewEmployee.LastName)) {
-      this.error = "Last Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.error = "Last Name should not contain special characters";
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
     if (this.NewEmployee.LastName.trim().length > 35) {
-      this.error = "Last Name should not exceed 35 characters"
-      this.renderer.invokeElementMethod(this.lastName, 'focus');
+      this.error = "Last Name should not exceed 35 characters";
+      this.renderer.invokeElementMethod(this.lastName.nativeElement, 'focus');
       return false;
     }
-    if (this.NewEmployee.EmployeeNumber && !employeeNumberRegex.test(this.NewEmployee.EmployeeNumber)) {
-      this.error = "Please enter a valid Employee Number (eg : MX0001)"
-      this.renderer.invokeElementMethod(this.employeeNumber, 'focus');
-      return false;
-    }
-    if (this.NewEmployee.EmployeeNumber && this.NewEmployee.EmployeeNumber.trim().length > 7) {
-      this.error = "Employee Number should not exceed 7 characters"
-      this.renderer.invokeElementMethod(this.employeeNumber, 'focus');
+    if (this.NewEmployee.PrimaryPhone.trim().length == 0) {
+      this.error = "Primary Phone should not be empty";
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
       return false;
     }
     if (!phoneRegex.test(this.NewEmployee.PrimaryPhone)) {
-      this.error = "Please enter a valid Primary Phone Number "
-      this.renderer.invokeElementMethod(this.primaryPhone, 'focus');
+      this.error = "Please enter a valid Primary Phone Number";
+      this.renderer.invokeElementMethod(this.primaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewEmployee.SecondaryPhone && this.NewEmployee.SecondaryPhone.trim().length == 0) {
+      this.error = "Secondary Phone should not be empty";
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
       return false;
     }
     if (this.NewEmployee.SecondaryPhone && !phoneRegex.test(this.NewEmployee.SecondaryPhone)) {
-      this.error = "Please enter a valid Secondary Phone Number "
-      this.renderer.invokeElementMethod(this.secondaryPhone, 'focus');
+      this.error = "Please enter a valid Secondary Phone Number";
+      this.renderer.invokeElementMethod(this.secondaryPhone.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewEmployee.Email.trim().length == 0) {
+      this.error = "Email should not be empty";
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
       return false;
     }
 
     if (!emailRegex.test(this.NewEmployee.Email)) {
       this.error = "Please enter a valid email";
-      this.renderer.invokeElementMethod(this.email, 'focus');
+      this.renderer.invokeElementMethod(this.email.nativeElement, 'focus');
       return false;
     }
 
@@ -517,109 +578,142 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
 
     if (dob.getTime() >= new Date().getTime()) {
       this.error = "Please select a valid DOB";
-      this.renderer.invokeElementMethod(this.dob, 'focus');
+      this.renderer.invokeElementMethod(this.dob.nativeElement, 'focus');
       return false;
     }
 
     if (this.bloodGroups.findIndex((item) => item.toLowerCase() == this.NewEmployee.BloodGroup.toLowerCase()) == -1) {
-      this.error = "Please select a valid Blood Group"
-      this.renderer.invokeElementMethod(this.bloodGroup, 'focus');
+      this.error = "Please select a valid Blood Group";
+      this.renderer.invokeElementMethod(this.bloodGroup.nativeElement, 'focus');
       return false;
     }
-
+    if (this.NewEmployee.PAN && this.NewEmployee.PAN.trim().length == 0) {
+      this.error = "PAN should not be empty";
+      this.renderer.invokeElementMethod(this.pan.nativeElement, 'focus');
+      return false;
+    }
     if (this.NewEmployee.PAN && !panRegex.test(this.NewEmployee.PAN)) {
       this.error = "Please enter a valid PAN";
-      this.renderer.invokeElementMethod(this.pan, 'focus');
+      this.renderer.invokeElementMethod(this.pan.nativeElement, 'focus');
       return false;
     }
-
+    if (this.NewEmployee.Aadhar && this.NewEmployee.Aadhar.trim().length == 0) {
+      this.error = "Aadhar should not be empty";
+      this.renderer.invokeElementMethod(this.aadhar.nativeElement, 'focus');
+      return false;
+    }
     if (this.NewEmployee.Aadhar && !aadharRegex.test(this.NewEmployee.Aadhar)) {
       this.error = "Please enter a valid aadhar (12 digits)";
-      this.renderer.invokeElementMethod(this.aadhar, 'focus');
+      this.renderer.invokeElementMethod(this.aadhar.nativeElement, 'focus');
       return false;
     }
-
     if (this.uploader.queue.length < 1) {
       this.error = "Please select a valid photo for the employee";
       this.renderer.invokeElementMethod(this.photo.nativeElement, 'focus');
       return false;
     }
 
+    if (this.NewEmployee.AddressLine1.trim().length == 0) {
+      this.error = "Address should not be empty";
+      this.renderer.invokeElementMethod(this.addressLine1.nativeElement, 'focus');
+      return false;
+    }
     if (this.NewEmployee.AddressLine1.trim().length > 255) {
-      this.error = "Address should not exceed 255 characters"
-      this.renderer.invokeElementMethod(this.addressLine1, 'focus');
+      this.error = "Address should not exceed 255 characters";
+      this.renderer.invokeElementMethod(this.addressLine1.nativeElement, 'focus');
       return false;
     }
 
+    if (this.NewEmployee.AddressLine2 && this.NewEmployee.AddressLine2.trim().length == 0) {
+      this.error = "Address should not be empty";
+      this.renderer.invokeElementMethod(this.addressLine2.nativeElement, 'focus');
+      return false;
+    }
     if (this.NewEmployee.AddressLine2 && this.NewEmployee.AddressLine2.trim().length > 255) {
-      this.error = "Address should not exceed 255 characters"
-      this.renderer.invokeElementMethod(this.addressLine2, 'focus');
+      this.error = "Address should not exceed 255 characters";
+      this.renderer.invokeElementMethod(this.addressLine2.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.Country_Id) {
       this.error = "Please select valid country";
-      this.renderer.invokeElementMethod(this.country, 'focus');
+      this.renderer.invokeElementMethod(this.country.nativeElement, 'focus');
       return false;
     }
     if (!this.NewEmployee.State_Id) {
       this.error = "Please select valid state";
-      this.renderer.invokeElementMethod(this.state, 'focus');
+      this.renderer.invokeElementMethod(this.state.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.City_Id) {
       this.error = "Please select valid city";
-      this.renderer.invokeElementMethod(this.city, 'focus');
+      this.renderer.invokeElementMethod(this.city.nativeElement, 'focus');
       return false;
     }
 
+    if (this.NewEmployee.ZIP.trim().length == 0) {
+      this.error = "ZIP should not be empty";
+      this.renderer.invokeElementMethod(this.zip.nativeElement, 'focus');
+      return false;
+    }
     if (this.NewEmployee.ZIP.trim().length > 10) {
-      this.error = "ZIP should not exceed 10 characters"
-      this.renderer.invokeElementMethod(this.zip, 'focus');
+      this.error = "ZIP should not exceed 10 characters";
+      this.renderer.invokeElementMethod(this.zip.nativeElement, 'focus');
       return false;
     }
 
-    if (doj.getTime() <= dob.getTime() || doj.getTime() >= new Date().getTime()) {
-      this.error = "Please select a valid DOJ"
-      this.renderer.invokeElementMethod(this.doj, 'focus');
+    if (doj.getTime() <= dob.getTime()) {
+      this.error = "DOJ should be greater than DOB";
+      this.renderer.invokeElementMethod(this.doj.nativeElement, 'focus');
+      return false;
+    }
+
+    if (doj.getTime() >= new Date().getTime()) {
+      this.error = "DOJ should not be a future date";
+      this.renderer.invokeElementMethod(this.doj.nativeElement, 'focus');
       return false;
     }
 
 
-    if (this.NewEmployee.DOR && (dor.getTime() <= dob.getTime() || dor.getTime() <= doj.getTime())) {
-      this.error = "Please select a valid DOR"
-      this.renderer.invokeElementMethod(this.dor, 'focus');
+    if (this.NewEmployee.DOR && dor.getTime() <= dob.getTime()) {
+      this.error = "DOR should be greater than DOB";
+      this.renderer.invokeElementMethod(this.dor.nativeElement, 'focus');
+      return false;
+    }
+    if (this.NewEmployee.DOR && dor.getTime() <= doj.getTime()) {
+      this.error = "DOR should be greater than DOJ";
+      this.renderer.invokeElementMethod(this.dor.nativeElement, 'focus');
       return false;
     }
 
     if (this.employmentTypes.findIndex((item) => item.toLowerCase() == this.NewEmployee.EmploymentType.toLowerCase()) == -1) {
-      this.error = "Please select a valid Employment Type"
-      this.renderer.invokeElementMethod(this.employmentType, 'focus');
+      this.error = "Please select a valid Employment Type";
+      this.renderer.invokeElementMethod(this.employmentType.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.Designation_Id) {
       this.error = "Please select valid designation";
-      this.renderer.invokeElementMethod(this.designation, 'focus');
+      this.renderer.invokeElementMethod(this.designation.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.Department_Id) {
       this.error = "Please select valid department";
-      this.renderer.invokeElementMethod(this.department, 'focus');
+      this.renderer.invokeElementMethod(this.department.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.Manager_Id && this.NewEmployee.Manager) {
       this.error = "Please select valid manager";
-      this.renderer.invokeElementMethod(this.manager, 'focus');
+      this.renderer.invokeElementMethod(this.manager.nativeElement, 'focus');
       return false;
     }
 
     if (!this.NewEmployee.Role_Id) {
       this.error = "Please select valid role";
-      this.renderer.invokeElementMethod(this.role, 'focus');
+      this.renderer.invokeElementMethod(this.role.nativeElement, 'focus');
       return false;
     }
 

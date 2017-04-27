@@ -23,18 +23,25 @@ export class LeavesReviewComponent implements OnInit {
   Reviewer_Ids: Array<number> = new Array<number>();
   IsReviewerDataAvailable: boolean;
   error: string;
+  SelectedLeaveIndex: number;
 
   constructor(private leavesReviewService: LeavesReviewService, private masterService: MasterService) {
+    this.masterService.postAlert("remove", "");
     this.ReviewLeaveModal = false;
     this.error = "";
     this.IsReviewerDataAvailable = false;
+    this.SelectedLeaveIndex = -1;
   }
 
   ngOnInit() {
     this.masterService.changeLoading(true);
     this.leavesReviewService.getLeavesToReview().then(
       (data) => {
-        this.Leaves = data;
+        this.Leaves = data["Leaves"];
+        this.Leaves.forEach(element => {
+          element.FromDate = new Date(element.FromDate);   //convert to local time
+          element.ToDate = new Date(element.ToDate);
+        });
         this.masterService.changeLoading(false);
       },
       (error) => {
@@ -46,6 +53,9 @@ export class LeavesReviewComponent implements OnInit {
   }
 
   getReviewers() {
+    if (this.SelectedLeave.ReviewStatus1 != "Further Authorization") {
+      return;
+    }
     this.masterService.changeLoading(true);
     if (!this.IsReviewerDataAvailable) {
       this.leavesReviewService.getReviewers().then(
@@ -66,29 +76,41 @@ export class LeavesReviewComponent implements OnInit {
     }
   }
 
-  review(leave: Leave) {
-    this.SelectedLeave = leave;
+  review(i: number) {
+    this.ReviewLeaveModal = true;
+    this.SelectedLeave = Object.assign({}, this.Leaves[i]);
+    this.SelectedLeaveIndex = i;
     this.SelectedLeaveFromDate = this.SelectedLeave.FromDate.toString().split("T")[0];
     this.SelectedLeaveToDate = this.SelectedLeave.ToDate.toString().split("T")[0];
     if (this.SelectedLeaveReviewDate1 != null)
       this.SelectedLeaveReviewDate1 = this.SelectedLeave.ReviewDate1.toString().split("T")[0];
     if (this.SelectedLeaveReviewDate2 != null)
       this.SelectedLeaveReviewDate2 = this.SelectedLeave.ReviewDate2.toString().split("T")[0];
-
   }
 
   authorizeLeave() {
     this.masterService.changeLoading(true);
     this.masterService.postAlert("remove", "");
     if (this.SelectedLeave.IsReviewer1) {
-      this.SelectedLeave.Reviewer2_Id = this.Reviewer_Ids[this.Reviewers.findIndex((item)=>item.toLowerCase()==this.SelectedLeave.Reviewer2.toLowerCase())];
+      if (this.SelectedLeave.Reviewer2) {
+        this.SelectedLeave.Reviewer2_Id = this.Reviewer_Ids[this.Reviewers.findIndex((item) => item.toLowerCase() == this.SelectedLeave.Reviewer2.toLowerCase())];
+        if (!this.SelectedLeave.Reviewer2_Id) {
+          this.error = "Please select a valid reviewer";
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
+        }
+      }
     }
 
     this.leavesReviewService.authorizeLeave(this.SelectedLeave).then(
       (data) => {
-        this.SelectedLeave = data;
+        data.FromDate = new Date(data.FromDate);
+        data.ToDate = new Date(data.ToDate);
+        this.Leaves[this.SelectedLeaveIndex] = data;
+        this.SelectedLeaveIndex = -1;
         this.ReviewLeaveModal = false;
         this.masterService.changeLoading(false);
+        this.masterService.postAlert("success", "Leave authorization succesful");
       },
       (error) => {
         this.error = "Error updating leave";

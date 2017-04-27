@@ -25,7 +25,8 @@ export class EmployeeDashboardComponent implements OnInit {
   error: string;
 
   constructor(private employeeDashboardService: EmployeeDashboardService, private router: Router, private masterService: MasterService, private appComponent: AppComponent) {
-  }
+      this.masterService.postAlert("remove", "");
+}
 
 
   ngOnInit() {

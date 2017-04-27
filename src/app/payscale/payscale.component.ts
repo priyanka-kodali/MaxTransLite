@@ -25,8 +25,8 @@ export class PayscaleComponent implements OnInit {
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private payscaleService: PayscaleService) {
     this.error = "";
     this.inputDisabled = false;
-
-    this.paymentStructure = new PaymentStructure();
+    this.masterService.postAlert("remove", "");
+ this.paymentStructure = new PaymentStructure();
     this.sub = this.activatedRoute.params.subscribe(
       params => this.EmpId = +params['EmpId']
     );
