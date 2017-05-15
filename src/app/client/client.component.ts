@@ -290,6 +290,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
     this.NewClient.Fax = this.NewClient.Fax ? this.NewClient.Fax.trim() : this.NewClient.Fax;
     this.NewClient.Email = this.NewClient.Email.trim();
     this.NewClient.FileTypes = this.NewClient.FileTypes ? this.NewClient.FileTypes.trim() : this.NewClient.FileTypes;
+    if (this.NewClient.PaymentAmount == null || isNaN(this.NewClient.PaymentAmount)) {
+      this.NewClient.PaymentAmount = 0;
+    }
 
     for (var i = 0; i < this.locations.length; i++) {
 
@@ -368,11 +371,11 @@ export class ClientComponent implements OnInit, AfterViewInit {
     this.NewClient.Vendor_Id = this.NewClient.Vendor ? this.vendorIds[this.vendors.findIndex((item) => item.toLowerCase() == this.NewClient.Vendor.toLowerCase())] : null;
     this.NewClient.ClientVertical_Id = this.verticalIds[this.verticals.findIndex((item) => item.toLowerCase() == this.NewClient.ClientVertical.toLowerCase())];
 
-    if (!namesRegex.test(this.NewClient.Name)) {
-      this.error = "Name should not contain special characters"
-      this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
-      return false;
-    }
+    // if (!namesRegex.test(this.NewClient.Name)) {
+    //   this.error = "Name should not contain special characters"
+    //   this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');
+    //   return false;
+    // }
     if (this.NewClient.Name.trim().length == 0) {
       this.error = "Name should not be empty"
       this.renderer.invokeElementMethod(this.name.nativeElement, 'focus');

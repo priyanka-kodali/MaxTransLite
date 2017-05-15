@@ -64,11 +64,11 @@
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input-container>   <input mdInput class="" name="country" #country [(ngModel)]="NewDoctor.Country" [typeahead]="countries" autocomplete="off" autocomplete="off"
-							 placeholder="Country" type="text" required [disabled]="inputDisabled" (blur)="countrySelected()" (typeaheadOnSelect)="countrySelected()"></md-input-container>
+							 placeholder="Country" type="text" required [disabled]="inputDisabled" (change)="countrySelected()" (typeaheadOnSelect)="countrySelected()"></md-input-container>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input-container>   <input mdInput class="" name="state" #state [(ngModel)]="NewDoctor.State" autocomplete="off" [typeahead]="states" placeholder="State"
-							 type="text" required [disabled]="inputDisabled" (blur)="stateSelected()" (typeaheadOnSelect)="stateSelected()"></md-input-container>
+							 type="text" required [disabled]="inputDisabled" (change)="stateSelected()" (typeaheadOnSelect)="stateSelected()"></md-input-container>
 						</div>
 						<div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
 							<md-input-container>   <input mdInput class="" name="city" #city [(ngModel)]="NewDoctor.City" [typeahead]="cities" autocomplete="off" placeholder="City"

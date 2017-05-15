@@ -3,7 +3,7 @@
   <a (click)="navigateTo('dashboard')" ><img src="images/logo.png" alt=""></a>
   </div>
     <nav>
-      <ul class="nav" *ngIf="isLoggedIn()">
+      <ul class="nav" *ngIf="LoggedIn">
         <li><a (click)="navigateTo('dashboard')" class="home"><span>Dashboard</span></a></li>
         <li *ngIf="isInRole('Transcriptionist') || isInRole('Coordinator')" ><a (click)="navigateTo('jobs')" class="home"><span>Jobs</span></a></li>
         <li class="dropdown"  *ngIf="isInRole('Coordinator') || isInRole('Manager')" > 

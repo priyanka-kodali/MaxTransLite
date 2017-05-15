@@ -50,18 +50,19 @@
 				<table>
 					<thead class="orange200">
 						<tr table-header>
-							<th>Date</th>
-							<th>Job No</th>
-							<th>Duration</th>
-							<th>Client</th>
-							<th>Doctor</th>
-							<th>MT</th>
-							<th>AQA</th>
-							<th>QA</th>
-							<th>TAT</th>
-							<th>Status</th>
-							<th></th>
-							<th></th>
+							<th style="width:85px">Date</th>
+							<th style="width:145px">Job No</th>
+							<th style="width:102px">Duration</th>
+							<th style="width:80px">Client</th>
+							<th style="width:150px">Doctor</th>
+							<th style="width:85px">Job Level</th>
+							<th style="width:135px">MT</th>
+							<th style="width:135px">AQA</th>
+							<th style="width:135px">QA</th>
+							<th style="width:65px">TAT</th>
+							<th style="width:65px">Status</th>
+							<th style="width:40px"></th>
+							<th style="width:40px"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -69,14 +70,15 @@
 						 [class.bg-green]="job.Color==0">
 							<td>{{job.JobDate}}</td>
 							<td [title]="job.OriginalFileName">{{job.JobNumber}}</td>
-							<td>{{job.Duration}}</td>
+							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
 							<td title={{job.Client}}>{{job.ClientShortName}}</td>
-							<td>{{job.Doctor}}</td>
-							<td>{{job.MT}}</td>
-							<td>{{job.AQA}}</td>
-							<td>{{job.QA}}</td>
+							<td title="{{job.Doctor}}">{{job.Doctor}}</td>
+							<td>{{job.JobLevel}}</td>
+							<td [class.bg-yellow]="job.MtStatus==2" [class.bg-white]="job.MtStatus==1" [class.bg-green]="job.MtStatus==0" title="{{job.MtTime}}">{{job.MT}}</td>
+							<td [class.bg-yellow]="job.AqaStatus==2" [class.bg-white]="job.AqaStatus==1" [class.bg-green]="job.AqaStatus==0" title="{{job.AqaTime}}">{{job.AQA}}</td>
+							<td [class.bg-yellow]="job.QaStatus==2" [class.bg-white]="job.QaStatus==1" [class.bg-green]="job.QaStatus==0" title="{{job.QaTime}}">{{job.QA}}</td>
 							<td>{{job.TAT}}</td>
-							<td>{{job.JobStatus}}</td>
+							<td>{{job.JobStatus.replace('Pending ', '')}}</td>
 							<td><span *ngIf="job.JobStatus != 'Completed' && job.JobStatus != 'Downloaded'" class="glyphicon glyphicon-pencil pointer" (click)="editAllocation(i)" title="Edit"></span></td>
 							<!--<td><span *ngIf="job.JobStatus != 'Completed' && job.JobStatus != 'Downloaded' && job.JobStatus != 'No Dictation' && job.JobStatus != 'Repeat' && job.JobStatus!='NYS' && job.JobStatus!='Pending at AQA' && job.JobStatus!='Pending at QA'" class="glyphicon glyphicon-resize-full pointer" (click)="splitJob(i)" title="Split"></span></td>-->
 							<td><span *ngIf="job.JobStatus=='NYS' || job.JobStatus=='Pending at MT'" class="glyphicon glyphicon-resize-full pointer" (click)="splitJob(i)" title="Split"></span></td>
@@ -107,16 +109,20 @@
 							</div>
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="jobDate" placeholder="JobDate" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input-container>
+								<md-input-container>   <input mdInput class="" name="jobDuration" placeholder="Duration" [(ngModel)]="SelectedJob.Duration" type="text" disabled></md-input-container>
 							</div>
 
-							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="SeletedJob.Client" [(ngModel)]="SelectedJob.ClientShortName"
+							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+								<md-input-container>   <input mdInput class="" name="jobDate" placeholder="Job Date" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input-container>
+							</div>
+
+							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+								<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName"
 								 type="text" disabled></md-input-container>
 							</div>
 
-							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="doctor" placeholder="Doctor" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input-container>
+							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+								<md-input-container>   <input mdInput class="" name="doctor" placeholder="Doctor" title="{{SelectedJob.Doctor}}" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input-container>
 							</div>
 						</div>
 
@@ -175,13 +181,13 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 bg-white p0">
 					<div class="row m0 ptop5 main-job-details">
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="jobDate" placeholder="JobDate" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input-container>
-						</div>
-						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
 							<md-input-container>   <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text" disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="Selected.Client" [(ngModel)]="SelectedJob.ClientShortName" type="text"
+							<md-input-container>   <input mdInput class="" name="jobDuration" placeholder="Job Duration" [(ngModel)]="SelectedJob.Duration" type="text" disabled></md-input-container>
+						</div>
+						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
+							<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName" type="text"
 							 disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
@@ -202,7 +208,7 @@
 					<div class="row m0 split-job-details ">
 						<div class="row m0 ptop5" *ngFor="let newSplitJob of SplitAllocationChildJobs; let i=index">
 							<div class="col-md-1 col-sm-6 col-lg-1 col-xs-12 f11 p8">
-								{{SelectedJobNumber+'_'+(SelectedJobSequenceNumber==0?1:SelectedJobSequenceNumber+i)}}
+								{{SelectedJobNumber+'_'+(SelectedJobSequenceNumber==0?1+i:SelectedJobSequenceNumber+i)}}
 							</div>
 							<div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
 								<md-input-container>   <input mdInput class="" name="startTime" placeholder="Start Time" [(ngModel)]="newSplitJob.StartTime" type="text"></md-input-container>

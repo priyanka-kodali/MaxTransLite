@@ -15,7 +15,6 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
   passwordModel: PasswordModel = new PasswordModel();
   sub: any;
 
-  @ViewChild("username") username: ElementRef;
   @ViewChild("password") password: ElementRef;
   @ViewChild("confirmPassword") confirmPassword: ElementRef;
 
@@ -23,7 +22,11 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
     this.error = "";
     this.masterService.postAlert("remove", "");
     this.sub = this.activatedRoute.params.subscribe(
-      params => this.passwordModel.Key = params['key']
+      params => {
+        this.passwordModel.Code = params['Code'];
+        this.passwordModel.UserId = params['UserId'];
+        console.log(params);
+      }
     );
 
   }
@@ -32,7 +35,7 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.renderer.invokeElementMethod(this.username.nativeElement, 'focus');
+    this.renderer.invokeElementMethod(this.password.nativeElement, 'focus');
   }
 
   resetPassword() {
@@ -53,7 +56,7 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
         this.navigateTo("login");
       },
       (error) => {
-      this.error = "An error occoured while changing password!";
+        this.error = "An error occoured while changing password!";
         this.masterService.changeLoading(false);
         this.masterService.postAlert("error", this.error);
         return;
@@ -62,17 +65,10 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
   }
 
   validate() {
- 
+
     this.masterService.postAlert("remove", "");
 
-    if (!this.passwordModel.Username || this.passwordModel.Username.trim().length == 0) {
-      this.error = "Username should not be empty";
-      this.renderer.invokeElementMethod(this.username.nativeElement, 'focus');
-      return false;
-    }
-
-
-    if (!this.passwordModel.Password || this.passwordModel.Password.trim().length == 0) {
+    if (!this.passwordModel.NewPassword || this.passwordModel.NewPassword.trim().length == 0) {
       this.error = "Password should not be empty";
       this.renderer.invokeElementMethod(this.password.nativeElement, 'focus');
       return false;
@@ -84,7 +80,7 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
       return false;
     }
 
-    if (this.passwordModel.Password != this.passwordModel.ConfirmPassword) {
+    if (this.passwordModel.NewPassword != this.passwordModel.ConfirmPassword) {
       this.error = "Passwords does not match!";
       this.renderer.invokeElementMethod(this.password.nativeElement, 'focus');
       return false;
@@ -100,8 +96,8 @@ export class ResetPasswordComponent implements OnInit, AfterViewInit {
 }
 
 class PasswordModel {
-  Username: string;
-  Password: string;
+  NewPassword: string;
   ConfirmPassword: string;
-  Key: any;
+  Code: string;
+  UserId: string;
 }

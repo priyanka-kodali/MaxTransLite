@@ -59,8 +59,8 @@
                     </table>
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-align">
-                    <ul class="pagination p0 m0">
-                        <li (click)="changePage(page-1)"><span aria-hidden="true" *ngIf="page>1">&laquo;</span></li>
+                    <ul class="pagination p0 m0 pointer">
+                        <li (click)="changePage(page-1)" ><span aria-hidden="true" *ngIf="page>1">&laquo;</span></li>
                         <li *ngFor="let number of numbers" (click)="changePage(number)" [class.active]="number==page"><span aria-hidden="true">{{number}}</span></li>
                         <li (click)="changePage(page+1)" *ngIf="allocations.length==count"><span aria-hidden="true">&raquo;</span></li>
                     </ul>

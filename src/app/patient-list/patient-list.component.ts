@@ -132,15 +132,20 @@ export class PatientListComponent implements OnInit {
     this.masterService.postAlert("remove", "");
 
     this.uploader.onBuildItemForm = (item, form) => {
-      form.append("FromDate", this.SelectedPatientList.FromDate);
-      form.append("ToDate", this.SelectedPatientList.ToDate);
+      form.append("FromDate", this.SelectedPatientList.FromDate.toDateString());
+      form.append("ToDate", this.SelectedPatientList.ToDate.toDateString());
       form.append("Client_Id", this.SelectedPatientList.Client_Id);
       form.append("Doctor_Id", this.SelectedPatientList.Doctor_Id);
     }
 
+
+
     this.uploader.queue.forEach(element => {
       element.withCredentials = false;
+
     });
+
+    let success = true;
 
     try {
       this.uploader.uploadAll();
@@ -151,30 +156,21 @@ export class PatientListComponent implements OnInit {
         this.PatientListModal = false;
         this.uploader.clearQueue();
         this.masterService.changeLoading(false);
-        this.masterService.postAlert("success", "Patient list added successfully");
+        if (success)
+          this.masterService.postAlert("success", "All Patient list added successfully");
       };
-      this.uploader.onErrorItem = () => {
-        this.error = "Error adding patient list";
-        this.masterService.changeLoading(false);
+
+      this.uploader.onErrorItem = (item: any, response: any, status: any, headers: any) => {
+        this.error = "Error adding " + item.file.name;
         this.masterService.postAlert("error", this.error);
+        success = false;
       }
 
-      // this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-      //   response = JSON.parse(response);
-      //   if (status != 200) {
-      //     this.error = "Error adding patient list";
-      //     this.masterService.changeLoading(false);
-      //     this.masterService.postAlert("error", this.error);
-      //   }
-      //   if (status == 200) {
-      //     this.PatientLists.push(response);
-      //     this.SelectedPatientList = new PatientList();
-      //     this.PatientListModal = false;
-      //     this.uploader.clearQueue();
-      //     this.masterService.changeLoading(false);
-      //     this.masterService.postAlert("success", "Patient list added successfully");
-      //   }
-      // };
+      this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+        if (status == 200) {
+          this.masterService.postAlert("success", item.file.name + " added successfully");
+        }
+      };
     }
     catch (e) {
       this.error = "Error adding patient list";
@@ -227,8 +223,13 @@ export class PatientListComponent implements OnInit {
   downloadFile(url: string) {
     this.masterService.changeLoading(true);
     this.masterService.GetURLWithSAS(url).then((data) => {
-      window.open(data);
+      var newWin = window.open(data, "_self");
       this.masterService.changeLoading(false);
+      setTimeout(function () {
+        if (!newWin || newWin.outerHeight === 0) {
+          alert("Popup Blocker is enabled! Please add this site to your exception list.");
+        }
+      }, 25);
     })
   }
 }

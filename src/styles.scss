@@ -316,11 +316,26 @@ table{
 tbody{
     background-color: #F1F8E9;
       tr{
-         border-bottom:1pt solid #c1c1c1;
+         border-bottom:1pt solid #eee;
          height:50px;
        }
        tr:hover{
         background-color:#ececec!important;
+            .bg-red{
+                background-color: rgba(255, 199, 199, 0.5);
+                }
+
+            .bg-yellow{
+                background-color: rgba(252, 255, 199, 0.5);
+                }
+
+            .bg-green{
+                background-color: rgba(220, 255, 199, 0.5);
+                }
+
+            .bg-white{
+                background-color: white;
+                }
      }
    }
 

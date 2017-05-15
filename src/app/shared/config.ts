@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 
 //  export var ApiUrl= "https://maxtransliteapi.azurewebsites.net";
 
-// export const ApiUrl : string = "https://maxtransliteapi.azurewebsites.net";
 
 if(environment.production){
     // ApiUrl= "https://stagingmaxtransliteapi.azurewebsites.net";

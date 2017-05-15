@@ -50,8 +50,8 @@ export class MasterService {
   }
 
 
-  getNotificationCount(){
-     let url = ApiUrl + "/api/Dashboard/GetNotificationsCount";
+  getNotificationCount() {
+    let url = ApiUrl + "/api/Dashboard/GetNotificationsCount";
     try {
       return this.http.get(url).toPromise().then((data) => data.json());
     }
@@ -79,6 +79,15 @@ export class MasterService {
     this.alert.next(myAlert);
   }
 
+
+
+  isLoggedIn = new Subject<boolean>();
+
+  logoutEmitter$ = this.isLoggedIn.asObservable();
+
+  logOut(value: boolean) {
+    this.isLoggedIn.next(value);
+  }
 }
 
 

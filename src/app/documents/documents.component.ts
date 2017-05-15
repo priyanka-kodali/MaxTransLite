@@ -43,8 +43,8 @@ export class DocumentsComponent implements OnInit {
 
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private documentService: DocumentsService) {
-        this.masterService.postAlert("remove", "");
-this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
+    this.masterService.postAlert("remove", "");
+    this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
     this.sorting = "none";
     this.error = "";
     this.sub = this.activatedRoute.params.subscribe(
@@ -140,8 +140,8 @@ this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
     var file = this.uploader.queue[this.uploader.queue.length - 1];
     file.withCredentials = false;
 
-    
-      this.uploader.uploadItem(file);
+
+    this.uploader.uploadItem(file);
 
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       response = JSON.parse(response);
@@ -151,8 +151,8 @@ this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
         this.documents = this.mainDocuments;
         this.masterService.changeLoading(false);
         this.masterService.postAlert("success", "Document added successfully");
-        this.NewDocument=new Document();
-        this.NewDocumentModal=false;
+        this.NewDocument = new Document();
+        this.NewDocumentModal = false;
       }
 
       if (status != 200) {
@@ -171,8 +171,13 @@ this.keys = ["Category", "Document Date", "Upload Date", "Keywords", "Notes"];
   downloadFile(url: string) {
     this.masterService.changeLoading(true);
     this.masterService.GetURLWithSAS(url).then((data) => {
-      window.open(data);
+      var newWin = window.open(data, "_self");
       this.masterService.changeLoading(false);
+      setTimeout(function () {
+        if (!newWin || newWin.outerHeight === 0) {
+          alert("Popup Blocker is enabled! Please add this site to your exception list.");
+        }
+      }, 25);
     })
   }
 }

@@ -7,10 +7,10 @@ export class ResetPasswordService {
 
     constructor(private http: Http) { }
 
-    resetPassword(model : any) {
+    resetPassword(model: any) {
         try {
-            let Url = ApiUrl + "/api/Account/ResetPassword";
-            let body=model;
+            let Url = ApiUrl + "/api/Account/SetPassword";
+            let body = model;
             return this.http.post(Url, body);
         }
         catch (e) { throw e; }

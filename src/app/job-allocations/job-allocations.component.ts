@@ -38,6 +38,7 @@ export class JobAllocationsComponent implements OnInit {
   Levels: Array<string> = new Array<string>();
   SplitJobsStartTime: number;
   SearchItem: Search = new Search();
+  SelectedJobIndex: number;
 
   constructor(private jobAllocationsService: JobAllocationsService, private masterService: MasterService) {
     this.masterService.postAlert("remove", "");
@@ -61,6 +62,9 @@ export class JobAllocationsComponent implements OnInit {
         this.Jobs = data["Jobs"];
         // this.DuplicateJobs = data;
         this.masterService.changeLoading(false);
+        if (this.Jobs.length == 0) {
+          this.masterService.postAlert("info", "There are currently no jobs available");
+        }
       },
       (error) => {
         this.error = "Error fetching jobs";
@@ -86,13 +90,13 @@ export class JobAllocationsComponent implements OnInit {
       this.AQADisabled = true;
     }
 
-    if (this.SelectedJob.QA.trim() == this.SelectedJob.AQA.trim() || this.SelectedJob.QA.trim() == this.SelectedJob.MT.trim()) {
+    if ((this.SelectedJob.AQA && this.SelectedJob.QA.trim() == this.SelectedJob.AQA.trim()) || (this.SelectedJob.MT && this.SelectedJob.QA.trim() == this.SelectedJob.MT.trim())) {
       this.SelectedJob.QA = "";
     }
   }
 
   aqaChanged() {
-    if (this.SelectedJob.AQA.trim() == this.SelectedJob.QA.trim() || this.SelectedJob.AQA.trim() == this.SelectedJob.MT.trim()) {
+    if ((this.SelectedJob.QA && this.SelectedJob.AQA.trim() == this.SelectedJob.QA.trim()) || (this.SelectedJob.MT && this.SelectedJob.AQA.trim() == this.SelectedJob.MT.trim())) {
       this.SelectedJob.AQA = "";
     }
   }
@@ -189,6 +193,7 @@ export class JobAllocationsComponent implements OnInit {
       return;
     }
     this.EditAllocationModal = true;
+    this.SelectedJobIndex = i;
     this.SelectedJob = Object.assign({}, this.Jobs[i]);
     if (this.SelectedJob.MT == null) this.SelectedJob.MT == "";
     if (this.SelectedJob.AQA == null) this.SelectedJob.AQA == "";
@@ -229,12 +234,7 @@ export class JobAllocationsComponent implements OnInit {
     try {
       this.jobAllocationsService.updateAllocation(this.SelectedJob).then(
         (data) => {
-          this.Jobs = this.Jobs.filter((item) => item.JobId != data['JobId']);
-          this.Jobs.push(data);
-          this.Jobs.sort(function (a, b) { return a.JobId - b.JobId; });
-          // this.Jobs.forEach(job => {
-          //   this.DuplicateJobs.push(Object.assign({}, job));
-          // });
+          this.Jobs[this.SelectedJobIndex] = data['data'];
           this.SelectedJob = new Job();
           this.EditAllocationModal = false;
           this.masterService.changeLoading(false);
@@ -311,6 +311,9 @@ export class JobAllocationsComponent implements OnInit {
     this.SplitAllocationChildJobs = new Array<SplitJob>();
     this.SelectedJobNumber = this.SelectedJob.JobNumber.split('_')[0];
     this.SelectedJobSequenceNumber = parseInt(this.SelectedJob.JobNumber.split('_')[1]);
+    if (isNaN(this.SelectedJobSequenceNumber)) {
+      this.SelectedJobSequenceNumber = 0;
+    }
     this.statusChanged();
     this.levelChanged();
     this.getEmployees();
@@ -320,8 +323,8 @@ export class JobAllocationsComponent implements OnInit {
   }
 
   employeeForSplitSelected(i: number, level: string) {
-    this.warning = "";
     var splitJob = this.SplitAllocationChildJobs[i];
+    var allSame = true;
     switch (level) {
       case 'MT':
         if (splitJob.MT != "" && (splitJob.MT == splitJob.AQA || splitJob.MT == splitJob.QA)) {
@@ -329,42 +332,55 @@ export class JobAllocationsComponent implements OnInit {
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
-          if (splitJob.MT != "" && this.SplitAllocationChildJobs[k].MT == splitJob.MT) {
-            this.warning = "Multiple jobs are having same MT";
+          if (splitJob.MT != "" && this.SplitAllocationChildJobs[k].MT != splitJob.MT) {
+            allSame = false;
+            break;
           }
         }
+        if (allSame) {
+          this.warning = "Multiple jobs are having same MT";
+          this.masterService.postAlert("info", this.warning);
+        }
+        else {
+          this.warning = "";
+        }
+
         break;
       case 'AQA':
-        if (splitJob.AQA != "" && (splitJob.AQA == splitJob.MT || splitJob.MT == splitJob.QA)) {
+        if (splitJob.AQA != "" && (splitJob.AQA == splitJob.MT || splitJob.AQA == splitJob.QA)) {
           splitJob.AQA = "";
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
-          if (splitJob.AQA != "" && this.SplitAllocationChildJobs[k].AQA == splitJob.AQA) {
-            this.warning = "Multiple jobs are having same AQA";
+          if (splitJob.AQA != ""  && this.SplitAllocationChildJobs[k].AQA != splitJob.AQA) {
+            allSame = false;
+            break;
           }
         }
+
+        if (allSame) {
+          this.warning = "Multiple jobs are having same AQA";
+          this.masterService.postAlert("info", this.warning);
+        }
+        else {
+          this.warning = "";
+        }
+
         break;
       case 'QA':
-        if (splitJob.QA != "" && (splitJob.QA == splitJob.MT || splitJob.MT == splitJob.AQA)) {
+        if (splitJob.QA != "" && (splitJob.QA == splitJob.MT || splitJob.QA == splitJob.AQA)) {
           splitJob.QA = "";
-        }
-        for (var k = 0; k < this.NoOfSplits; k++) {
-          if (k == i) continue;
-          if (splitJob.QA != "" && this.SplitAllocationChildJobs[k].QA == splitJob.QA) {
-            this.warning = "Multiple jobs are having same QA";
-          }
         }
         break;
     }
-    this.SplitAllocationError = this.warning;
-    if (this.warning != "") {
-      this.masterService.postAlert("warning", this.warning);
+    if (this.SplitAllocationError == "" || this.warning == "") {
+      this.SplitAllocationError = this.warning;
     }
   }
 
   splitNumberChange() {
     if (this.NoOfSplits < 2) return;
+    this.SplitAllocationError = "";
     this.NoOfSplits = this.NoOfSplits > 5 ? 5 : this.NoOfSplits;
     var SplitTime = this.SelectedJob.TotalMinutes / this.NoOfSplits;
     this.SplitAllocationChildJobs = new Array<SplitJob>();
@@ -372,8 +388,8 @@ export class JobAllocationsComponent implements OnInit {
     job.JobNumber = this.SelectedJobNumber + '_' + this.SelectedJobSequenceNumber;
     var startTime = this.SelectedJob.Duration.split('-'[0]).toString();
     job.StartTime = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]) + parseInt(startTime.split(':')[2]) / 60;
-    this.SplitJobsStartTime = job.StartTime;
-    job.EndTime = job.StartTime + SplitTime;
+    this.SplitJobsStartTime = Math.trunc(job.StartTime);
+    job.EndTime = Math.trunc(job.StartTime + SplitTime);
     job.MT = this.SelectedJob.MT;
     job.AQA = this.SelectedJob.AQA;
     job.QA = this.SelectedJob.QA;
@@ -384,7 +400,7 @@ export class JobAllocationsComponent implements OnInit {
       var jobNumber = this.SelectedJobNumber + '_' + i;
       job.JobNumber = jobNumber;
       job.StartTime = this.SplitAllocationChildJobs[i - 1].EndTime;
-      job.EndTime = this.SplitAllocationChildJobs[0].StartTime + ((i + 1) * SplitTime);
+      job.EndTime = Math.trunc(this.SplitAllocationChildJobs[0].StartTime + ((i + 1) * SplitTime));
       this.SplitAllocationChildJobs.push(job);
       if (this.SelectedJob.JobStatus == "Pending at AQA" || this.SelectedJob.JobStatus == "Pending at QA") {
         this.SplitAllocationChildJobs[i].MT = this.SelectedJob.MT;
@@ -413,7 +429,7 @@ export class JobAllocationsComponent implements OnInit {
 
     this.jobAllocationsService.splitAllocation(this.SplitAllocationChildJobs).then(
       (data) => {
-        this.Jobs = data;
+        this.Jobs = data["Jobs"];
         // this.DuplicateJobs = data;
         this.SplitAllocationModal = false;
         this.SplitAllocationChildJobs = new Array<SplitJob>();
@@ -490,6 +506,7 @@ export class JobAllocationsComponent implements OnInit {
         return false;
       }
     }
+    this.SplitAllocationError = "";
     return true;
   }
 
@@ -549,11 +566,18 @@ export class Job {
   JobStatus: string;
   JobLevel: string;
   Duration: string;
+  ShortDuration: string;
   ClientShortName: string;
   TotalMinutes: number;
   Color: number;
   DefaultTAT: number;
   OriginalFileName: string;
+  MtStatus: number;
+  AqaStatus: number;
+  QaStatus: number;
+  MtTime: string;
+  AqaTime: string;
+  QaTime: string;
 }
 
 class SplitJob {

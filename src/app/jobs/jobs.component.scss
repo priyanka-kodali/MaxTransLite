@@ -14,8 +14,27 @@
     margin: 0 5px;
 }
 
+.file-input-container{
+      height: 48px;
+    input[type='file']{  
+          margin: 0!important;
+          padding: 14px 0;
+    }
+}
+
 .checkbox-container{
-    padding: 13px 0;
+    margin: 10px 0;
+}
+
+.radio-button-container{
+    height: 48px;
+    *{
+        padding:9px 0;
+    }
+}
+
+td,th{
+    border-right: 1pt solid #eee
 }
 
 

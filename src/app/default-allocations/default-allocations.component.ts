@@ -21,10 +21,11 @@ export class DefaultAllocationsComponent implements OnInit {
   count: number;
   pages: number;
   error: string;
+  numbers; any;
 
   constructor(private router: Router, private defaultAllocationsService: DefaultAllocationsService, private masterService: MasterService) {
-       this.masterService.postAlert("remove", "");
- this.keys = ["Client", "Doctor", "Job Level", "Employee", "Accuracy", "Minutes"];
+    this.masterService.postAlert("remove", "");
+    this.keys = ["Client", "Doctor", "Job Level", "Employee", "Accuracy", "Minutes"];
     this.sorting = "none";
     this.page = 1;
     this.count = 10;
@@ -41,7 +42,14 @@ export class DefaultAllocationsComponent implements OnInit {
       (data) => {
         this.allocations = data['defaultAllocations'];
         this.pages = data['pages'];
+        this.numbers = new Array<number>(this.pages);
+        for (var i = 0; i < this.pages; i++) {
+          this.numbers[i] = i + 1;
+        }
         this.masterService.changeLoading(false);
+        if (this.allocations.length == 0) {
+          this.masterService.postAlert("info", "There are currently allocations available");
+        }
       },
       (error) => {
         this.error = "Error fetching default allocations";

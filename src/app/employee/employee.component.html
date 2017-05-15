@@ -65,6 +65,12 @@
                             </div>
                             <div class="col-md-2 col-sm-3 col-lg-2 col-xs-12">
                                 <md-input-container>
+                                    <input mdInput class="" name="gender" #gender [(ngModel)]="NewEmployee.Gender" placeholder="Gender"
+                                           type="text" required [disabled]="inputDisabled" autocomplete="off" [typeaheadMinLength]="0" [typeahead]="genders">
+                                </md-input-container>
+                            </div>
+                            <div class="col-md-1 col-sm-3 col-lg-1 col-xs-12">
+                                <md-input-container>
                                     <input mdInput class="" name="bloodGroup" #bloodGroup [(ngModel)]="NewEmployee.BloodGroup" placeholder="Blood Group"
                                            type="text" required [disabled]="inputDisabled" autocomplete="off" [typeaheadMinLength]="0" [typeahead]="bloodGroups">
                                 </md-input-container>
@@ -72,17 +78,12 @@
                             <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
                                 <md-input-container> <input mdInput class="" autocomplete="off" name="PAN" #pan [(ngModel)]="NewEmployee.PAN" placeholder="PAN" type="text" [disabled]="inputDisabled"></md-input-container>
                             </div>
-                            <div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
+                            <div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
                                 <md-input-container> <input mdInput class="" autocomplete="off" name="aadhar" #aadhar [(ngModel)]="NewEmployee.Aadhar" placeholder="Aadhar" type="text" [disabled]="inputDisabled"></md-input-container>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-12 col-sm-12 col-sm-12">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">
-                                <!--<button md-raised-button color="primary" class="file-button" type="button" [disabled]="inputDisabled" *ngIf="!hideFileButton">
-                                    <label for="imageInput">
-                                        Photo
-                                    </label>
-                                </button>-->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-sm-12">                              
                                 <input type="file" accept="image/*" #photo name="photo" value="Photo" class="file-input" id="imageInput" ng2FileSelect [uploader]="uploader"
                                        (change)="imagePreview($event)" [disabled]="inputDisabled" />
                             </div>
@@ -114,13 +115,13 @@
                         <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
                             <md-input-container>
                                 <input mdInput class="" name="country" #country [(ngModel)]="NewEmployee.Country" [typeahead]="countries" autocomplete="off"
-                                       (typeaheadOnSelect)="countrySelected()" placeholder="Country" type="text" required [disabled]="inputDisabled" (blur)="countrySelected()">
+                                       (typeaheadOnSelect)="countrySelected()" placeholder="Country" type="text" required [disabled]="inputDisabled" (change)="countrySelected()">
                             </md-input-container>
                         </div>
                         <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">
                             <md-input-container>
                                 <input mdInput class="" name="state" #state [(ngModel)]="NewEmployee.State" autocomplete="off" [typeahead]="states"
-                                       (typeaheadOnSelect)="stateSelected()" placeholder="State" type="text" required [disabled]="inputDisabled" (blur)="stateSelected()">
+                                       (typeaheadOnSelect)="stateSelected()" placeholder="State" type="text" required [disabled]="inputDisabled" (change)="stateSelected()">
                             </md-input-container>
                         </div>
                         <div class="col-md-3 col-sm-3 col-lg-3 col-xs-12">

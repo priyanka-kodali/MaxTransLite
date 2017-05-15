@@ -25,6 +25,7 @@ export class AppComponent implements OnInit {
   LeaveReviewCount: number;
   MessageCount: number;
   NotificationCount: number;
+  LoggedIn: boolean;
 
   public options = {
     position: ["bottom", "right"],
@@ -40,6 +41,7 @@ export class AppComponent implements OnInit {
     this.success = "";
     this.info = "";
     this.errorNotificationId = "";
+    this.LoggedIn = this.isLoggedIn();
     this.NoticeCount = this.LeaveReviewCount = this.MessageCount = this.NotificationCount = 0;
   }
 
@@ -50,6 +52,12 @@ export class AppComponent implements OnInit {
         this.loading = loading;
       }
     );
+
+    this.subscription = this.masterService.logoutEmitter$.subscribe(
+      (isLoggedIn) => {
+        this.LoggedIn = isLoggedIn;
+      }
+    )
 
     this.subscription = this.masterService.alertEmitter$.subscribe(
 

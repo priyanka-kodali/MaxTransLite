@@ -11,6 +11,9 @@ table{
             height: 25px;
         }
     }
+    td,th{
+        border-right: 1pt solid #eee
+    }
 }
 .bg-brown{
     background-color:rgba(156, 103, 33, 0.45);

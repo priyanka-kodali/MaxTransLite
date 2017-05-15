@@ -43,6 +43,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   NewEmployee: Employee;
   ImageSrc: string;
   bloodGroups: Array<string>;
+  genders: Array<string>;
   employmentTypes: Array<string>;
 
   @ViewChild("firstName") firstName: ElementRef;
@@ -53,6 +54,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   @ViewChild("secondaryPhone") secondaryPhone: ElementRef;
   @ViewChild("email") email: ElementRef;
   @ViewChild("dob") dob: ElementRef;
+  @ViewChild("gender") gender: ElementRef;
   @ViewChild("bloodGroup") bloodGroup: ElementRef;
   @ViewChild("pan") pan: ElementRef;
   @ViewChild("aadhar") aadhar: ElementRef;
@@ -87,6 +89,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     this.NewEmployee = new Employee();
     this.NewEmployee.Specialties = new Array<string>();
     this.NewEmployee.DoctorGroups = new Array<string>();
+    this.genders=["Female","Male"];
     this.bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     this.employmentTypes = ['Consultant', 'Permanent'];
     this.error = "";
@@ -110,7 +113,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       this.inputDisabled = false;
       this.getMasterData();
       this.ImageSrc = "../images/dummy-profile-pic.png";
-      this.NewEmployee.ProvisionalPeriod=0;
+      this.NewEmployee.ProvisionalPeriod = 0;
     }
 
     if (!this.isNewEmployee) {
@@ -291,7 +294,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   }
 
   doctorGroupChange() {
-    if(!this.doctorGroupSelector){
+    if (!this.doctorGroupSelector) {
       return;
     }
     if (this.NewEmployee.DoctorGroups.findIndex((item) => item.toLowerCase() == this.doctorGroupSelector.toLowerCase()) > -1) {
@@ -350,11 +353,13 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.masterService.getStates(countryId).then(
-      (data) => data['states'].forEach(state => {
-        this.states.push(state.Name);
-        this.stateIds.push(state.Id);
+      (data) => {
+        data['states'].forEach(state => {
+          this.states.push(state.Name);
+          this.stateIds.push(state.Id);
+        });
         this.masterService.changeLoading(false);
-      })
+      }
     )
   }
 
@@ -368,11 +373,13 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.masterService.getCities(stateId).then(
-      (data) => data['cities'].forEach(city => {
-        this.cities.push(city.Name);
-        this.cityIds.push(city.Id);
+      (data) => {
+        data['cities'].forEach(city => {
+          this.cities.push(city.Name);
+          this.cityIds.push(city.Id);
+        });
         this.masterService.changeLoading(false);
-      })
+      }
     )
   }
 
@@ -434,7 +441,9 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
             // this.isNewEmployee = false;
             // this.specialtySelector="";
             // this.doctorGroupSelector="";
-            this.router.navigate(["new-employee","documents",response["employee"]["Id"]]);      
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("success", "Employee added successfully");
+            this.router.navigate(["new-employee", "documents", response["employee"]["Id"]]);
           }
         }
       }
@@ -585,6 +594,11 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     if (this.bloodGroups.findIndex((item) => item.toLowerCase() == this.NewEmployee.BloodGroup.toLowerCase()) == -1) {
       this.error = "Please select a valid Blood Group";
       this.renderer.invokeElementMethod(this.bloodGroup.nativeElement, 'focus');
+      return false;
+    }
+    if (this.genders.findIndex((item) => item.toLowerCase() == this.NewEmployee.Gender.toLowerCase()) == -1) {
+      this.error = "Please select a valid Gender";
+      this.renderer.invokeElementMethod(this.gender.nativeElement, 'focus');
       return false;
     }
     if (this.NewEmployee.PAN && this.NewEmployee.PAN.trim().length == 0) {
@@ -761,5 +775,6 @@ class Employee {
   DoctorGroup_Id: number;
   Role_Id: number;
   Active: boolean;
+  Gender:string;
 }
 

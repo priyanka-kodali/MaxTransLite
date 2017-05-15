@@ -67,6 +67,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
           sessionStorage.setItem('roles', data.roles);
           sessionStorage.setItem('displayName', data.displayName);
           this.masterService.changeLoading(false);
+          this.masterService.logOut(true);
           this.router.navigate(['dashboard']);
         },
         (error) => {

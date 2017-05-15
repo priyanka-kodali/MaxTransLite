@@ -46,8 +46,8 @@ export class DoctorsComponent implements OnInit {
 
 
   constructor(private router: Router, private doctorsService: DoctorsService, private activatedRoute: ActivatedRoute, private masterService: MasterService) {
-        this.masterService.postAlert("remove", "");
-this.sorting = "none";
+    this.masterService.postAlert("remove", "");
+    this.sorting = "none";
     this.keys = ["Name", "Client", "Phone", "Email", "Job Level", "Voice Grade"];
     this.page = 1;
     this.count = 10;
@@ -163,15 +163,19 @@ this.sorting = "none";
   }
 
   updateTemplates() {
+    if (this.uploader.queue.length < 1) {
+      this.masterService.postAlert("error", "Please select a file");
+      return;
+    }
     this.masterService.changeLoading(true);
     this.masterService.postAlert("remove", "");
     this.uploader.onBuildItemForm = (item, form) => { form.append("DocId", this.SelectedDoctor.Id); form.append("Name", this.NewTemplate.Name); }
-    
+
     var file = this.uploader.queue[this.uploader.queue.length - 1];
     file.withCredentials = false;
 
-    
-      this.uploader.uploadItem(file);
+
+    this.uploader.uploadItem(file);
     this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       response = JSON.parse(response);
       if (status != 200) {
@@ -185,16 +189,21 @@ this.sorting = "none";
         this.masterService.changeLoading(false);
         this.masterService.postAlert("success", "Template added successfully");
         this.uploader.clearQueue();
-        this.NewTemplate=new Template();
+        this.NewTemplate = new Template();
       }
     };
   }
 
-   downloadFile(url: string) {
+  downloadFile(url: string) {
     this.masterService.changeLoading(true);
     this.masterService.GetURLWithSAS(url).then((data) => {
-      window.open(data);
+      var newWin = window.open(data, "_self");
       this.masterService.changeLoading(false);
+      setTimeout(function () {
+        if (!newWin || newWin.outerHeight === 0) {
+          alert("Popup Blocker is enabled! Please add this site to your exception list.");
+        }
+      }, 25);
     })
   }
 

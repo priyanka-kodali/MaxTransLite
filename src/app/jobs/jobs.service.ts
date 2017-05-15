@@ -81,4 +81,31 @@ export class JobsService {
     catch (e) { throw e; }
   }
 
+  getPartialUploadFiles(JobWorkId: number) {
+    let url = ApiUrl + "/api/Jobs/GetPartialUploads?JobWorkId=" + JobWorkId;
+    try {
+      return this.http.get(url).toPromise().then((data) => data.json());
+    }
+    catch (e) { throw e; }
+  }
+
+  getPreviousSplitFiles(JobId: number) {
+    let url = ApiUrl + "/api/Jobs/GetPreviousSplitFiles?JobId=" + JobId;
+    try {
+      return this.http.get(url).toPromise().then((data) => data.json());
+    }
+    catch (e) { throw e; }
+
+  }
+
+  uploadTranscriptFolder(formData: any) {
+    let url = ApiUrl + "/api/Jobs/UploadTranscriptFolder";
+    try {
+      return this.http.post(url,formData).toPromise().then((data) => data.json());
+    }
+    catch (e) { throw e; }
+
+  }
+
+
 }

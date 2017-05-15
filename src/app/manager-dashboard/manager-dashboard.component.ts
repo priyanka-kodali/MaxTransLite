@@ -80,11 +80,18 @@ export class Job {
   JobStatus: string;
   JobLevel: string;
   Duration: string;
+  ShortDuration: string;
   ClientShortName: string;
   TotalMinutes: number;
   PatientList: string;
   Color: number;
   DefaultTAT: number;
+  MtStatus : number;
+  AqaStatus : number;
+  QaStatus : number;
+  MtTime : string;
+  AqaTime : string;
+  QaTime : string;
 }
 
 

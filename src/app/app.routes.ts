@@ -38,7 +38,7 @@ export const routes: Routes=[
   { path: 'login', component: LoginComponent },
   { path: 'logout', component: LogoutComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password/:key', component: ResetPasswordComponent },
+  { path: 'reset-password/:Code/:UserId', component: ResetPasswordComponent },
   { path: 'change-password', component: ChangePasswordComponent },
 
   { path: 'home', component: HomeComponent },
