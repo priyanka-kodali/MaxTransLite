@@ -40,6 +40,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
   clientTypes: Array<string> = new Array<string>();
   paymentTypes: Array<string> = new Array<string>();
   currencies: Array<string> = new Array<string>();
+  password: string;
+  PasswordModal: boolean;
+  ShowPaymentDetails: boolean;
 
 
   @ViewChild("name") name: ElementRef;
@@ -55,6 +58,7 @@ export class ClientComponent implements OnInit, AfterViewInit {
   @ViewChild("fileTypes") fileTypes: ElementRef;
   @ViewChild("paymentType") paymentType: ElementRef;
   @ViewChild("currency") currency: ElementRef;
+  @ViewChild("passwordField") passwordField: ElementRef;
 
 
   constructor(private renderer: Renderer, private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private clientService: ClientService) {
@@ -73,6 +77,9 @@ export class ClientComponent implements OnInit, AfterViewInit {
     this.isDataAvailable = false;
     this.locations.push(new Location());
     this.locations[0].IsInvoiceAddress = true;
+    this.password = "";
+    this.PasswordModal = false;
+    this.ShowPaymentDetails = false;
   }
 
   ngAfterViewInit() {
@@ -542,6 +549,37 @@ export class ClientComponent implements OnInit, AfterViewInit {
 
     return true;
   }
+
+
+  showPassword() {
+    this.PasswordModal = true;
+    this.password = "";
+    this.ShowPaymentDetails = false;
+  }
+
+  verifyPassword() {
+    if (this.password.trim().length == 0) {
+      this.error = "password should not be empty for location";
+      this.renderer.invokeElementMethod(this.passwordField.nativeElement, 'focus');
+      return false;
+    }
+
+    if (this.password == "qwerty123") {
+      this.ShowPaymentDetails = true;
+      this.PasswordModal = false;
+    }
+
+
+    else {
+      this.ShowPaymentDetails = false;
+      this.error = "authentication failed, please try again";
+      this.renderer.invokeElementMethod(this.passwordField.nativeElement, 'focus');
+      return;
+    }
+
+  }
+
+
 }
 
 class Client {

@@ -45,6 +45,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   bloodGroups: Array<string>;
   genders: Array<string>;
   employmentTypes: Array<string>;
+  Photo: File;
 
   @ViewChild("firstName") firstName: ElementRef;
   @ViewChild("middleName") middleName: ElementRef;
@@ -75,25 +76,17 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
   @ViewChild("role") role: ElementRef;
 
 
-  public uploader: FileUploader = new FileUploader({
-    headers: [{
-      name: 'Authorization',
-      value: 'Bearer ' + sessionStorage.getItem('access_token')
-    }],
-    allowedMimeType: ["image/png", "image/jpg", "image/jpeg"]
-
-  });
-
   constructor(private router: Router, private masterService: MasterService, private activatedRoute: ActivatedRoute, private employeeService: EmployeeService, private renderer: Renderer) {
     this.masterService.postAlert("remove", "");
     this.NewEmployee = new Employee();
     this.NewEmployee.Specialties = new Array<string>();
     this.NewEmployee.DoctorGroups = new Array<string>();
-    this.genders=["Female","Male"];
+    this.genders = ["Female", "Male"];
     this.bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     this.employmentTypes = ['Consultant', 'Permanent'];
     this.error = "";
     this.ImageSrc = "";
+    this.Photo = null;
     this.sub = this.activatedRoute.params.subscribe(
       params => this.EmpId = +params['EmpId']
     );
@@ -154,6 +147,8 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     });
     // read the image file as a data URL.
     reader.readAsDataURL(event.target['files'][0]);
+    this.Photo = event.target['files'][0];
+
   }
 
   removeImage() {
@@ -161,7 +156,7 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
       return;
     }
     this.ImageSrc = "";
-    this.uploader.clearQueue();
+    this.Photo = null;
     this.renderer.setElementProperty(this.photo, "value", "");
   }
 
@@ -408,70 +403,65 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
 
     this.masterService.postAlert("remove", "");
 
-    this.uploader.onBuildItemForm = (item, form) => {
-      form.append("employeeData", JSON.stringify(this.NewEmployee));
+
+    let formData: FormData = new FormData();
+    if (this.Photo != null) {
+      formData.append(this.Photo.name, this.Photo, this.Photo.name);
     }
+    formData.append("employeeData", JSON.stringify(this.NewEmployee));
 
 
-    var file = this.uploader.queue[this.uploader.queue.length - 1];
-    file.withCredentials = false;
 
     try {
       if (this.isNewEmployee) {
-        this.uploader.queue.forEach((elem) => {  //used to change url for new employee and edit employee
-          elem.alias = "MyForm";
-          elem.url = ApiUrl + "/api/Employee/AddEmployee";
-        });
-        this.uploader.uploadItem(file);
-        this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-          response = JSON.parse(response);
-          if (status != 200) {
-            this.error = response;
-            this.masterService.changeLoading(false);
-            this.masterService.postAlert("error", this.error);
-          }
-          if (status == 200) {
-            // this.NewEmployee = response["employee"];
-            // this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
-            // this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
-            // this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
-            // this.inputDisabled = true;
-            // this.masterService.changeLoading(false);
-            // this.masterService.postAlert("success", "Employee added successfully");
-            // this.isNewEmployee = false;
-            // this.specialtySelector="";
-            // this.doctorGroupSelector="";
+
+        this.employeeService.postGeneral(formData).then(
+          (data) => {
+            if (data["status"] == 500) {
+              this.error = data["_body"];
+              this.masterService.changeLoading(false);
+              this.masterService.postAlert("error", this.error);
+              return
+            }
             this.masterService.changeLoading(false);
             this.masterService.postAlert("success", "Employee added successfully");
-            this.router.navigate(["new-employee", "documents", response["employee"]["Id"]]);
+            this.router.navigate(["new-employee", "documents", data["employee"]["Id"]]);
+
+          },
+          (error) => {
+            this.error = error["_body"];
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+            return
           }
-        }
+        );
+
       }
 
       else {
-        this.uploader.queue.forEach((elem) => {
-          elem.alias = "MyForm";
-          elem.url = ApiUrl + "/api/Employee/EditEmployee";
-        });
-        this.uploader.uploadItem(file);
-
-        this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
-          response = JSON.parse(response);
-          if (status != 200) {
-            this.error = response;
-            this.masterService.changeLoading(false);
-            this.masterService.postAlert("error", this.error);
-          }
-          if (status == 200) {
-            this.NewEmployee = response["employee"];
-            this.NewEmployee.DOB = response["employee"]['DOB'].split("T")[0];
-            this.NewEmployee.DOJ = response["employee"]['DOJ'].split("T")[0];
-            this.NewEmployee.DOR = response["employee"]['DOR'] ? response["employee"]['DOR'].split("T")[0] : null;
+        this.employeeService.editEmployee(formData).then(
+          (data) => {
+            if (data["status"] == 500) {
+              this.error = data["_body"];
+              this.masterService.changeLoading(false);
+              this.masterService.postAlert("error", this.error);
+              return
+            }
+            this.NewEmployee = data["employee"];
+            this.NewEmployee.DOB = data["employee"]['DOB'].split("T")[0];
+            this.NewEmployee.DOJ = data["employee"]['DOJ'].split("T")[0];
+            this.NewEmployee.DOR = data["employee"]['DOR'] ? data["employee"]['DOR'].split("T")[0] : null;
             this.inputDisabled = true;
             this.masterService.changeLoading(false);
             this.masterService.postAlert("success", "Employee details updated successfully");
+          },
+          (error) => {
+            this.error = error["_body"];
+            this.masterService.changeLoading(false);
+            this.masterService.postAlert("error", this.error);
+            return
           }
-        }
+        );
       }
     }
     catch (e) {
@@ -619,11 +609,6 @@ export class EmployeeComponent implements OnInit, AfterViewInit {
     if (this.NewEmployee.Aadhar && !aadharRegex.test(this.NewEmployee.Aadhar)) {
       this.error = "Please enter a valid aadhar (12 digits)";
       this.renderer.invokeElementMethod(this.aadhar.nativeElement, 'focus');
-      return false;
-    }
-    if (this.uploader.queue.length < 1) {
-      this.error = "Please select a valid photo for the employee";
-      this.renderer.invokeElementMethod(this.photo.nativeElement, 'focus');
       return false;
     }
 
@@ -775,6 +760,6 @@ class Employee {
   DoctorGroup_Id: number;
   Role_Id: number;
   Active: boolean;
-  Gender:string;
+  Gender: string;
 }
 

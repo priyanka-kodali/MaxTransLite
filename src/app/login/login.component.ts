@@ -23,6 +23,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   constructor(private loginService: LoginService, private router: Router, private masterService: MasterService, private renderer: Renderer) {
     this.error = "";
+    if(this.isLoggedIn()){
+      this.router.navigate(['dashboard']);
+    }
   }
 
   ngAfterViewInit() {

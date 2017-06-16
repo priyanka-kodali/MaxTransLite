@@ -88,6 +88,20 @@ export class AppComponent implements OnInit {
 
   }
 
+  getDesktopApplication() {
+
+ this.masterService.GetURLWithSAS("https://maxtrans.blob.core.windows.net/setup/EmpApp_Setup.rar").then((data) => {
+      data["files"].forEach(file => {
+        var newWin = window.open(file);
+        setTimeout(function () {
+          if (!newWin || newWin.outerHeight === 0) {
+            alert("Popup Blocker is enabled! Please add this site to your exception list.");
+          }
+        }, 25);
+      });
+    });   
+  }
+
   onCreate(event) {
     if (event["type"] == "error") {
       this.errorNotificationId = event["id"];

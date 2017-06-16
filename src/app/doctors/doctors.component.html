@@ -38,6 +38,7 @@
                     <table>
                         <thead (click)="sort($event)">
                             <tr table-header>
+                                <th>Auth Id</th>
                                 <th>Name</th>
                                 <th>Client</th> 
                                 <th>Phone</th>
@@ -50,6 +51,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let doctor of doctors">
+                                <td>{{doctor.IdigitalAuthorId}}</td>
                                 <td>{{doctor.FirstName+" "+doctor.LastName }}</td>
                                 <td>{{doctor.Client}}</td>
                                 <td>{{doctor.PrimaryPhone}}</td>

@@ -150,6 +150,7 @@ export class JobsComponent implements OnInit {
   uploadFile(job: Job, jobLevel: string) {
     this.ExistingPartialUploadFiles = new Array<ExistingPartialUploadFile>();
     this.PreviousSplitFiles = new Array<PreviousSplitFile>();
+    this.UploadType = "";
     this.FileModal = true;
     this.SelectedJob = job;
     this.SelectedJobLevel = jobLevel;
@@ -182,7 +183,6 @@ export class JobsComponent implements OnInit {
     );
   }
 
-
   getPreviousSplitFiles(JobId) {
     this.masterService.postAlert("remove", "");
     this.jobsService.getPreviousSplitFiles(JobId).then(
@@ -208,12 +208,26 @@ export class JobsComponent implements OnInit {
     }
     var file = this.uploader.queue[this.uploader.queue.length - 1];
     file.withCredentials = false;
-    if (file.file.name.split('.').pop() != "doc" && file.file.name.split('.').pop() != "docx") {
-      this.error = "Please select a word('.doc. or '.docx') document";
-      this.masterService.changeLoading(false);
-      this.masterService.postAlert("error", this.error);
-      return;
+    var user = sessionStorage.getItem("displayName");
+    if (user.toLowerCase().indexOf("vr vr")!=-1) {
+      if (file.file.name.split('.').pop() != "doc" && file.file.name.split('.').pop() != "docx" && file.file.name.split('.').pop() != "txt") {
+        this.error = "Please select a word('.doc' or '.docx' or '.txt') document";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+        return;
+      }
+
     }
+    else {
+
+      if (file.file.name.split('.').pop() != "doc" && file.file.name.split('.').pop() != "docx") {
+        this.error = "Please select a word('.doc. or '.docx') document";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+        return;
+      }
+    }
+
 
     if (file.file.name.indexOf(this.SelectedJob.JobNumber) == -1) {
       this.error = "file name should contain job number!";
@@ -256,7 +270,6 @@ export class JobsComponent implements OnInit {
 
     if (this.Files.length > 0) {
       let formData: FormData = new FormData();
-      this.Files[0].name;
       for (var i = 0; i < this.Files.length; i++) {
         if (this.Files[i].name.split('.').pop() != "doc" && this.Files[i].name.split('.').pop() != "docx") {
           continue;
@@ -297,6 +310,11 @@ export class JobsComponent implements OnInit {
           this.masterService.changeLoading(false);
           this.masterService.postAlert("success", "Folder uploaded successfully");
           this.FileModal = false;
+        },
+        (error) => {
+          this.error = error["_body"];
+          this.masterService.changeLoading(false);
+          this.masterService.postAlert("error", this.error);
         }
       );
     }
@@ -310,7 +328,6 @@ export class JobsComponent implements OnInit {
   folderSelected(event) {
     this.Files = event.target.files;
   }
-
 
   submitJob() {
     this.IsFinalUpload = false;
@@ -326,6 +343,13 @@ export class JobsComponent implements OnInit {
           return;
         }
         this.IsFinalUpload = true;
+      }
+
+      if (this.IsFinalUpload && (this.ExistingPartialUploadFiles.length <= 0 || !this.SelectedJob.FullUploadAvailable)) {
+        this.error = "Please enter valid time spans";
+        this.masterService.changeLoading(false);
+        this.masterService.postAlert("error", this.error);
+        return;
       }
 
       if (this.SelectedJob.IsLastSplit) {
@@ -366,7 +390,8 @@ export class JobsComponent implements OnInit {
 
     switch (Level) {
       case 'AQA':
-        if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
+        // if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
+        if (job.MTUrl.toLowerCase().indexOf('partial') != -1) {
           event.preventDefault();
           this.masterService.changeLoading(true);
           this.PartialDowloadDocuments = new Array<Document>();
@@ -390,7 +415,8 @@ export class JobsComponent implements OnInit {
       case 'QA':
 
         if (!job.AQA) {
-          if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
+          // if (job.MTUrl.indexOf('.docx') == -1 && job.MTUrl.indexOf('.doc') == -1) {
+          if (job.MTUrl.toLowerCase().indexOf('partial') != -1) {
             event.preventDefault();
             this.masterService.changeLoading(true);
             this.PartialDowloadDocuments = new Array<Document>();
@@ -412,7 +438,8 @@ export class JobsComponent implements OnInit {
           }
         }
         else {
-          if (job.AQAUrl.indexOf('.docx') == -1 || job.AQAUrl.indexOf('.doc') == -1) {
+          // if (job.AQAUrl.indexOf('.docx') == -1 || job.AQAUrl.indexOf('.doc') == -1) {
+          if (job.AQAUrl.toLowerCase().indexOf('partial') != -1) {
             event.preventDefault();
             this.masterService.changeLoading(true);
             this.PartialDowloadDocuments = new Array<Document>();

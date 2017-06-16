@@ -39,6 +39,12 @@ export class JobAllocationsComponent implements OnInit {
   SplitJobsStartTime: number;
   SearchItem: Search = new Search();
   SelectedJobIndex: number;
+  JobsCount: number;
+  TotalMinutes: string;
+  PendingMinutes: string;
+  CompletedMinutes: string;
+  InvalidMinutes: string;
+
 
   constructor(private jobAllocationsService: JobAllocationsService, private masterService: MasterService) {
     this.masterService.postAlert("remove", "");
@@ -60,7 +66,11 @@ export class JobAllocationsComponent implements OnInit {
     this.jobAllocationsService.getJobs().then(
       (data) => {
         this.Jobs = data["Jobs"];
-        // this.DuplicateJobs = data;
+        this.TotalMinutes = data["TotalMinutes"];
+        this.PendingMinutes = data["PendingMinutes"];
+        this.CompletedMinutes = data["CompletedMinutes"];
+        this.InvalidMinutes = data["InvalidMinutes"];
+        this.JobsCount = data["JobsCount"];
         this.masterService.changeLoading(false);
         if (this.Jobs.length == 0) {
           this.masterService.postAlert("info", "There are currently no jobs available");
@@ -126,7 +136,12 @@ export class JobAllocationsComponent implements OnInit {
 
       case 'Pending at QA':
         this.MTDisabled = true;
-        this.AQADisabled = true;
+        if (this.SelectedJob.JobLevel == "L1-L2-L3" && !this.SelectedJob.AQAId) {
+          this.AQADisabled = false;
+        }
+        else {
+          this.AQADisabled = true;
+        }
         this.QADisabled = false;
         break;
 
@@ -182,6 +197,7 @@ export class JobAllocationsComponent implements OnInit {
         this.MTHidden = false;
         break;
     }
+    this.statusChanged();
   }
 
   closeEditAllocationModal() {
@@ -352,7 +368,7 @@ export class JobAllocationsComponent implements OnInit {
         }
         for (var k = 0; k < this.NoOfSplits; k++) {
           if (k == i) continue;
-          if (splitJob.AQA != ""  && this.SplitAllocationChildJobs[k].AQA != splitJob.AQA) {
+          if (splitJob.AQA != "" && this.SplitAllocationChildJobs[k].AQA != splitJob.AQA) {
             allSame = false;
             break;
           }
@@ -525,7 +541,15 @@ export class JobAllocationsComponent implements OnInit {
 
 
     this.jobAllocationsService.searchJobs(this.SearchItem).then(
-      (data) => { this.Jobs = data; this.masterService.changeLoading(false); },
+      (data) => {
+        this.Jobs = data["Jobs"];
+        this.TotalMinutes = data["TotalMinutes"];
+        this.PendingMinutes = data["PendingMinutes"];
+        this.CompletedMinutes = data["CompletedMinutes"];
+        this.InvalidMinutes = data["InvalidMinutes"];
+        this.JobsCount = data["JobsCount"];
+        this.masterService.changeLoading(false);
+      },
       (error) => {
         this.error = "Error fetching jobs";
         this.masterService.changeLoading(false);
@@ -547,6 +571,20 @@ export class JobAllocationsComponent implements OnInit {
     this.SearchItem.FromDate = null;
     this.SearchItem.ToDate = null;
     this.ngOnInit(); //load current jobs
+  }
+
+  downloadFile(url: string) {
+    this.masterService.GetURLWithSAS(url).then((data) => {
+      data["files"].forEach(file => {
+        var newWin = window.open(file);
+        setTimeout(function () {
+          if (!newWin || newWin.outerHeight === 0) {
+            alert("Popup Blocker is enabled! Please add this site to your exception list.");
+          }
+        }, 25);
+      });
+    });
+    this.masterService.changeLoading(false);
   }
 }
 

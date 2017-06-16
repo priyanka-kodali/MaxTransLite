@@ -1,6 +1,6 @@
 <div class="my-nav-bar">
-  <div class="logo">
-  <a (click)="navigateTo('dashboard')" ><img src="images/logo.png" alt=""></a>
+  <div class="logo" (click)="navigateTo('login')">
+  <a ><img src="images/logo.png" alt=""></a>
   </div>
     <nav>
       <ul class="nav" *ngIf="LoggedIn">
@@ -24,7 +24,7 @@
             <li><a (click)="navigateTo('client-employees')">Client Employee</a></li>
           </ul>
         </li>
-        <li class="dropdown" ><a href=""><span class="glyphicon glyphicon-comment notification-icon"></span> <span class="badge redA200 notification-badge">{{NotificationCount}}</span> </a>
+        <li class="dropdown hidden" ><a href=""><span class="glyphicon glyphicon-comment notification-icon"></span> <span class="badge redA200 notification-badge">{{NotificationCount}}</span> </a>
           <ul class="dropdown-menu dropdown-menu-right">
             <li><a (click)="navigateTo('dashboard')">Messages <span class="badge">{{MessageCount}} new</span> </a></li>
             <li><a (click)="navigateTo('dashboard')">Notices <span class="badge">{{NoticeCount}} new</span></a></li>
@@ -34,7 +34,8 @@
          <li class="dropdown">
           <a>Hi {{getDisplayName()}}!</a>
           <ul class="dropdown-menu dropdown-menu-right">
-            <li><a (click)="navigateTo('dashboard')">Edit Profile</a></li>
+            <li class="hidden"> <a (click)="navigateTo('dashboard')">Edit Profile</a></li>
+            <li><a (click)="getDesktopApplication()">Desktop Application</a></li>
             <li><a (click)="navigateTo('change-password')">Change Password</a></li>
             <li><a (click)="navigateTo('logout')">Logout</a></li>
           </ul>

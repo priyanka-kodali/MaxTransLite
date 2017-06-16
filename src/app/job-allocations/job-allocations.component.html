@@ -14,35 +14,35 @@
 				</md-toolbar>
 				<div class="search col-md-12" *ngIf="showSearch.checked">
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="fromDate" placeholder="From Date" [(ngModel)]="SearchItem.FromDate" type="date"></md-input-container>
+						<md-input-container> <input mdInput class="" name="fromDate" placeholder="From Date" [(ngModel)]="SearchItem.FromDate" type="date"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="toDate" placeholder="To Date" [(ngModel)]="SearchItem.ToDate" type="date"></md-input-container>
+						<md-input-container> <input mdInput class="" name="toDate" placeholder="To Date" [(ngModel)]="SearchItem.ToDate" type="date"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="client" placeholder="Client" [(ngModel)]="SearchItem.Client" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="client" placeholder="Client" [(ngModel)]="SearchItem.Client" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="doctor" placeholder="Doctor" [(ngModel)]="SearchItem.Doctor" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="doctor" placeholder="Doctor" [(ngModel)]="SearchItem.Doctor" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="SearchItem.MT" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="SearchItem.MT" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="SearchItem.AQA" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="SearchItem.AQA" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="SearchItem.QA" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="SearchItem.QA" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SearchItem.JobStatus" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SearchItem.JobStatus" type="text"></md-input-container>
 					</div>
 					<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-						<md-input-container>   <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SearchItem.JobNumber" type="text"></md-input-container>
+						<md-input-container> <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SearchItem.JobNumber" type="text"></md-input-container>
 					</div>
-						<button md-raised-button type="submit" value="Submit" style="margin:0 !important" (click)="search()">Search</button>
-						<button md-raised-button type="submit" value="Clear" style="margin:0 !important" (click)="clearSearch()">Clear</button>
-					
+					<button md-raised-button type="submit" value="Submit" style="margin:0 !important" (click)="search()">Search</button>
+					<button md-raised-button type="submit" value="Clear" style="margin:0 !important" (click)="clearSearch()">Clear</button>
+
 
 				</div>
 			</div>
@@ -69,7 +69,7 @@
 						<tr *ngFor="let job of Jobs , let i=index" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
 						 [class.bg-green]="job.Color==0">
 							<td>{{job.JobDate}}</td>
-							<td [title]="job.OriginalFileName">{{job.JobNumber}}</td>
+							<td><a (click)="downloadFile(job.AudioURL)" class="pointer">{{job.JobNumber}}</a></td>
 							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
 							<td title={{job.Client}}>{{job.ClientShortName}}</td>
 							<td title="{{job.Doctor}}">{{job.Doctor}}</td>
@@ -79,12 +79,35 @@
 							<td [class.bg-yellow]="job.QaStatus==2" [class.bg-white]="job.QaStatus==1" [class.bg-green]="job.QaStatus==0" title="{{job.QaTime}}">{{job.QA}}</td>
 							<td>{{job.TAT}}</td>
 							<td>{{job.JobStatus.replace('Pending ', '')}}</td>
-							<td><span *ngIf="job.JobStatus != 'Completed' && job.JobStatus != 'Downloaded'" class="glyphicon glyphicon-pencil pointer" (click)="editAllocation(i)" title="Edit"></span></td>
+							<td><span *ngIf="job.JobStatus != 'Completed' && job.JobStatus != 'Downloaded'" class="glyphicon glyphicon-pencil pointer"
+								 (click)="editAllocation(i)" title="Edit"></span></td>
 							<!--<td><span *ngIf="job.JobStatus != 'Completed' && job.JobStatus != 'Downloaded' && job.JobStatus != 'No Dictation' && job.JobStatus != 'Repeat' && job.JobStatus!='NYS' && job.JobStatus!='Pending at AQA' && job.JobStatus!='Pending at QA'" class="glyphicon glyphicon-resize-full pointer" (click)="splitJob(i)" title="Split"></span></td>-->
-							<td><span *ngIf="job.JobStatus=='NYS' || job.JobStatus=='Pending at MT'" class="glyphicon glyphicon-resize-full pointer" (click)="splitJob(i)" title="Split"></span></td>
+							<td><span *ngIf="job.JobStatus=='NYS' || job.JobStatus=='Pending at MT'" class="glyphicon glyphicon-resize-full pointer"
+								 (click)="splitJob(i)" title="Split"></span></td>
 						</tr>
 					</tbody>
 				</table>
+			</div>
+			<div>
+				<div class="col-xs-12 p0 m0 text-center">
+					<span class="job-summary-strip teal500">  <span>
+                            Jobs Count : <span class="amberA700-text"> {{JobsCount}}</span>
+					</span>|
+					<span>
+                            Total :  <span class="amberA700-text"> {{TotalMinutes}}</span>
+					</span>|
+					<span>
+                            Pending : <span class="amberA700-text"> {{PendingMinutes}}</span>
+					</span>|
+					<span>
+                            Completed : <span class="amberA700-text"> {{CompletedMinutes}}</span>
+					</span>|
+					<span>
+                            Invalid : <span class="amberA700-text"> {{InvalidMinutes}}</span>
+					</span>
+					</span>
+
+				</div>
 			</div>
 		</md-card-content>
 	</md-card>
@@ -105,56 +128,60 @@
 
 						<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 ptop10 bg-brown">
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text" disabled></md-input-container>
+								<md-input-container> <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text"
+									 disabled></md-input-container>
 							</div>
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="jobDuration" placeholder="Duration" [(ngModel)]="SelectedJob.Duration" type="text" disabled></md-input-container>
+								<md-input-container> <input mdInput class="" name="jobDuration" placeholder="Duration" [(ngModel)]="SelectedJob.Duration" type="text"
+									 disabled></md-input-container>
 							</div>
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="jobDate" placeholder="Job Date" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input-container>
+								<md-input-container> <input mdInput class="" name="jobDate" placeholder="Job Date" [(ngModel)]="SelectedJob.JobDate" type="text" disabled></md-input-container>
 							</div>
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName"
-								 type="text" disabled></md-input-container>
+								<md-input-container> <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName"
+									 type="text" disabled></md-input-container>
 							</div>
 
 							<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="doctor" placeholder="Doctor" title="{{SelectedJob.Doctor}}" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input-container>
+								<md-input-container> <input mdInput class="" name="doctor" placeholder="Doctor" title="{{SelectedJob.Doctor}}" [(ngModel)]="SelectedJob.Doctor"
+									 type="text" disabled></md-input-container>
 							</div>
 						</div>
 
 						<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 row">
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SelectedJob.JobStatus" type="text" (change)="statusChanged()"
-								 (typeaheadOnSelect)="statusChanged()" [typeaheadMinLength]="0" [typeahead]="['No Dictation','NYS','Repeat']"></md-input-container>
+								<md-input-container> <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SelectedJob.JobStatus" type="text" (change)="statusChanged()"
+									 (typeaheadOnSelect)="statusChanged()" [typeaheadMinLength]="0" [typeahead]="['No Dictation','NYS','Repeat']"></md-input-container>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="level" placeholder="Job Level" [(ngModel)]="SelectedJob.JobLevel" type="text" (change)="statusChanged()"
-								 (typeaheadOnSelect)="levelChanged()" [typeaheadMinLength]="0" [typeahead]="['L1','L1-L3','L1-L2-L3']"></md-input-container>
+								<md-input-container> <input mdInput class="" name="level" placeholder="Job Level" [(ngModel)]="SelectedJob.JobLevel" type="text" (change)="statusChanged()"
+									 (typeaheadOnSelect)="levelChanged()" [typeaheadMinLength]="0" [typeahead]="['L1','L1-L3','L1-L2-L3']"></md-input-container>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="defaultTAT" placeholder="Default TAT" [(ngModel)]="SelectedJob.DefaultTAT" type="number" min=0></md-input-container>
+								<md-input-container> <input mdInput class="" name="defaultTAT" placeholder="Default TAT" [(ngModel)]="SelectedJob.DefaultTAT" type="number"
+									 min=0></md-input-container>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!MTHidden">
-								<md-input-container>   <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="SelectedJob.MT" [typeahead]="Employees" autocomplete="off" type="text"
-								 [disabled]="MTDisabled" (blur)="mtChanged()" (typeaheadOnSelect)="mtChanged()"></md-input-container>
+								<md-input-container> <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="SelectedJob.MT" [typeahead]="Employees" autocomplete="off"
+									 type="text" [disabled]="MTDisabled" (blur)="mtChanged()" (typeaheadOnSelect)="mtChanged()"></md-input-container>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!AQAHidden">
-								<md-input-container>   <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="SelectedJob.AQA" [typeahead]="Employees" autocomplete="off"
-								 type="text" [disabled]="AQADisabled" (blur)="aqaChanged()" (typeaheadOnSelect)="aqaChanged()"></md-input-container>
+								<md-input-container> <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="SelectedJob.AQA" [typeahead]="Employees" autocomplete="off"
+									 type="text" [disabled]="AQADisabled" (blur)="aqaChanged()" (typeaheadOnSelect)="aqaChanged()"></md-input-container>
 							</div>
 
 							<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="!QAHidden">
-								<md-input-container>   <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off" type="text"
-								 [disabled]="QADisabled" (blur)="qaChanged()" (typeaheadOnSelect)="qaChanged()"></md-input-container>
+								<md-input-container> <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="SelectedJob.QA" [typeahead]="Employees" autocomplete="off"
+									 type="text" [disabled]="QADisabled" (blur)="qaChanged()" (typeaheadOnSelect)="qaChanged()"></md-input-container>
 							</div>
 
 							<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
@@ -181,28 +208,30 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-sm-12 mbottom10 bg-white p0">
 					<div class="row m0 ptop5 main-job-details">
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text" disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="jobNumber" placeholder="Job Number" [(ngModel)]="SelectedJob.JobNumber" type="text"
+								 disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="jobDuration" placeholder="Job Duration" [(ngModel)]="SelectedJob.Duration" type="text" disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="jobDuration" placeholder="Job Duration" [(ngModel)]="SelectedJob.Duration" type="text"
+								 disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName" type="text"
-							 disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="client" placeholder="Client" title="{{SelectedJob.Client}}" [(ngModel)]="SelectedJob.ClientShortName"
+								 type="text" disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="doctor" placeholder="Doctor" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="doctor" placeholder="Doctor" [(ngModel)]="SelectedJob.Doctor" type="text" disabled></md-input-container>
 						</div>
 						<div class="col-md-1 col-sm-3 col-lg-1 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="TAT" placeholder="TAT" [(ngModel)]="SelectedJob.TAT" type="text" disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="TAT" placeholder="TAT" [(ngModel)]="SelectedJob.TAT" type="text" disabled></md-input-container>
 						</div>
 						<div class="col-md-2 col-sm-6 col-lg-2 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SelectedJob.JobStatus" type="text" disabled></md-input-container>
+							<md-input-container> <input mdInput class="" name="status" placeholder="Status" [(ngModel)]="SelectedJob.JobStatus" type="text" disabled></md-input-container>
 						</div>
 
 						<div class="col-md-1 col-sm-3 col-lg-1 col-xs-12">
-							<md-input-container>   <input mdInput class="" name="splits" placeholder="No of Splits" [(ngModel)]="NoOfSplits" type="text" min=2 max=5 step=1 autocomplete="off"
-							 (change)="splitNumberChange()" (keyup)="splitNumberChange()"></md-input-container>
+							<md-input-container> <input mdInput class="" name="splits" placeholder="No of Splits" [(ngModel)]="NoOfSplits" type="text" min=2 max=5
+								 step=1 autocomplete="off" (change)="splitNumberChange()" (keyup)="splitNumberChange()"></md-input-container>
 						</div>
 					</div>
 					<div class="row m0 split-job-details ">
@@ -211,22 +240,22 @@
 								{{SelectedJobNumber+'_'+(SelectedJobSequenceNumber==0?1+i:SelectedJobSequenceNumber+i)}}
 							</div>
 							<div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="startTime" placeholder="Start Time" [(ngModel)]="newSplitJob.StartTime" type="text"></md-input-container>
+								<md-input-container> <input mdInput class="" name="startTime" placeholder="Start Time" [(ngModel)]="newSplitJob.StartTime" type="text"></md-input-container>
 							</div>
 							<div class="col-md-1 col-sm-6 col-lg-1 col-xs-12">
-								<md-input-container>   <input mdInput class="" name="endTime" placeholder="End Time" [(ngModel)]="newSplitJob.EndTime" type="text"></md-input-container>
+								<md-input-container> <input mdInput class="" name="endTime" placeholder="End Time" [(ngModel)]="newSplitJob.EndTime" type="text"></md-input-container>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!MTHidden">
-								<md-input-container>   <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="newSplitJob.MT" (typeaheadOnSelect)="employeeForSplitSelected(i,'MT')" [disabled]="splitMTDisabled"
-								 [typeahead]="Employees" type="text"></md-input-container>
+								<md-input-container> <input mdInput class="" name="MT" placeholder="MT" [(ngModel)]="newSplitJob.MT" (typeaheadOnSelect)="employeeForSplitSelected(i,'MT')"
+									 [disabled]="splitMTDisabled" [typeahead]="Employees" type="text"></md-input-container>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!AQAHidden">
-								<md-input-container>   <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="newSplitJob.AQA" (typeaheadOnSelect)="employeeForSplitSelected(i,'AQA')" [disabled]="splitAQATDisabled"
-								 [typeahead]="Employees" type="text"></md-input-container>
+								<md-input-container> <input mdInput class="" name="AQA" placeholder="AQA" [(ngModel)]="newSplitJob.AQA" (typeaheadOnSelect)="employeeForSplitSelected(i,'AQA')"
+									 [disabled]="splitAQATDisabled" [typeahead]="Employees" type="text"></md-input-container>
 							</div>
 							<div class="col-md-3 col-sm-6 col-lg-3 col-xs-12" *ngIf="!QAHidden">
-								<md-input-container>   <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="newSplitJob.QA" (typeaheadOnSelect)="employeeForSplitSelected(i,'QA')" 
-								 [typeahead]="Employees" type="text"></md-input-container>
+								<md-input-container> <input mdInput class="" name="QA" placeholder="QA" [(ngModel)]="newSplitJob.QA" (typeaheadOnSelect)="employeeForSplitSelected(i,'QA')"
+									 [typeahead]="Employees" type="text"></md-input-container>
 							</div>
 						</div>
 

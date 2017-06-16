@@ -62,7 +62,7 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td [title]="job.OriginalFileName"> <a (click)="downloadAudioFile(job.AudioURL,job,'MT')" class="pointer"> {{job.JobNumber}}</a></td>
+							<td> <a (click)="downloadAudioFile(job.AudioURL,job,'MT')" class="pointer"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
@@ -141,7 +141,7 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td [title]="job.OriginalFileName"> <a [href]="job.AudioURL" class="pointer" (click)="downloadAudioFile(job.AudioURL,job,'AQA')"> {{job.JobNumber}}</a></td>
+							<td> <a class="pointer" (click)="downloadAudioFile(job.AudioURL,job,'AQA')"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
@@ -222,7 +222,7 @@
 								<md-checkbox [(ngModel)]="job.Selected" name="job_selected"></md-checkbox>
 							</td>
 							<td>{{job.JobDate}}</td>
-							<td [title]="job.OriginalFileName"> <a class="pointer" (click)="downloadAudioFile(job.AudioURL,job,'QA')"> {{job.JobNumber}}</a></td>
+							<td> <a class="pointer" (click)="downloadAudioFile(job.AudioURL,job,'QA')"> {{job.JobNumber}}</a></td>
 							<td><span class="glyphicon glyphicon-file pointer" title="Template" (click)="getTemplates(job.DoctorId)"></span></td>
 							<td><span class="glyphicon glyphicon-user pointer" *ngIf="job.PatientList.length>0" (click)="getPatientList(job)" title="Patient List"></span></td>
 							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
@@ -320,7 +320,7 @@
 						</div>
 
 						<div class="col-md-6 col-sm-6 col-lg-6 col-xs-12 checkbox-container" *ngIf="(SelectedJob.JobWorkLevel!='QA' && SelectedJob.JobLevel!='L1') && UploadType">
-							<md-checkbox [(ngModel)]="IsPartialUpload" name="partial" [disabled]="this.SelectedJob.LevelStatus == 'Partial'">Partial Upload</md-checkbox>
+							<md-checkbox [(ngModel)]="IsPartialUpload" name="partial" [disabled]="this.SelectedJob.LevelStatus == 'Partial'||!this.SelectedJob.FullUploadAvailable">Partial Upload</md-checkbox>
 						</div>
 
 						<div class="col-md-4 col-sm-6 col-lg-4 col-xs-12" *ngIf="IsPartialUpload">

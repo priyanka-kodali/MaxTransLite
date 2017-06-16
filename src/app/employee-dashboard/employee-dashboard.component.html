@@ -100,7 +100,7 @@
             <td>Total</td>
             <td class="pending"><span class="badge mright2 red300">{{teamJobsData.TotalPending}}</span>{{teamJobsData.TotalPendingHours}} </td>
             <td class="completed"> <span class="badge mright2 green300">{{teamJobsData.TotalCompleted}}</span>{{teamJobsData.TotalCompletedHours}}</td>
-            <td class="total"> <span class="badge mright2 orange300">{{teamJobsData.TotalTotal}}</span>{{teamJobsData.TotalTotalHours}} </td>
+            <td class="total"> <!--<span class="badge mright2 orange300">{{teamJobsData.TotalTotal}}</span>{{teamJobsData.TotalTotalHours}}--> </td>
             <td class="l18"> <span class="badge mright2 purple300">{{teamJobsData.TotalLt18}}</span>{{ teamJobsData.TotalLt18Hours}}</td>
             <td class="g18"> <span class="badge mright2 red900">{{teamJobsData.TotalGt18}}</span>{{teamJobsData.TotalGt18Hours}} </td>
           </tr>
@@ -153,7 +153,7 @@
   </md-card>
 
 
-  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12 hidden">
     <md-card-content class="plr10 ptb5">
       <h3 class="redA200-text">Stars</h3>
       <div class="row col p0 col-sm-12 center-align">
@@ -177,7 +177,7 @@
   </md-card>
 
 
-  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+  <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12 hidden">
     <md-card-content class="plr10 ptb5">
       <h3 class="redA200-text">Notices <span class="badge">{{notices.count}}</span></h3>
       <ul class="notice-list">
@@ -189,7 +189,7 @@
   </md-card>
 
 
-  <md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr5 p0 md-elevation-z12">
+  <md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr5 p0 md-elevation-z12 hidden">
     <md-card-content class="plr10 ptb5">
       <h3 class="redA200-text">Messages <span class="badge">{{messages.count}}</span></h3>
       <ul class="message-list">
