@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, Renderer, ElementRef, ViewChild } from '@angular/core';
 import { ClientEmployeeService } from './client-employee.service';
-import { TypeaheadDirective } from 'ng2-bootstrap';
+// import { TypeaheadDirective } from 'ng2-bootstrap';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MasterService } from '../app.service';
 

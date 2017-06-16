@@ -10,7 +10,7 @@ import { MaterialModule } from '@angular/material'
 // import { MdButtonModule } from '@angular2-material/button';
 // import { MdCheckboxModule } from '@angular2-material/checkbox';
 // import { MdRadioModule, MdUniqueSelectionDispatcher } from '@angular2-material/radio';
-import { TypeaheadModule, ComponentLoaderFactory, PositioningService } from 'ng2-bootstrap';
+import { TypeaheadModule, ComponentLoaderFactory, PositioningService } from 'ngx-bootstrap';
 import { FileUploadModule } from 'ng2-file-upload';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
