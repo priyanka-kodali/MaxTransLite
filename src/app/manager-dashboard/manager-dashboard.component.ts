@@ -16,9 +16,9 @@ export class ManagerDashboardComponent implements OnInit {
   SearchItem: Search = new Search();
 
   constructor(private managerDashboardService: ManagerDashboardService, private masterService: MasterService) {
-        this.masterService.postAlert("remove", "");
-this.error = "";
-   }
+    this.masterService.postAlert("remove", "");
+    this.error = "";
+  }
 
   ngOnInit() {
     this.masterService.changeLoading(true);
@@ -86,12 +86,12 @@ export class Job {
   PatientList: string;
   Color: number;
   DefaultTAT: number;
-  MtStatus : number;
-  AqaStatus : number;
-  QaStatus : number;
-  MtTime : string;
-  AqaTime : string;
-  QaTime : string;
+  MtStatus: number;
+  AqaStatus: number;
+  QaStatus: number;
+  MtTime: string;
+  AqaTime: string;
+  QaTime: string;
 }
 
 
@@ -117,4 +117,6 @@ class DailyStats {
   NYS: number;
   Completed: string;
   CompletedJobs: number;
+  Total: string;
+  TotalJobs: number;
 }

@@ -4,12 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '@angular/material'
-// import { MdInputModule } from '@angular2-material/input';
-// import { MdCardModule } from '@angular2-material/card';
-// import { MdToolbarModule } from '@angular2-material/toolbar';
-// import { MdButtonModule } from '@angular2-material/button';
-// import { MdCheckboxModule } from '@angular2-material/checkbox';
-// import { MdRadioModule, MdUniqueSelectionDispatcher } from '@angular2-material/radio';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TypeaheadModule, ComponentLoaderFactory, PositioningService } from 'ngx-bootstrap';
 import { FileUploadModule } from 'ng2-file-upload';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -75,12 +70,7 @@ import { MasterService } from './app.service';
     HttpModule,
     AppRoutingModule,
     MaterialModule,
-    // MdInputModule,
-    // MdCardModule,
-    // MdToolbarModule,
-    // MdButtonModule,
-    // MdCheckboxModule,
-    // MdRadioModule,
+    BrowserAnimationsModule,
     TypeaheadModule,
     FileUploadModule,
     SimpleNotificationsModule,

@@ -5,7 +5,6 @@ import { ApiUrl } from '../shared/config';
 import { MasterService } from '../app.service';
 
 
-
 @Component({
   selector: 'app-jobs',
   templateUrl: './jobs.component.html',
@@ -209,7 +208,7 @@ export class JobsComponent implements OnInit {
     var file = this.uploader.queue[this.uploader.queue.length - 1];
     file.withCredentials = false;
     var user = sessionStorage.getItem("displayName");
-    if (user.toLowerCase().indexOf("vr vr")!=-1) {
+    if (user.toLowerCase().indexOf("vr vr") != -1) {
       if (file.file.name.split('.').pop() != "doc" && file.file.name.split('.').pop() != "docx" && file.file.name.split('.').pop() != "txt") {
         this.error = "Please select a word('.doc' or '.docx' or '.txt') document";
         this.masterService.changeLoading(false);
@@ -465,16 +464,18 @@ export class JobsComponent implements OnInit {
   }
 
   downloadFile(url: string) {
-    this.jobsService.GetURLWithSAS(url).then((data) => {
-      data["files"].forEach(file => {
-        var newWin = window.open(file);
-        setTimeout(function () {
-          if (!newWin || newWin.outerHeight === 0) {
-            alert("Popup Blocker is enabled! Please add this site to your exception list.");
-          }
-        }, 25);
-      });
-    });
+    this.masterService.DownloadFile(url);
+    // this.jobsService.GetURLWithSAS(url).then((data) => {
+    //   window.open(data);
+    //   data["files"].forEach(file => {
+    //     var newWin = window.open(file);
+    //     setTimeout(function () {
+    //       if (!newWin || newWin.outerHeight === 0) {
+    //         alert("Popup Blocker is enabled! Please add this site to your exception list.");
+    //       }
+    //     }, 25);
+    //   });
+    // });
     this.masterService.changeLoading(false);
   }
 

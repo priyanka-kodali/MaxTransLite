@@ -98,7 +98,7 @@ class Jobs {
   MtLt18: number;
   MtLt18Hours: string;
   MtGt18: number;
-  MtGt18Hour: string;
+  MtGt18Hours: string;
 
 
   AqaPending: number;

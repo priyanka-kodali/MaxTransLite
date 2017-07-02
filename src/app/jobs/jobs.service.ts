@@ -74,7 +74,7 @@ export class JobsService {
   }
 
   GetURLWithSAS(blobURL: string) {
-    let url = ApiUrl + "/api/Jobs/GetURLWithSAS?url=" + blobURL;
+    let url = ApiUrl + "/api/Jobs/GetURLWithSASNew?url=" + blobURL;
     try {
       return this.http.get(url).toPromise().then((data) => data.json());
     }

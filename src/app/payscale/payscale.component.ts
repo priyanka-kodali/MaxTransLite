@@ -21,12 +21,14 @@ export class PayscaleComponent implements OnInit {
   EmployeeName: string;
   EmployeeNumber: string;
   isNewEmployee: boolean;
+  successFlag: boolean;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private masterService: MasterService, private payscaleService: PayscaleService) {
     this.error = "";
     this.inputDisabled = false;
+    this.successFlag = false;
     this.masterService.postAlert("remove", "");
- this.paymentStructure = new PaymentStructure();
+    this.paymentStructure = new PaymentStructure();
     this.sub = this.activatedRoute.params.subscribe(
       params => this.EmpId = +params['EmpId']
     );
@@ -71,7 +73,7 @@ export class PayscaleComponent implements OnInit {
 
 
   saveChanges() {
-
+    this.successFlag = false;
     this.masterService.changeLoading(true);
     this.masterService.postAlert("remove", "");
 
@@ -98,6 +100,7 @@ export class PayscaleComponent implements OnInit {
           this.inputDisabled = true;
           this.masterService.changeLoading(false);
           this.masterService.postAlert("success", "Payscale updated successfully");
+          this.successFlag = true;
         },
         (error) => {
           this.error = error['_body'];

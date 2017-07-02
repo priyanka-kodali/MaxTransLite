@@ -1,7 +1,7 @@
 <div class="row">
     <md-card class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-lg-offset-1 col-md-offset-1 mtb10 p0 md-elevation-z12">
         <md-card-content class="p0">
-            <form #myForm (submit)="saveChanges()">
+            <form #myForm>
                 <div>
                     <md-toolbar color="primary">
                         <div class="col-xs-12 p0 m0">
@@ -213,7 +213,7 @@
                         </div>
 
                         <div class="col-md-12 col-sm-12 col-lg-12 col-xs-12 center-align">
-                            <button md-raised-button class="btn-save" [disabled]="inputDisabled">Save</button>
+                            <button md-raised-button class="btn-save" [disabled]="inputDisabled" (click)="saveChanges()">Save</button>
                         </div>
                     </div>
                 </div>

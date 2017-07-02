@@ -195,16 +195,17 @@ export class DoctorsComponent implements OnInit {
   }
 
   downloadFile(url: string) {
-    this.masterService.changeLoading(true);
-    this.masterService.GetURLWithSAS(url).then((data) => {
-      var newWin = window.open(data, "_self");
-      this.masterService.changeLoading(false);
-      setTimeout(function () {
-        if (!newWin || newWin.outerHeight === 0) {
-          alert("Popup Blocker is enabled! Please add this site to your exception list.");
-        }
-      }, 25);
-    })
+    this.masterService.DownloadFile(url);
+    // this.masterService.changeLoading(true);
+    // this.masterService.GetURLWithSAS(url).then((data) => {
+    //   var newWin = window.open(data, "_self");
+    //   this.masterService.changeLoading(false);
+    //   setTimeout(function () {
+    //     if (!newWin || newWin.outerHeight === 0) {
+    //       alert("Popup Blocker is enabled! Please add this site to your exception list.");
+    //     }
+    //   }, 25);
+    // })
   }
 
 }

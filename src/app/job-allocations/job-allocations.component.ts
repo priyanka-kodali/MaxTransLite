@@ -531,13 +531,13 @@ export class JobAllocationsComponent implements OnInit {
     this.masterService.changeLoading(true);
     this.masterService.postAlert("remove", "");
 
-    this.SearchItem.Doctor = this.SearchItem.Doctor ? this.SearchItem.Doctor.trim() : this.SearchItem.Doctor;
-    this.SearchItem.Client = this.SearchItem.Client ? this.SearchItem.Client.trim() : this.SearchItem.Client;
-    this.SearchItem.MT = this.SearchItem.MT ? this.SearchItem.MT.trim() : this.SearchItem.MT;
-    this.SearchItem.AQA = this.SearchItem.AQA ? this.SearchItem.AQA.trim() : this.SearchItem.AQA;
-    this.SearchItem.QA = this.SearchItem.QA ? this.SearchItem.QA.trim() : this.SearchItem.QA;
-    this.SearchItem.JobStatus = this.SearchItem.JobStatus ? this.SearchItem.JobStatus.trim() : this.SearchItem.JobStatus;
-    this.SearchItem.JobNumber = this.SearchItem.JobNumber ? this.SearchItem.JobNumber.trim() : this.SearchItem.JobNumber;
+    this.SearchItem.Doctor = this.SearchItem.Doctor ? this.SearchItem.Doctor.trim() : "";
+    this.SearchItem.Client = this.SearchItem.Client ? this.SearchItem.Client.trim() : "";
+    this.SearchItem.MT = this.SearchItem.MT ? this.SearchItem.MT.trim() : "";
+    this.SearchItem.AQA = this.SearchItem.AQA ? this.SearchItem.AQA.trim() : "";
+    this.SearchItem.QA = this.SearchItem.QA ? this.SearchItem.QA.trim() : "";
+    this.SearchItem.JobStatus = this.SearchItem.JobStatus ? this.SearchItem.JobStatus.trim() : "";
+    this.SearchItem.JobNumber = this.SearchItem.JobNumber ? this.SearchItem.JobNumber.trim() : "";
 
 
     this.jobAllocationsService.searchJobs(this.SearchItem).then(
@@ -574,17 +574,20 @@ export class JobAllocationsComponent implements OnInit {
   }
 
   downloadFile(url: string) {
-    this.masterService.GetURLWithSAS(url).then((data) => {
-      data["files"].forEach(file => {
-        var newWin = window.open(file);
-        setTimeout(function () {
-          if (!newWin || newWin.outerHeight === 0) {
-            alert("Popup Blocker is enabled! Please add this site to your exception list.");
-          }
-        }, 25);
-      });
-    });
-    this.masterService.changeLoading(false);
+    this.masterService.DownloadFile(url);
+
+    // this.masterService.GetURLWithSAS(url).then((data) => {
+    //   window.open(data);
+    //   data["files"].forEach(file => {
+    //     var newWin = window.open(file);
+    //     setTimeout(function () {
+    //       if (!newWin || newWin.outerHeight === 0) {
+    //         alert("Popup Blocker is enabled! Please add this site to your exception list.");
+    //       }
+    //     }, 25);
+    //   });
+    // });
+    // this.masterService.changeLoading(false);
   }
 }
 
@@ -592,6 +595,7 @@ export class Job {
   JobId: number;
   JobNumber: string;
   JobDate: string;
+  ArrivalTime: string;
   Client: string;
   Doctor: string;
   MTId: number;

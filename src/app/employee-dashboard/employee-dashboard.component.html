@@ -179,7 +179,7 @@
 
   <md-card class="col-xs-12 col-sm-12 col-md-3 col-lg-3 mtb10 mlr5 p0 md-elevation-z12 hidden">
     <md-card-content class="plr10 ptb5">
-      <h3 class="redA200-text">Notices <span class="badge">{{notices.count}}</span></h3>
+      <h3 class="redA200-text">Notices <span class="badge">{{notices.length}}</span></h3>
       <ul class="notice-list">
         <li *ngFor="let notice of notices">
           <span class="glyphicon glyphicon-triangle-right"></span> notice.Notice
@@ -191,7 +191,7 @@
 
   <md-card class="col-xs-12 col-sm-12 col-md-4 col-lg-3 mtb10 mlr5 p0 md-elevation-z12 hidden">
     <md-card-content class="plr10 ptb5">
-      <h3 class="redA200-text">Messages <span class="badge">{{messages.count}}</span></h3>
+      <h3 class="redA200-text">Messages <span class="badge">{{messages.length}}</span></h3>
       <ul class="message-list">
         <li *ngFor="let message of messages">
           <span class="glyphicon glyphicon-triangle-right"></span> message.Message

@@ -42,11 +42,15 @@ export class MasterService {
   }
 
   GetURLWithSAS(blobURL: string) {
-    let url = ApiUrl + "/api/MasterData/GetURLWithSAS?url=" + blobURL;
     try {
-      return this.http.get(url).toPromise().then((data) => data.json());
+      return this.http.get(blobURL).toPromise().then((data) => data.json());
     }
     catch (e) { throw e; }
+  }
+
+  DownloadFile(blobUrl: string) {
+    let url = ApiUrl + "/api/MasterData/DownloadFile?url=" + blobUrl;
+    window.open(url, "_self");
   }
 
 
