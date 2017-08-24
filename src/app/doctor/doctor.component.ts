@@ -493,18 +493,13 @@ export class DoctorComponent implements OnInit, AfterViewInit {
       return false;
     }
 
-    if (this.NewDoctor.DictationMode != "Toll Free" && this.NewDoctor.DictationMode != "Dictaphone & Toll Free") {
-      this.NewDoctor.IdigitalId = null;
-      this.NewDoctor.IdigitalAuthorId = null;
-    }
-
-    if (this.NewDoctor.IdigitalId && this.NewDoctor.IdigitalId.trim().length == 0) {
+    if (this.NewDoctor.IdigitalId.trim().length == 0) {
       this.error = "Idigital Id should not be empty"
       this.renderer.invokeElementMethod(this.idigitalId.nativeElement, 'focus');
       return false;
     }
 
-    if (this.NewDoctor.IdigitalAuthorId && this.NewDoctor.IdigitalAuthorId.trim().length == 0) {
+    if (this.NewDoctor.IdigitalAuthorId.trim().length == 0) {
       this.error = "Idigital Author Id should not be empty"
       this.renderer.invokeElementMethod(this.idigitalAuthorId.nativeElement, 'focus');
       return false;

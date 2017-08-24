@@ -69,7 +69,7 @@
 						<tr *ngFor="let job of Jobs , let i=index" [class.bg-red]="job.Color==3" [class.bg-yellow]="job.Color==2" [class.bg-white]="job.Color==1"
 						 [class.bg-green]="job.Color==0">
 							<td title="{{job.ArrivalTime}}">{{job.JobDate}}</td>
-							<td><a (click)="downloadFile(job.AudioURL)" class="pointer" title="{{job.AudioURL}}">{{job.JobNumber}}</a></td>
+							<td><a (click)="downloadFile(job.AudioURL)" class="pointer" title="{{job.AudioURL}} + | + {{job.OriginalFileName}} ">{{job.JobNumber}}</a></td>
 							<td title="Total Minutes : {{job.TotalMinutes}}">{{job.Duration}}</td>
 							<td title={{job.Client}}>{{job.ClientShortName}}</td>
 							<td title="{{job.Doctor}}">{{job.Doctor}}</td>
